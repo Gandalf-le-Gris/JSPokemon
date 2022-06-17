@@ -319,7 +319,7 @@ function pathSelector() {
         image.className = 'pixel-sprite';
         title = document.createElement('div');
         image.src = 'resources/sprites/map_icons/pokemon_center.png';
-        title.innerHTML = "pokÃ©mon center";
+        title.innerHTML = "pokémon center";
         cell.appendChild(image);
         cell.appendChild(title);
         cell.className = "team-selector-element";
@@ -352,11 +352,11 @@ function pathSelector() {
                 encounter = type;
             } else if (rd < 21) {
                 image.src = 'resources/sprites/map_icons/pokemart.png';
-                title.innerHTML = "pokÃ©mart";
+                title.innerHTML = "pokémart";
                 encounter = "pokemart";
             } else {
                 image.src = 'resources/sprites/map_icons/pokemon_center.png';
-                title.innerHTML = "pokÃ©mon center";
+                title.innerHTML = "pokémon center";
                 encounter = "pokemon_center";
             }
             cell.encounter = encounter;
@@ -1269,7 +1269,7 @@ function aiActions() {
         i = aiPlayable();
     }
     if (team[activePokemon].currenthp == 0) {
-        desc.innerHTML += '<br />' + team[activePokemon].name + ' fainted!<br />Choose a new PokÃ©mon to send out.<br />';
+        desc.innerHTML += '<br />' + team[activePokemon].name + ' fainted!<br />Choose a new Pokémon to send out.<br />';
     }
     endTurn();
 }
@@ -1556,11 +1556,11 @@ function pokemonCenterEncounter() {
 
     var title = document.createElement('div');
     title.className = "centered-title";
-    title.innerHTML = "PokÃ©mon Center";
+    title.innerHTML = "Pokémon Center";
 
     var progress = document.createElement('div');
     progress.className = "centered-subtitle";
-    progress.innerHTML = "Your PokÃ©mon have been healed";
+    progress.innerHTML = "Your Pokémon have been healed";
 
     var replay = document.createElement('div');
     replay.className = "centered-subtitle replay";
@@ -1585,7 +1585,7 @@ function pokemonCenterEncounter() {
 
 
 /* ------------------------------------------------------ */
-/* ----------------- PokÃ©mart encounter ----------------- */
+/* ----------------- Pokémart encounter ----------------- */
 /* ------------------------------------------------------ */
 
 movePrice = 1000;
@@ -1609,7 +1609,7 @@ function pokemartEncounter() {
 
     var title = document.createElement('div');
     title.className = "centered-title";
-    title.innerHTML = "PokÃ©mart";
+    title.innerHTML = "Pokémart";
     grid.appendChild(title);
 
     var articles = document.createElement('div');
@@ -1935,7 +1935,7 @@ function gameOver() {
 
 
 /* ------------------------------------------------------ */
-/* ------------------ PokÃ©mon creation ------------------ */
+/* ------------------ Pokémon creation ------------------ */
 /* ------------------------------------------------------ */
 
 //sprites: https://www.pokencyclopedia.info/en/index.php?id=sprites/3ds/ani-b_6
@@ -3268,7 +3268,7 @@ function HealPulse() {
             dealDamage(-pA.maxhp * .1, pA);
         }
     };
-    this.description = "Heals all PokÃ©mon in the user's party for 10% of maximum HP.";
+    this.description = "Heals all Pokémon in the user's party for 10% of maximum HP.";
 }
 
 function HyperBeam() {
@@ -3321,7 +3321,7 @@ function KingsShield() {
     this.bp = 0;
     this.cost = 1;
     this.effect = (move, pA, pD) => { applyEffect("kings_protection", 1, pA); };
-    this.description = "Applies one stack of protection to the user. PokÃ©mon making contact with the user have their attack lowered by one stage.";
+    this.description = "Applies one stack of protection to the user. Pokémon making contact with the user have their attack lowered by one stage.";
 }
 
 function LastResort() {
@@ -3342,7 +3342,7 @@ function LeechSeed() {
     this.bp = 0;
     this.cost = 2;
     this.effect = (move, pA, pD) => { applyEffect("leech_seed", 5, pD); };
-    this.description = "Drains a little HP from the opponent at the end of every turn for 5 turns. Grass type PokÃ©mon are immune.";
+    this.description = "Drains a little HP from the opponent at the end of every turn for 5 turns. Grass type Pokémon are immune.";
 }
 
 function MetalClaw() {
@@ -3648,7 +3648,7 @@ function StickyWeb() {
             }
         }
     };
-    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and is the PokÃ©mon is grounded.";
+    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and is the Pokémon is grounded.";
 }
 
 function StompingTantrum() {
@@ -3887,7 +3887,7 @@ function Fear(stacks) {
 
 function KingsProtection(stacks) {
     this.name = "King's Protection";
-    this.description = "King's Protection\nCancel next attack targetting this PokÃ©mon. Attackers making contact have their attack lowered by one stage.";
+    this.description = "King's Protection\nCancel next attack targetting this Pokémon. Attackers making contact have their attack lowered by one stage.";
     this.icon = 'resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
@@ -3901,7 +3901,7 @@ function KingsProtection(stacks) {
 
 function Seed(stacks) {
     this.name = "Leech Seed";
-    this.description = "Leech Seed\nTransfer 15HP to the opposing PokÃ©mon at the end of the turn, then remove 1 stack.";
+    this.description = "Leech Seed\nTransfer 15HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
     this.icon = 'resources/sprites/effect_icons/seed.png';
     this.stacks = stacks;
     this.immune = ["grass"];
@@ -3937,7 +3937,7 @@ function Poison(stacks) {
 
 function Protection(stacks) {
     this.name = "Protection";
-    this.description = "Protection\nCancel next attack targetting this PokÃ©mon.";
+    this.description = "Protection\nCancel next attack targetting this Pokémon.";
     this.icon = 'resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
@@ -3959,7 +3959,7 @@ function Sleep(stacks) {
 
 function StickyWebE(stacks) {
     this.name = "Sticky Web";
-    this.description = "Sticky Web\nLower speed by one stage at the end of each turn if it hasn't been lowered already. Airborne PokÃ©mon are immune.";
+    this.description = "Sticky Web\nLower speed by one stage at the end of each turn if it hasn't been lowered already. Airborne Pokémon are immune.";
     this.icon = 'resources/sprites/effect_icons/sticky_web.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
