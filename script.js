@@ -758,9 +758,9 @@ function drawHand() {
                                                         this.className = "selected-move";
                                                         previewMove(move);
                                                     } else {
+                                                        document.getElementById("movePreview").innerHTML = "";
                                                         useMove(move);
                                                         this.className = "move-card";
-                                                        hidePreview();
                                                     }
                                                     return;
                                                 }
@@ -1101,7 +1101,7 @@ var rewardTimeout = -1;
 
 //use move
 function useMove(move) {
-    if (energy >= move.cost) {
+    if (energy >= move.cost && opponent.currenthp > 0) {
         energy -= move.cost;
 
         var pCopied;
@@ -1115,6 +1115,7 @@ function useMove(move) {
                     cancelled = true;
                     e.effect(team[activePokemon], opponent);
                     drawEffects(true);
+                    message = e.specialMessage;
                 }
             }
             if (doesBlock(opponent)) {
@@ -1144,15 +1145,38 @@ function useMove(move) {
                 cancelled = true;
         }
 
+        var desc = document.getElementById("movePreview");
+        desc.className = "preview-on";
         if (!player) {
-            var desc = document.getElementById("movePreview");
             if (message !== "")
                 desc.innerHTML += opponent.name + message;
             else
                 desc.innerHTML += opponent.name + ' used ' + move.name + '!<br />';
+        } else {
+            if (message !== "")
+                desc.innerHTML += team[activePokemon].name + message;
+            else {
+                desc.innerHTML += team[activePokemon].name + ' used ' + move.name + '!<br />';
+            }
+        }
+
+        if (move.fails && message === "") {
+            desc.innerHTML += "But it failed!<br />";
         }
 
         if (!cancelled && ((player && !doesBlock(opponent)) || (!player && !doesBlock(team[activePokemon])))) {
+            var effMul = effectiveMultiplier(move, player ? opponent : team[activePokemon]);
+            if (move.cat !== "status") {
+                if (move.crit)
+                    desc.innerHTML += "Critical hit!<br />";
+                if (effMul > 1)
+                    desc.innerHTML += "It's super effective!<br />";
+                else if (effMul == 0)
+                    desc.innerHTML += "It doesn't affect " + (player ? opponent : team[activePokemon]).name + "...< br /> ";
+                else if (effMul < 1)
+                    desc.innerHTML += "It's not very effective...<br />";
+            }
+
             var hits = 1;
             if (move.multihit != undefined)
                 hits = move.multihit;
@@ -1163,6 +1187,7 @@ function useMove(move) {
                     if (move.recoil != undefined)
                         dealDamage(Math.floor(move.recoil * damage), team[activePokemon]);
                 }
+
             } else {
                 for (let i = 0; i < hits; i++) {
                     var damage = damageCalculator(move, opponent, team[activePokemon]);
@@ -1241,7 +1266,7 @@ function discardCard(move) {
 }
 
 function endTurn() {
-    if (!player || team[activePokemon].currenthp > 0) {
+    if ((!player || team[activePokemon].currenthp > 0) && opponent.currenthp > 0) {
         runEffects();
         for (let p of team) {
             for (let i of p.items) {
