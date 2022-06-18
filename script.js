@@ -7,9 +7,13 @@ function drawStartingMenu() {
     startButton = document.createElement('button');
     startButton.className = "start";
     startButton.innerText = "start";
-    startButton.id = 'startButton';
-    startButton.addEventListener('click', () => { drawTeamSelection() });
+    startButton.addEventListener('click', () => { tuto = false; drawTeamSelection(); });
     document.body.appendChild(startButton);
+    tutoButton = document.createElement('button');
+    tutoButton.className = "launch-tuto";
+    tutoButton.innerText = "how to play?";
+    tutoButton.addEventListener('click', () => { startTuto() });
+    document.body.appendChild(tutoButton);
     gArea = new gameArea('resources/homescreen.jfif', () => {});
     gArea.start();
 }
@@ -64,6 +68,7 @@ const pokemonList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp"
 
 var cSelected = 0;
 var pSelected = ["", "", ""];
+var tuto = false;
 
 function drawTeamSelection() {
     document.body.innerHTML = "";
@@ -384,6 +389,17 @@ function pathSelector() {
         }
     }
     sel.appendChild(grid);
+    if (tuto) {
+        var filter = document.createElement('div');
+        filter.className = "filter-clear";
+        document.body.appendChild(filter);
+        filter.onclick = () => { document.body.removeChild(filter); }
+
+        var instruct = document.createElement('div');
+        instruct.className = "overlay-text";
+        instruct.innerHTML = "You will have to progress by battling wild Pokémon. Choose the type of the Pokémon you want to battle first.";
+        filter.appendChild(instruct);
+    }
 }
 
 
@@ -690,6 +706,10 @@ function battleEncounter(encounter) {
 
     switch1.title = getMoveDescription(team[switchInd[0]]);
     switch2.title = getMoveDescription(team[switchInd[1]]);
+
+    if (tuto) {
+        drawBattleExplanations()
+    }
 }
 
 function startTurn() {
@@ -1442,7 +1462,7 @@ function rewardScreen() {
             this.reward1.move = move1;
             this.reward1.onclick = function () {
                 team[this.p].moves.push(this.move);
-                if (Math.random() < extraLoot) {
+                if (Math.random() < extraLoot || tuto) {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -1459,7 +1479,7 @@ function rewardScreen() {
     skip.innerHTML = "skip (" + String.fromCharCode(08381) + "100)";
     skip.onclick = () => {
         money += 100;
-        if (Math.random() < extraLoot) {
+        if (Math.random() < extraLoot || tuto) {
             extraLoot = 0;
             extraReward();
         } else {
@@ -1468,6 +1488,18 @@ function rewardScreen() {
         }
     };
     grid.appendChild(skip);
+
+    if (tuto) {
+        var filter2 = document.createElement('div');
+        filter2.className = "filter-clear";
+        document.body.appendChild(filter2);
+        filter2.onclick = () => { document.body.removeChild(filter2); }
+
+        var instruct = document.createElement('div');
+        instruct.className = "overlay-text";
+        instruct.innerHTML = "After each battle, you will have the opportunity to add a move to one of your Pokémon's deck. You can also skip it for some money.";
+        filter2.appendChild(instruct);
+    }
 }
 
 function extraReward() {
@@ -1539,6 +1571,22 @@ function extraReward() {
         nextEncounter();
     };
     grid.appendChild(skip);
+
+    if (tuto) {
+        var filter2 = document.createElement('div');
+        filter2.className = "filter-clear";
+        document.body.appendChild(filter2);
+        filter2.onclick = () => {
+            instruct.innerHTML = "Now you know all that you need to get started. Keep enhancing your decks, gather held items, refine your strategies, and you will surely make it to the legendary Pokémon awaiting you!";
+            filter2.onclick = () => { document.body.removeChild(filter2); };
+            tuto = false;
+        }
+
+        var instruct = document.createElement('div');
+        instruct.className = "overlay-text";
+        instruct.innerHTML = "Sometimes you will also be offered held items. Those give passive bonuses to their holder. Some of them can only be found after specific battles.";
+        filter2.appendChild(instruct);
+    }
 }
 
 function getFromMovepool(p) {
@@ -3826,7 +3874,8 @@ function HealPulse() {
     this.effect = (move, pA, pD) => {
         if (contains(team, pA)) {
             for (let p of team) {
-                dealDamage(-p.maxhp * .1, p);
+                if (p.currenthp > 0)
+                    dealDamage(-p.maxhp * .1, p);
             }
             drawHealthBar(1);
             drawHealthBar(2);
@@ -4396,8 +4445,8 @@ function Scratch() {
 
 function SeismicToss() {
     this.name = "Seismic Toss";
-    this.type = "normal";
-    this.cat = "fighting";
+    this.type = "fighting";
+    this.cat = "physical";
     this.bp = 0;
     this.cost = 1;
     this.effect = (move, pA, pD) => { dealDamage(40, pD); };
@@ -5923,3 +5972,170 @@ function LifeOrb() {
         return 1.3;
     };
 }
+
+
+
+
+
+
+/* ------------------------------------------------------ */
+/* ---------------------- Tutorial ---------------------- */
+/* ------------------------------------------------------ */
+
+function startTuto() {
+    tuto = true;
+    drawTeamSelectionTuto();
+}
+
+function drawTeamSelectionTuto() {
+    document.body.innerHTML = "";
+    var gArea = new gameArea('resources/teamscreen.webp', () => { });
+    gArea.start();
+
+    cSelected = 0;
+    pSelected = ["", "", ""];
+
+    var teamSelectorScreen = document.createElement('div');
+    teamSelectorScreen.className = "team-selector-screen";
+    document.body.appendChild(teamSelectorScreen);
+
+    var teamSelectorTitle = document.createElement('div');
+    teamSelectorTitle.className = "selector-title";
+    var teamTitle = document.createElement('div');
+    teamTitle.className = "title";
+    teamTitle.innerHTML = "Select your team";
+    teamSelectorTitle.appendChild(teamTitle);
+    var teamSelectorCount = document.createElement('button');
+    teamSelectorCount.className = "selector-count";
+    teamSelectorCount.innerText = "(0/3)";
+    teamSelectorCount.id = "teamSelectorCount";
+    teamSelectorTitle.appendChild(teamSelectorCount);
+    teamSelectorScreen.appendChild(teamSelectorTitle);
+
+    var teamSelector = document.createElement('div');
+    teamSelector.className = "team-selector";
+
+    for (const pokemon of pokemonList) {
+        var cell = (new pokemonSelectorTuto(pokemon)).cell;
+        teamSelector.appendChild(cell);
+    }
+
+    teamSelectorScreen.appendChild(teamSelector);
+
+    var filter = document.createElement('div');
+    filter.className = "filter";
+    filter.id = "filter";
+    teamSelectorScreen.appendChild(filter);
+
+    var title = document.createElement('div');
+    title.className = "centered-title";
+    title.innerHTML = "Welcome trainer!";
+
+    var message = document.createElement('div');
+    message.className = "centered-subtitle";
+    message.innerHTML = "Every adventure begins with a choice! Before venturing into the world of Pokémon you will need to assemble a powerful party. Here you can select which Pokémon to travel with.";
+
+    var replay = document.createElement('div');
+    replay.className = "centered-subtitle replay";
+    replay.innerHTML = "Continue";
+    replay.onclick = () => {
+        teamSelectorScreen.removeChild(filter);
+        var instruct = document.createElement('div');
+        instruct.className = "overlay-text";
+        instruct.innerHTML = "Select Venusaur, Charizard and Blastoise, then hit start.";
+        teamSelectorScreen.appendChild(instruct);
+    };
+
+    var grid = document.createElement('div');
+    grid.className = "gameover-grid";
+    grid.appendChild(title);
+    grid.appendChild(message);
+    grid.appendChild(replay);
+    filter.appendChild(grid);
+}
+
+function pokemonSelectorTuto(name) {
+    this.cell = document.createElement('div');
+    this.name = name;
+    image = new Image();
+    image.src = 'resources/sprites/pokemon_icons/' + name + '.png';
+    image.className = 'pixel-sprite';
+    title = document.createElement('div');
+    title.innerHTML = name;
+    this.cell.appendChild(title);
+    this.cell.appendChild(image);
+    this.cell.className = "team-selector-element";
+    this.cell.onclick = function () {
+        tsc = document.getElementById("teamSelectorCount");
+        if (pSelected.findIndex(element => element === name) == -1 && cSelected < 3) {
+            pSelected[pSelected.findIndex(element => element === "")] = name;
+            cSelected += 1;
+            if (cSelected < 3) {
+                tsc.innerText = "(" + cSelected + "/3)";
+            } else {
+                tsc.innerText = "start";
+                tsc.className = "selector-count-start";
+                tsc.onclick = () => { if (contains(pSelected, "venusaur") && contains(pSelected, "charizard") && contains(pSelected, "blastoise")) launchGame(); };
+            }
+            this.className = "selected-cell";
+        } else if (pSelected.findIndex(element => element === name) != -1) {
+            pSelected[pSelected.findIndex(element => element === name)] = "";
+            cSelected -= 1;
+            tsc.innerText = "(" + cSelected + "/3)";
+            tsc.className = "selector-count";
+            tsc.onclick = () => { };
+            this.className = "team-selector-element";
+        }
+    }
+}
+
+function drawBattleExplanations() {
+    var filter = document.createElement('div');
+    filter.className = "filter-clear";
+    document.body.appendChild(filter);
+
+    var instruct = document.createElement('div');
+    instruct.className = "overlay-text";
+    instruct.innerHTML = "You have encountered a wild " + opponent.name + "! To defeat it, you will need the strength of your own Pokémon, on the left.";
+    filter.appendChild(instruct);
+
+    filter.onclick = () => {
+        instruct.innerHTML = team[activePokemon].name + " is your active Pokémon. It's the one that will attack and take the hits.";
+        filter.onclick = () => {
+            instruct.innerHTML = "Pokémon take turns attacking. You will always go first, but once your turn ends, your opponent will strike back so it is important to plan ahead.";
+            filter.onclick = () => {
+                instruct.innerHTML = "If you feel like another Pokémon in your party is better suit for a battle, you can click on it in the top left corner. Be careful, you can only switch once per turn."
+                filter.onclick = () => {
+                    instruct.innerHTML = "The bars next to the Pokémon represent their remaining HP. Once a Pokémon's HP reaches 0, it faints and cannot battle anymore until healed at a Pokémon Center."
+                    filter.onclick = () => {
+                        instruct.innerHTML = "Your available attacks are displayed at the bottom. They are drawn from your draw pile at the beginning of the turn and discarded at the end if they haven't been used."
+                        filter.onclick = () => {
+                            instruct.innerHTML = "In the bottom left corners are located important indicators: the amount of cards in the discard pile, in the draw pile, and the energy left."
+                            filter.onclick = () => {
+                                instruct.innerHTML = "Playing a move requires energy, indicated in the corner of the move card. For example, " + team[activePokemon].hand[0].name + " costs " + team[activePokemon].hand[0].cost + " energy to play."
+                                filter.onclick = () => {
+                                    instruct.innerHTML = "Moves can be physical, special, or status-related. The former two deal physical or special damage, whereas the latter spreads all sorts of effects, modifying the battle rules."
+                                    filter.onclick = () => {
+                                        instruct.innerHTML = "You should also keep in mind that moves of the same type as the user deal more damage, and some types are stronger or weaker against others."
+                                        filter.onclick = () => {
+                                            instruct.innerHTML = "To preview the effects of a move, simply click on it. Click again to use it. Used moves will be discarded."
+                                            filter.onclick = () => {
+                                                instruct.innerHTML = "Once you're out of options, click the end turn button. You will get new cards, a fresh switch and more energy the next turn."
+                                                filter.onclick = () => {
+                                                    instruct.innerHTML = "Now that you know how to battle, try to take down that nasty " + opponent.name + "!"
+                                                    filter.onclick = () => { document.body.removeChild(filter); }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+

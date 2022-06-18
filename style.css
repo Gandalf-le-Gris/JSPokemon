@@ -453,7 +453,6 @@ button.start:hover {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-
 }
 
 .reward-selector {
@@ -627,6 +626,48 @@ button.start:hover {
     transform: translate(-50%, 0%);
 }
 
+button.launch-tuto {
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -90%);
+    font-size: 2vw;
+    color: white;
+    font-weight: bold;
+    font-family: 'Copperplate Gothic';
+    background-color: transparent;
+    border: none;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: gray;
+}
+
+button.launch-tuto:hover {
+    font-size: 2.1vw;
+    color: goldenrod;
+    -webkit-text-stroke-color: black;
+}
+
+.overlay-text {
+    background: rgba(0, 0, 0, .65);
+    font-size: 2vw;
+    color: white;
+    font-family: 'Copperplate Gothic';
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -90%);
+    text-align: center;
+}
+
+.filter-clear {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
 
 
 
