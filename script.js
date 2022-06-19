@@ -245,6 +245,9 @@ function damageCalculator(move, pA, pD) {
                 other *= 1.5;
         }
     }
+    if (isCharged(pA) && move.type === "electric")
+        other *= 2;
+
 
     for (let i of pA.items) {
         if (i.boost != undefined)
@@ -262,6 +265,8 @@ function effectiveMultiplier(move, pD) {
             mul *= typetable[i][n];
         }
     }
+    if (move.type === "ground" && !isGrounded(pD))
+        mul = 0;
     return mul;
 }
 
@@ -1112,10 +1117,12 @@ function useMove(move) {
         if (player) {
             for (let e of team[activePokemon].effects) {
                 if (e.cancel != undefined && e.stacks > 0) {
-                    cancelled = true;
-                    e.effect(team[activePokemon], opponent);
-                    drawEffects(true);
-                    message = e.specialMessage;
+                    if (!cancelled) {
+                        cancelled = true;
+                        e.effect(team[activePokemon], opponent);
+                        drawEffects(true);
+                        message = e.specialMessage;
+                    }
                 }
             }
             if (doesBlock(opponent)) {
@@ -1125,9 +1132,11 @@ function useMove(move) {
         } else {
             for (let e of opponent.effects) {
                 if (e.cancel != undefined && e.stacks > 0) {
-                    cancelled = true;
-                    e.effect(opponent, team[activePokemon]);
-                    message = e.specialMessage;
+                    if (!cancelled) {
+                        cancelled = true;
+                        e.effect(opponent, team[activePokemon]);
+                        message = e.specialMessage;
+                    }
                 }
             }
             if (doesBlock(team[activePokemon])) {
@@ -1282,7 +1291,8 @@ function endTurn() {
 function runEffects() {
     if (player) {
         for (let e of team[activePokemon].effects) {
-            e.effect(team[activePokemon], opponent);
+            if (e.stacks > 0)
+                e.effect(team[activePokemon], opponent);
         }
         for (let e of team[activePokemon].effects) {
             if (e.stacks <= 0) {
@@ -1294,7 +1304,8 @@ function runEffects() {
     }
     else {
         for (let e of opponent.effects) {
-            e.effect(opponent, team[activePokemon]);
+            if (e.stacks > 0)
+                e.effect(opponent, team[activePokemon]);
         }
         for (let e of opponent.effects) {
             if (e.stacks <= 0) {
@@ -2202,8 +2213,8 @@ function Pikachu() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric"];
-    this.moves = [createMove("tackle"), createMove("tackle"), createMove("thunder_shock"), createMove("quick_attack")];
-    this.movepool = ["thunder_shock", "quick_attack", "nuzzle"];
+    this.moves = [createMove("thunder_shock"), createMove("nuzzle"), createMove("quick_attack"), createMove("volt_switch"), createMove("fake_out"), createMove("electroweb")];
+    this.movepool = ["thunder_shock", "quick_attack", "nuzzle", "detect", "extreme_speed", "rollout", "seismic_toss", "spark", "surf", "volt_switch", "agility", "calm_mind", "charge", "charge_beam", "discharge", "double_kick", "draining_kiss", "electro_ball", "electroweb", "facade", "fake_out", "grass_knot", "iron_tail", "last_resort", "magnet_rise", "mimic", "nasty_plot", "play_rough", "shock_wave", "swagger", "thunder", "thunderbolt", "thunder_punch", "volt_tackle", "wild_charge", "wish", "zap_cannon"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/pikachu.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/pikachu.gif';
     this.effects = [];
@@ -2901,10 +2912,14 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "dual_wingbeat", "fire_blast", "fire_spin", "flame_charge", "flare_blitz", "focus_blast", "heat_wave", "hurricane", "inferno", "overheat", "scale_shot",
     "scorching_sands", "shadow_claw", "will_o_wisp", "avalanche", "blizzard", "brine", "bubble_beam", "dark_pulse", "dive", "dynamic_punch", "flip_turn",
     "gyro_ball", "hydro_cannon", "hydro_pump", "ice_beam", "iron_defense", "iron_tail", "liquidation", "rock_slide", "scald", "seismic_toss", "shell_smash",
-    "skull_bash", "surf", "water_pulse", "water_spout", "whirlpool"];
+    "skull_bash", "surf", "water_pulse", "water_spout", "whirlpool", "agility", "calm_mind", "charge", "charge_beam", "discharge", "double_kick",
+    "draining_kiss", "electro_ball", "electroweb", "facade", "fake_out", "grass_knot", "magnet_rise", "mimic", "nasty_plot", "shock_wave", "swagger",
+    "thunder", "thunderbolt", "thunder_punch", "volt_tackle", "wild_charge", "wish", "zap_cannon"];
 
 function createMove(move) {
     switch (move) {
+        case "agility":
+            return new Agility();
         case "air_cutter":
             return new AirCutter();
         case "air_slash":
@@ -2939,6 +2954,12 @@ function createMove(move) {
             return new BulletPunch();
         case "bullet_seed":
             return new BulletSeed();
+        case "calm_mind":
+            return new CalmMind();
+        case "charge":
+            return new Charge();
+        case "charge_beam":
+            return new ChargeBeam();
         case "confusion":
             return new Confusion();
         case "crunch":
@@ -2953,16 +2974,22 @@ function createMove(move) {
             return new Defog();
         case "detect":
             return new Detect();
+        case "disarming_voice":
+            return new DisarmingVoice();
+        case "discharge":
+            return new Discharge();
         case "dive":
             return new Dive();
+        case "double_kick":
+            return new DoubleKick();
         case "dragon_claw":
             return new DragonClaw();
         case "dragon_dance":
             return new DragonDance();
         case "dragon_pulse":
             return new DragonPulse();
-        case "disarming_voice":
-            return new DisarmingVoice();
+        case "draining_kiss":
+            return new DrainingKiss();
         case "double_edge":
             return new DoubleEdge();
         case "dream_eater":
@@ -2977,12 +3004,20 @@ function createMove(move) {
             return new Earthquake();
         case "echoed_voice":
             return new EchoedVoice();
+        case "electro_ball":
+            return new ElectroBall();
+        case "electroweb":
+            return new Electroweb();
         case "ember":
             return new Ember();
         case "energy_ball":
             return new EnergyBall();
         case "extreme_speed":
             return new ExtremeSpeed();
+        case "facade":
+            return new Facade();
+        case "fake_out":
+            return new FakeOut();
         case "fiery_dance":
             return new FieryDance();
         case "fire_blast":
@@ -3009,6 +3044,8 @@ function createMove(move) {
             return new FurySwipes();
         case "giga_drain":
             return new GigaDrain();
+        case "grass_knot":
+            return new GrassKnot();
         case "growth":
             return new Growth();
         case "gust":
@@ -3057,12 +3094,18 @@ function createMove(move) {
             return new LeechSeed();
         case "liquidation":
             return new Liquidation();
+        case "magnet_rise":
+            return new MagnetRise();
         case "mega_drain":
             return new MegaDrain();
         case "metal_claw":
             return new MetalClaw();
         case "metronome":
             return new Metronome();
+        case "mimic":
+            return new Mimic();
+        case "nasty_plot":
+            return new NastyPlot();
         case "nuzzle":
             return new Nuzzle();
         case "outrage":
@@ -3127,6 +3170,8 @@ function createMove(move) {
             return new ShadowSneak();
         case "shell_smash":
             return new ShellSmash();
+        case "shock_wave":
+            return new ShockWave();
         case "skull_bash":
             return new SkullBash();
         case "sleep_powder":
@@ -3155,12 +3200,20 @@ function createMove(move) {
             return new Surf();
         case "surging_strikes":
             return new SurgingStrikes();
+        case "swagger":
+            return new Swagger();
         case "swords_dance":
             return new SwordsDance();
         case "synthesis":
             return new Synthesis();
         case "tackle":
             return new Tackle();
+        case "thunder":
+            return new Thunder();
+        case "thunderbolt":
+            return new Thunderbolt();
+        case "thunder_punch":
+            return new ThunderPunch();
         case "thunder_shock":
             return new ThunderShock();
         case "toxic":
@@ -3177,6 +3230,8 @@ function createMove(move) {
             return new VineWhip();
         case "volt_switch":
             return new VoltSwitch();
+        case "volt_tackle":
+            return new VoltTackle();
         case "waterfall":
             return new Waterfall();
         case "water_gun":
@@ -3191,13 +3246,29 @@ function createMove(move) {
             return new Whirlpool();
         case "wicked_blow":
             return new WickedBlow();
+        case "wild_charge":
+            return new WildCharge();
         case "will_o_wisp":
             return new WillOWisp();
         case "wing_attack":
             return new WingAttack();
+        case "wish":
+            return new Wish();
+        case "zap_cannon":
+            return new ZapCannon();
         default:
             return new Struggle();
     }
+}
+
+function Agility() {
+    this.name = "Agility";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { boostStat(pA, "speed", 2); };
+    this.description = "Raises the user's speed by 2 stages.";
 }
 
 function AirCutter() {
@@ -3403,6 +3474,47 @@ function BulletSeed() {
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
 }
 
+function CalmMind() {
+    this.name = "Calm Mind";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => {
+        boostStat(pA, "spattack", 1);
+        boostStat(pA, "spdefense", 1);
+    };
+    this.description = "Raises the user's special attack and special defense by 1 stage.";
+}
+
+function Charge() {
+    this.name = "Charge";
+    this.type = "electric";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = (move, pA, pD) => {
+        applyEffect("charge", 1, pA);
+        boostStat(pA, "spdefense", 1);
+    };
+    this.description = "Raises the user's special defense by 1 stage. Applies 1 stack of charge to the user.";
+}
+
+function ChargeBeam() {
+    this.name = "Charge Beam";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 10;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => {
+        if (energy >= 4) {
+            energy++;
+            boostStat(pA, "spattack", 1);
+        }
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Raises the user's special attack by 1 stage and restores 1 energy if energy is at least 5 upon use.";
+}
+
 function Confusion() {
     this.name = "Confusion";
     this.type = "psychic";
@@ -3505,6 +3617,21 @@ function DisarmingVoice() {
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
+function Discharge() {
+    this.name = "Discharge";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 0;
+    this.cost = 0;
+    this.effect = (move, pA, pD) => {
+        if (energy >= 3)
+            applyEffect("paralysis", 1, pD);
+        this.bp = 50 * energy;
+        energy = 0;
+    };
+    this.description = "Deals 50 base power damage per energy point left to the opponent. Consumes all energy left. Applies 1 stack of paralysis to the target is at least 3 energy has been used.";
+}
+
 function Dive() {
     this.name = "Dive";
     this.type = "water";
@@ -3538,6 +3665,17 @@ function DoubleEdge() {
     this.recoil = .33;
     this.effect = (move, pA, pD) => { };
     this.description = "Deals " + this.bp + " base power damage to the opponent. 33% recoil.";
+}
+
+function DoubleKick() {
+    this.name = "Double Kick";
+    this.type = "fighting";
+    this.cat = "physical";
+    this.bp = 25;
+    this.cost = 1;
+    this.multihit = 2;
+    this.effect = (move, pA, pD) => { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent twice.";
 }
 
 function DragonClaw() {
@@ -3585,6 +3723,17 @@ function DragonPulse() {
             boostStat(pA, "spattack", 1);
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Raises the user's special attack by 1 stage if its deck contains at least 3 dragon moves.";
+}
+
+function DrainingKiss() {
+    this.name = "Draining Kiss";
+    this.type = "fairy";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.recoil = -.75;
+    this.effect = (move, pA, pD) => { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Heals user for 75% of damage dealt.";
 }
 
 function DreamEater() {
@@ -3671,6 +3820,26 @@ function EchoedVoice() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
 }
 
+function ElectroBall() {
+    this.name = "Electro Ball";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { this.bp = Math.min(125, Math.max(25, 25 * (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1) / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
+    this.description = "Deals between 25 and 125 base power damage to the opponent, depending on how fast the user is compared to the target.";
+}
+
+function Electroweb() {
+    this.name = "Electroweb";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { boostStat(pD, "speed", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's speed by 1 stage.";
+}
+
 function Ember() {
     this.name = "Ember";
     this.type = "fire";
@@ -3699,6 +3868,39 @@ function ExtremeSpeed() {
     this.cost = 2;
     this.effect = (move, pA, pD) => { drawMove(pA, false); drawMove(pA, false); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw 2 cards.";
+}
+
+function Facade() {
+    this.name = "Facade";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 70;
+    this.cost = 2;
+    this.effect = (move, pA, pD) => {
+        if (isBurned(pA) || isPoisoned(pA))
+            this.bp = 140;
+        else
+            this.bp = 70;
+    };
+    this.description = "Deals 70 base power damage to the opponent. Base power doubles if user is poisoned or burned.";
+}
+
+function FakeOut() {
+    this.name = "Fake Out";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 30;
+    this.cost = 1;
+    this.fails = false;
+    this.effect = (move, pA, pD) => {
+        if (energy >= 4) {
+            drawMove(pA, false);
+            applyEffect("fear", 1, pD);
+            this.fails = true;
+        } else
+            this.fails = false;
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target. Draw a card. Fails if energy is below 5 upon use.";
 }
 
 function FieryDance() {
@@ -3845,6 +4047,16 @@ function GigaDrain() {
     this.recoil = -.5;
     this.effect = (move, pA, pD) => { };
     this.description = "Deals " + this.bp + " base power damage to the opponent and heals user for 50% damage dealt.";
+}
+
+function GrassKnot() {
+    this.name = "Grass Knot";
+    this.type = "grass";
+    this.cat = "special";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { this.bp = Math.max(1, Math.min(125, 25 * 180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
+    this.description = "Deals up to 125 base power damage to the opponent depending on how slow it is.";
 }
 
 function Growth() {
@@ -4124,6 +4336,16 @@ function Liquidation() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's defense by 1 stage in the rain.";
 }
 
+function MagnetRise() {
+    this.name = "Magnet Rise";
+    this.type = "electric";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { applyEffect("levitation", 5, pA); };
+    this.description = "Applies 5 stacks of levitation to the user.";
+}
+
 function MegaDrain() {
     this.name = "Mega Drain";
     this.type = "grass";
@@ -4158,6 +4380,38 @@ function Metronome() {
         pA.hand.push(m);
     };
     this.description = "Adds a random move to the user's hand and lowers its cost by 1.";
+}
+
+function Mimic() {
+    this.name = "Mimic";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.fails = false;
+    this.effect = (move, pA, pD) => {
+        if (pD.discard.length > 0) {
+            var m = JSON.parse(JSON.stringify(pD.discard[pD.discard.length - 1]))
+            m.effect = pD.discard[pD.discard.length - 1].effect;
+            m.exhaust = true;
+            if (!m.description.includes("Exhaust."))
+                m.description += " Exhaust.";
+            pA.hand.push(m);
+            this.fails = false;
+        } else
+            this.fails = true;
+    };
+    this.description = "Creates a copy with exhaust of the last card in the target's discard pile in the user's hand. Fails if target's discard pile is empty.";
+}
+
+function NastyPlot() {
+    this.name = "Nasty Plot";
+    this.type = "dark";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = (move, pA, pD) => { boostStat(pA, "spattack", 2); };
+    this.description = "Raises user's special attack by 2 stages.";
 }
 
 function Nuzzle() {
@@ -4528,6 +4782,16 @@ function ShellSmash() {
     this.description = "Raises the user's attack, special attack and speed by 2 stages and lowers its defense and special defense by 1 stage.";
 }
 
+function ShockWave() {
+    this.name = "Shock Wave";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 30;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { if (energy == 0) this.bp = 60; else this.bp = 30; };
+    this.description = "Deals 30 base power damage to the opponent. Base power doubles if user's energy reaches 0 upon use.";
+}
+
 function SkullBash() {
     this.name = "Skull Bash";
     this.type = "normal";
@@ -4721,6 +4985,16 @@ function SurgingStrikes() {
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Always results in a critical hit.";
 }
 
+function Swagger() {
+    this.name = "Swagger";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { boostStat(pD, "attack", 2); applyEffect("confusion", 2, pD); };
+    this.description = "Raises target's attack by 2 stages and applies 2 stacks of confusion to it.";
+}
+
 function SwordsDance() {
     this.name = "Swords Dance";
     this.type = "normal";
@@ -4757,6 +5031,36 @@ function Tackle() {
     this.cost = 1;
     this.effect = (move, pA, pD) => { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function Thunder() {
+    this.name = "Thunder";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 130;
+    this.cost = 3;
+    this.effect = (move, pA, pD) => { if (weather != undefined && weather.name === "Rain") applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target in the rain.";
+}
+
+function Thunderbolt() {
+    this.name = "Thunderbolt";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 80;
+    this.cost = 2;
+    this.effect = (move, pA, pD) => { if (energy == 1) applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if user's energy is 3 upon use.";
+}
+
+function ThunderPunch() {
+    this.name = "Thunder Punch";
+    this.type = "electric";
+    this.cat = "physical";
+    this.bp = 80;
+    this.cost = 2;
+    this.effect = (move, pA, pD) => { if (energy == 2) applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if user's energy is 4 upon use.";
 }
 
 function ThunderShock() {
@@ -4871,6 +5175,17 @@ function VoltSwitch() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. User regains the opportunity to switch out and loses all trapping effects.";
 }
 
+function VoltTackle() {
+    this.name = "Volt Tackle";
+    this.type = "electric";
+    this.cat = "physical";
+    this.bp = 120;
+    this.cost = 2;
+    this.recoil = .33;
+    this.effect = (move, pA, pD) => { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. 33% recoil. Applies 1 stack of paralysis to the target if it's paralyzed already.";
+}
+
 function Waterfall() {
     this.name = "Waterfall";
     this.type = "water";
@@ -4952,6 +5267,17 @@ function WickedBlow() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
 }
 
+function WildCharge() {
+    this.name = "Wild Charge";
+    this.type = "electric";
+    this.cat = "physical";
+    this.bp = 70;
+    this.cost = 1;
+    this.recoil = 0;
+    this.effect = (move, pA, pD) => { this.recoil = .1 * energy; };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. 10% recoil per energy left after use.";
+}
+
 function WillOWisp() {
     this.name = "Will-O-Wisp";
     this.type = "fire";
@@ -4970,6 +5296,33 @@ function WingAttack() {
     this.cost = 1;
     this.effect = (move, pA, pD) => { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function Wish() {
+    this.name = "Wish";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = (move, pA, pD) => { applyEffect("wish", 2, pA); };
+    this.description = "Applies 2 stacks of wish to the user.";
+}
+
+function ZapCannon() {
+    this.name = "Zap Cannon";
+    this.type = "electric";
+    this.cat = "special";
+    this.bp = 150;
+    this.cost = 3;
+    this.fails = false;
+    this.effect = (move, pA, pD) => {
+        if (isParalyzed(pD)) {
+            applyEffect("paralysis", 2, pD);
+            this.fails = false;
+        } else
+            this.fails = true;
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent and applies 2 stacks of paralysis to it. Fails unless target is paralyzed.";
 }
 
 function Struggle() {
@@ -5027,6 +5380,8 @@ function createEffect(type, stacks) {
     switch (type) {
         case "burn":
             return new Burn(stacks);
+        case "charge":
+            return new ChargeE(stacks);
         case "confusion":
             return new ConfusionE(stacks);
         case "curse":
@@ -5041,6 +5396,8 @@ function createEffect(type, stacks) {
             return new KingsProtection(stacks);
         case "leech_seed":
             return new Seed(stacks);
+        case "levitation":
+            return new Levitation(stacks);
         case "paralysis":
             return new Paralysis(stacks);
         case "poison":
@@ -5057,6 +5414,8 @@ function createEffect(type, stacks) {
             return new Trap(stacks);
         case "trap_damage":
             return new TrapDamage(stacks);
+        case "wish":
+            return new WishE(stacks);
         default:
             return new Poison(0);
     }
@@ -5073,6 +5432,14 @@ function Burn(stacks) {
     this.name = "Burn";
     this.description = "Burn\nPhysical damage reduced by 40%. Remove 1 stack at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/burn.png';
+    this.stacks = stacks;
+    this.effect = (pA, pD) => { this.stacks--; };
+}
+
+function ChargeE(stacks) {
+    this.name = "Charge";
+    this.description = "Chargen\nIncreases the damage of eletric type moves. Remove 1 stack at the end of each turn.";
+    this.icon = 'resources/sprites/effect_icons/charge.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
 }
@@ -5138,17 +5505,12 @@ function KingsProtection(stacks) {
     };
 }
 
-function Seed(stacks) {
-    this.name = "Leech Seed";
-    this.description = "Leech Seed\nTransfer 15HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/seed.png';
+function Levitation(stacks) {
+    this.name = "Levitation";
+    this.description = "Levitation\nImmunity to ground type moves and ground related effects.";
+    this.icon = 'resources/sprites/effect_icons/levitation.webp';
     this.stacks = stacks;
-    this.immune = ["grass"];
-    this.effect = (pA, pD) => {
-        dealDamage(15, pA);
-        dealDamage(-15, pD);
-        this.stacks--;
-    }
+    this.effect = (pA, pD) => { this.stacks--; };
 }
 
 function Paralysis(stacks) {
@@ -5184,6 +5546,19 @@ function Protection(stacks) {
     this.bEffect = (move, pA, pD) => {
         this.stacks--;
     };
+}
+
+function Seed(stacks) {
+    this.name = "Leech Seed";
+    this.description = "Leech Seed\nTransfer 15HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
+    this.icon = 'resources/sprites/effect_icons/seed.png';
+    this.stacks = stacks;
+    this.immune = ["grass"];
+    this.effect = (pA, pD) => {
+        dealDamage(15, pA);
+        dealDamage(-15, pD);
+        this.stacks--;
+    }
 }
 
 function Sleep(stacks) {
@@ -5239,6 +5614,18 @@ function Trap(stacks) {
     this.effect = (pA, pD) => { }
 }
 
+function WishE(stacks) {
+    this.name = "Wish";
+    this.description = "Wish\nRestores 20% of maximum HP once this effect ends. Remove 1 stack at the end of each turn.";
+    this.icon = 'resources/sprites/effect_icons/trap.png';
+    this.stacks = stacks;
+    this.effect = (pA, pD) => {
+        this.stack--;
+        if (this.stacks == 0)
+            dealDamage(-pA.maxhp * .2, pA);
+    }
+}
+
 function isTrapped(p) {
     var i = p.effects.findIndex(e => e.trapped != undefined);
     return i >= 0 && p.effects[i].stacks > 0;
@@ -5267,6 +5654,21 @@ function isBurned(p) {
 
 function isScared(p) {
     var i = p.effects.findIndex(e => e.name === "Fear");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
+function isCharged(p) {
+    var i = p.effects.findIndex(e => e.name === "Charge");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
+function isPoisoned(p) {
+    var i = p.effects.findIndex(e => e.name === "Poison");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
+function isParalyzed(p) {
+    var i = p.effects.findIndex(e => e.name === "Paralysis");
     return i >= 0 && p.effects[i].stacks > 0;
 }
 
