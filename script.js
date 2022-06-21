@@ -2353,8 +2353,8 @@ function Eevee() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("tackle"), createMove("tackle"), createMove("quick_attack"), createMove("last_resort")];
-    this.movepool = ["quick_attack", "last_resort", "double_edge"];
+    this.moves = [createMove("tackle"), createMove("facade"), createMove("quick_attack"), createMove("wish"), createMove("baton_pass"), createMove("hidden_power")];
+    this.movepool = ["quick_attack", "last_resort", "double_edge", "baton_pass", "bite", "echoed_voice", "facade", "hidden_power", "mimic", "protect", "shadow_ball", "skull_bash", "wish", "psychic", "flamethrower", "ice_beam", "thunderbolt", "hydro_pump", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell", "hyper_voice", "iron_tail", "tickle", "leaf_blade", "moonblast", "snarl"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/eevee.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/eevee.gif';
     this.effects = [];
@@ -2376,8 +2376,8 @@ function Gardevoir() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["psychic", "fairy"];
-    this.moves = [createMove("confusion"), createMove("confusion"), createMove("disarming_voice"), createMove("hypnosis")];
-    this.movepool = ["confusion", "disarming_voice", "hypnosis", "dazzling_gleam"];
+    this.moves = [createMove("confusion"), createMove("psychic"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("calm_mind"), createMove("hypnosis")];
+    this.movepool = ["confusion", "disarming_voice", "hypnosis", "dazzling_gleam", "ally_switch", "calm_mind", "charge_beam", "draining_kiss", "dream_eater", "echoed_voice", "energy_ball", "focus_blast", "grass_knot", "heal_pulse", "hidden_power", "hyper_beam", "hyper_voice", "moonblast", "psychic", "shadow_ball", "shock_wave", "signal_beam", "stored_power", "thunderbolt", "will_o_wisp", "wish", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/gardevoir.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/gardevoir.gif';
     this.effects = [];
@@ -2944,7 +2944,8 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "baton_pass", "blaze_kick", "bounce", "fire_punch", "gunk_shot", "high_jump_kick", "low_sweep", "mega_kick", "reversal", "sucker_punch", "u_turn",
     "zen_headbutt", "bulk_up", "protect", "super_fang", "ally_switch", "bone_rush", "close_combat", "cross_chop", "drain_punch", "focus_punch",
     "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance",
-    "string_shot", "signal_beam", "silver_wind"];
+    "string_shot", "signal_beam", "silver_wind", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell",
+    "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave"];
 
 function createMove(move) {
     switch (move) {
@@ -2982,6 +2983,8 @@ function createMove(move) {
             return new BlazeKick();
         case "blizzard":
             return new Blizzard();
+        case "body_slam":
+            return new BodySlam();
         case "bone_rush":
             return new BoneRush();
         case "bounce":
@@ -3010,8 +3013,12 @@ function createMove(move) {
             return new Charge();
         case "charge_beam":
             return new ChargeBeam();
+        case "charm":
+            return new Charm();
         case "close_combat":
             return new CloseCombat();
+        case "confuse_ray":
+            return new ConfuseRay();
         case "confusion":
             return new Confusion();
         case "cross_chop":
@@ -3078,12 +3085,16 @@ function createMove(move) {
             return new Ember();
         case "energy_ball":
             return new EnergyBall();
+        case "extreme_evoboost":
+            return new ExtremeEvoboost();
         case "extreme_speed":
             return new ExtremeSpeed();
         case "facade":
             return new Facade();
         case "fake_out":
             return new FakeOut();
+        case "fake_tears":
+            return new FakeTears();
         case "fiery_dance":
             return new FieryDance();
         case "fire_blast":
@@ -3094,6 +3105,8 @@ function createMove(move) {
             return new FirePunch();
         case "fire_spin":
             return new FireSpin();
+        case "flail":
+            return new Flail();
         case "flame_charge":
             return new FlameCharge();
         case "flamethrower":
@@ -3116,6 +3129,8 @@ function createMove(move) {
             return new FuryCutter();
         case "fury_swipes":
             return new FurySwipes();
+        case "future_sight":
+            return new FutureSight();
         case "giga_drain":
             return new GigaDrain();
         case "giga_impact":
@@ -3132,6 +3147,10 @@ function createMove(move) {
             return new GyroBall();
         case "hammer_arm":
             return new HammerArm();
+        case "headbutt":
+            return new Headbutt();
+        case "heal_bell":
+            return new HealBell();
         case "heal_pulse":
             return new HealPulse();
         case "heat_wave":
@@ -3150,6 +3169,8 @@ function createMove(move) {
             return new HydroPump();
         case "hyper_beam":
             return new HyperBeam();
+        case "hyper_voice":
+            return new HyperVoice();
         case "hypnosis":
             return new Hypnosis();
         case "ice_beam":
@@ -3172,22 +3193,28 @@ function createMove(move) {
             return new KingsShield();
         case "last_resort":
             return new LastResort();
+        case "leaf_blade":
+            return new LeafBlade();
         case "leaf_storm":
             return new LeafStorm();
         case "leech_seed":
             return new LeechSeed();
-        case "low_sweep":
-            return new LowSweep();
         case "life_dew":
             return new LifeDew();
         case "liquidation":
             return new Liquidation();
+        case "low_sweep":
+            return new LowSweep();
+        case "magical_leaf":
+            return new MagicalLeaf();
         case "magnet_rise":
             return new MagnetRise();
         case "mega_drain":
             return new MegaDrain();
         case "mega_kick":
             return new MegaKick();
+        case "memento":
+            return new Memento();
         case "metal_claw":
             return new MetalClaw();
         case "meteor_mash":
@@ -3196,6 +3223,8 @@ function createMove(move) {
             return new Metronome();
         case "mimic":
             return new Mimic();
+        case "moonblast":
+            return new Moonblast();
         case "morning_sun":
             return new MorningSun();
         case "mystical_fire":
@@ -3228,6 +3257,8 @@ function createMove(move) {
             return new Protect();
         case "psychic":
             return new Psychic();
+        case "psych_up":
+            return new PsychUp();
         case "pyro_ball":
             return new PyroBall();
         case "quick_attack":
@@ -3290,6 +3321,8 @@ function createMove(move) {
             return new Sludge();
         case "sludge_bomb":
             return new SludgeBomb();
+        case "snarl":
+            return new Snarl();
         case "soft_boiled":
             return new SoftBoiled();
         case "solar_beam":
@@ -3306,6 +3339,8 @@ function createMove(move) {
             return new StompingTantrum();
         case "stone_edge":
             return new StoneEdge();
+        case "stored_power":
+            return new StoredPower();
         case "string_shot":
             return new StringShot();
         case "struggle_bug":
@@ -3338,8 +3373,12 @@ function createMove(move) {
             return new ThunderPunch();
         case "thunder_shock":
             return new ThunderShock();
+        case "thunder_wave":
+            return new ThunderWave();
         case "thrash":
             return new Thrash();
+        case "tickle":
+            return new Tickle();
         case "toxic":
             return new Toxic();
         case "toxic_spikes":
@@ -3606,6 +3645,16 @@ function Blizzard() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target in the hail.";
 }
 
+function BodySlam() {
+    this.name = "Body Slam";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 80;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (pA.statchanges.speed > 0) applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if the user's speed has been raised.";
+}
+
 function BoneRush() {
     this.name = "Bone Rush";
     this.type = "ground";
@@ -3613,7 +3662,7 @@ function BoneRush() {
     this.bp = 18;
     this.cost = 1;
     this.multihit = 3;
-    this.effect = function (move, pA, pD) { boostStat(pD, "attack", -1); };
+    this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
 }
 
@@ -3786,6 +3835,16 @@ function ChargeBeam() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Raises the user's special attack by 1 stage and restores 1 energy if energy is at least 5 upon use.";
 }
 
+function Charm() {
+    this.name = "Charm";
+    this.type = "fairy";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "attack", -2); };
+    this.description = "Lowers target's attack by 2 stages.";
+}
+
 function CloseCombat() {
     this.name = "Close Combat";
     this.type = "fighting";
@@ -3799,6 +3858,16 @@ function CloseCombat() {
         }
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense and special defense by 1 stage unless its HP is higher than the target's.";
+}
+
+function ConfuseRay() {
+    this.name = "Confuse Ray";
+    this.type = "ghost";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Applies 1 stack of confusion to the target.";
 }
 
 function Confusion() {
@@ -4003,7 +4072,7 @@ function DracoMeteor() {
     this.name = "Draco Meteor";
     this.type = "dragon";
     this.cat = "special";
-    this.bp = 130;
+    this.bp = 170;
     this.cost = 2;
     this.effect = function (move, pA, pD) {
         var c = 0;
@@ -4249,6 +4318,23 @@ function EnergyBall() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special defense by 1 stage under the sun.";
 }
 
+function ExtremeEvoboost() {
+    this.name = "Extreme Evoboost";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 4;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) {
+        boostStat(pA, "attack", 2);
+        boostStat(pA, "defense", 2);
+        boostStat(pA, "spattack", 2);
+        boostStat(pA, "spdefense", 2);
+        boostStat(pA, "speed", 2);
+    };
+    this.description = "Raises all of user's stats by 2 stages. Exhaust.";
+}
+
 function ExtremeSpeed() {
     this.name = "Extreme Speed";
     this.type = "normal";
@@ -4290,6 +4376,16 @@ function FakeOut() {
             this.fails = false;
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target. Draw a card. Fails if energy is below 5 upon use.";
+}
+
+function FakeTears() {
+    this.name = "Fake Tears";
+    this.type = "dark";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -2); };
+    this.description = "Lowers target's special attack by 2 stages.";
 }
 
 function FieryDance() {
@@ -4343,6 +4439,16 @@ function FireSpin() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("trap_damage", 3, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 3 turns.";
+}
+
+function Flail() {
+    this.name = "Flail";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = Math.max(1, 100 * (1 - pA.currenthp / pA.maxhp)); };
+    this.description = "Deals up to 100 base power damage to the opponent, depending on how low user's HP is.";
 }
 
 function FlameCharge() {
@@ -4484,6 +4590,29 @@ function FurySwipes() {
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
 }
 
+function FutureSight() {
+    this.name = "FutureSight";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ForeseenAttack());
+    };
+    this.description = "Shuffles a Foreseen Attack into the user's deck.";
+}
+
+function ForeseenAttack() {
+    this.name = "Foreseen Attack";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 120;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Exhaust.";
+}
+
 function GigaDrain() {
     this.name = "Giga Drain";
     this.type = "grass";
@@ -4570,6 +4699,42 @@ function HammerArm() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { boostStat(pA, "speed", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's speed by one stage.";
+}
+
+function Headbutt() {
+    this.name = "Headbutt";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's attack has been raised.";
+}
+
+function HealBell() {
+    this.name = "Heal Bell";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        if (contains(team, pA)) {
+            for (let p of team) {
+                removeEffect(p, "Poison");
+                removeEffect(p, "Burn");
+                removeEffect(p, "Paralysis");
+                removeEffect(p, "Sleep");
+                removeEffect(p, "Freeze");
+            }
+        } else {
+            removeEffect(pA, "Poison");
+            removeEffect(pA, "Burn");
+            removeEffect(pA, "Paralysis");
+            removeEffect(pA, "Sleep");
+            removeEffect(pA, "Freeze");
+        }
+    };
+    this.description = "Removes all status conditions from the user's party.";
 }
 
 function HealPulse() {
@@ -4704,6 +4869,16 @@ function HyperBeam() {
     this.description = "Deals 50 base power damage per energy point left to the opponent. Consumes all energy left.";
 }
 
+function HyperVoice() {
+    this.name = "Hyper Voice";
+    this.type = "normal";
+    this.cat = "special";
+    this.bp = 100;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { removeEffect("Sleep", pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Wakes up the target if it is alseep.";
+}
+
 function Hypnosis() {
     this.name = "Hypnosis";
     this.type = "psychic";
@@ -4826,11 +5001,22 @@ function LastResort() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fails unless it is the last card in the user's hand.";
 }
 
+function LeafBlade() {
+    this.name = "Leaf Blade";
+    this.type = "grass";
+    this.cat = "physical";
+    this.bp = 60;
+    this.cost = 2;
+    this.crit = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
+}
+
 function LeafStorm() {
     this.name = "Leaf Storm";
     this.type = "grass";
     this.cat = "special";
-    this.bp = 130;
+    this.bp = 200;
     this.cost = 2;
     this.effect = function (move, pA, pD) { boostStat(pA, "spattack", -2); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's special attack by 2 stages.";
@@ -4885,6 +5071,16 @@ function Liquidation() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") boostStat(pD, "defense", 1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's defense by 1 stage in the rain.";
+}
+
+function MagicalLeaf() {
+    this.name = "Magical Leaf";
+    this.type = "grass";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = 40 + 15 * Math.max(0, pA.statchanges.spattack); };
+    this.description = "Deals 40 base power damage to the opponent. Base power increases with user's special attack boosts.";
 }
 
 function MagnetRise() {
@@ -4976,6 +5172,16 @@ function Mimic() {
     this.description = "Creates a copy with exhaust of the last card in the target's discard pile in the user's hand. Fails if target's discard pile is empty.";
 }
 
+function Moonblast() {
+    this.name = "Moonblast";
+    this.type = "fairy";
+    this.cat = "special";
+    this.bp = 90;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (pA.currenthp == pA.maxhp) boostStat(pD, "spattack", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special attack by 1 stage if user's HP is full.";
+}
+
 function MorningSun() {
     this.name = "Morning Sun";
     this.type = "normal";
@@ -5041,7 +5247,7 @@ function Overheat() {
     this.name = "Overheat";
     this.type = "fire";
     this.cat = "special";
-    this.bp = 130;
+    this.bp = 200;
     this.cost = 2;
     this.effect = function (move, pA, pD) { boostStat(pA, "spattack", -2); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's special attack by 2 stages.";
@@ -5150,6 +5356,16 @@ function Psychic() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { if (pA.draw.length >= 5) boostStat(pD, "spdefense", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers its special defense by one stage if the user's draw pile contains at least 5 cards.";
+}
+
+function PsychUp() {
+    this.name = "Psych Up";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { (player ? team[activePokemon] : opponent).statchanges = JSON.parse(JSON.stringify((player ? opponent : team[activePokemon]).statchanges)); };
+    this.description = "User copies target's stat changes.";
 }
 
 function PyroBall() {
@@ -5543,6 +5759,16 @@ function SludgeBomb() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. If target is poisoned, applies 4 stacks of poison to it.";
 }
 
+function Snarl() {
+    this.name = "Snarl";
+    this.type = "dark";
+    this.cat = "special";
+    this.bp = 20;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special attack by 1 stage.";
+}
+
 function SoftBoiled() {
     this.name = "Soft Boiled";
     this.type = "normal";
@@ -5647,6 +5873,24 @@ function StoneEdge() {
     this.crit = false;
     this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sandstorm") this.crit = true; else this.crit = false; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit in a sandstorm.";
+}
+
+function StoredPower() {
+    this.name = "Stored Power";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        var c = 0;
+        c += Math.max(0, pA.statchanges.attack);
+        c += Math.max(0, pA.statchanges.defense);
+        c += Math.max(0, pA.statchanges.spattack);
+        c += Math.max(0, pA.statchanges.spdefense);
+        c += Math.max(0, pA.statchanges.speed);
+        this.bp = 20 * c;
+    };
+    this.description = "Deals 20 base power damage to the opponent, multiplied by the amount of positive stat changes on the user.";
 }
 
 function StompingTantrum() {
@@ -5849,6 +6093,29 @@ function ThunderShock() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function ThunderWave() {
+    this.name = "Thunder Wave";
+    this.type = "electric";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
+    this.description = "Applies 1 stack of paralysis to the target.";
+}
+
+function Tickle() {
+    this.name = "Tickle";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        boostStat(pD, "attack", -1);
+        boostStat(pD, "defense", -1);
+    };
+    this.description = "Lowers target's attack and defense by 1 stage.";
 }
 
 function Toxic() {
@@ -6444,7 +6711,7 @@ function WishE(stacks) {
     this.icon = 'resources/sprites/effect_icons/wish.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
-        this.stack--;
+        this.stacks--;
         if (this.stacks == 0)
             dealDamage(-pA.maxhp * .2, pA);
     }
