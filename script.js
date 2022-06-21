@@ -2330,8 +2330,8 @@ function Volcarona() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire", "bug"];
-    this.moves = [createMove("ember"), createMove("ember"), createMove("struggle_bug"), createMove("gust")];
-    this.movepool = ["ember", "struggle_bug", "gust", "fiery_dance"];
+    this.moves = [createMove("ember"), createMove("gust"), createMove("struggle_bug"), createMove("quiver_dance"), createMove("fiery_dance"), createMove("silver_wind")];
+    this.movepool = ["ember", "struggle_bug", "gust", "fiery_dance", "calm_mind", "defog", "fire_blast", "fire_spin", "flamethrower", "giga_drain", "heat_wave", "hidden_power", "hurricane", "hyper_beam", "overheat", "protect", "psychic", "roost", "solar_beam", "sunny_day", "u_turn", "will_o_wisp", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance", "string_shot", "signal_beam", "silver_wind"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/volcarona.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/volcarona.gif';
     this.effects = [];
@@ -2943,10 +2943,13 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "dragon_tail", "earth_power", "fire_fang", "giga_impact", "hone_claws", "iron_head", "poison_jab", "sandstorm", "stealth_rock", "stone_edge", "thrash",
     "baton_pass", "blaze_kick", "bounce", "fire_punch", "gunk_shot", "high_jump_kick", "low_sweep", "mega_kick", "reversal", "sucker_punch", "u_turn",
     "zen_headbutt", "bulk_up", "protect", "super_fang", "ally_switch", "bone_rush", "close_combat", "cross_chop", "drain_punch", "focus_punch",
-    "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave"];
+    "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance",
+    "string_shot", "signal_beam", "silver_wind"];
 
 function createMove(move) {
     switch (move) {
+        case "absorb":
+            return new Absorb();
         case "agility":
             return new Agility();
         case "air_cutter":
@@ -2955,6 +2958,8 @@ function createMove(move) {
             return new AirSlash();
         case "ally_switch":
             return new AllySwitch();
+        case "amnesia":
+            return new Amnesia();
         case "ancient_power":
             return new AncientPower();
         case "aqua_tail":
@@ -2989,6 +2994,8 @@ function createMove(move) {
             return new Brine();
         case "bubble_beam":
             return new BubbleBeam();
+        case "bug_buzz":
+            return new BugBuzz();
         case "bulk_up":
             return new BulkUp();
         case "bulldoze":
@@ -3189,6 +3196,10 @@ function createMove(move) {
             return new Metronome();
         case "mimic":
             return new Mimic();
+        case "morning_sun":
+            return new MorningSun();
+        case "mystical_fire":
+            return new MysticalFire();
         case "nasty_plot":
             return new NastyPlot();
         case "nuzzle":
@@ -3221,6 +3232,8 @@ function createMove(move) {
             return new PyroBall();
         case "quick_attack":
             return new QuickAttack();
+        case "quiver_dance":
+            return new QuiverDance();
         case "rain_dance":
             return new RainDance();
         case "rapid_spin":
@@ -3265,6 +3278,10 @@ function createMove(move) {
             return new ShellSmash();
         case "shock_wave":
             return new ShockWave();
+        case "signal_beam":
+            return new SignalBeam();
+        case "silver_wind":
+            return new SilverWind();
         case "skull_bash":
             return new SkullBash();
         case "sleep_powder":
@@ -3289,6 +3306,8 @@ function createMove(move) {
             return new StompingTantrum();
         case "stone_edge":
             return new StoneEdge();
+        case "string_shot":
+            return new StringShot();
         case "struggle_bug":
             return new StruggleBug();
         case "substitute":
@@ -3372,6 +3391,17 @@ function createMove(move) {
     }
 }
 
+function Absorb() {
+    this.name = "Absorb";
+    this.type = "grass";
+    this.cat = "special";
+    this.bp = 20;
+    this.cost = 0;
+    this.recoil = -.5;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent and heals user for 50% of damage dealt.";
+}
+
 function Agility() {
     this.name = "Agility";
     this.type = "psychic";
@@ -3411,6 +3441,16 @@ function AllySwitch() {
     this.cost = 0;
     this.effect = function (move, pA, pD) { switchesLeft = Math.max(1, switchesLeft); };
     this.description = "User regains the opportunity to switch out.";
+}
+
+function Amnesia() {
+    this.name = "Amnesia";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { boostStat(pA, "spdefense", 2); };
+    this.description = "Raises the user's special defense by 2 stages.";
 }
 
 function AncientPower() {
@@ -3649,6 +3689,16 @@ function BubbleBeam() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") boostStat(pD, "speed", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's speed by 1 stage in the rain.";
+}
+
+function BugBuzz() {
+    this.name = "Bug Buzz";
+    this.type = "bug";
+    this.cat = "special";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (pA.discard.length > 0 && pA.discard[pA.discard.length-1].type === "bug") boostStat(pD, "spdefense", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special defense by 1 stage if the user's last discarded move is of the bug type.";
 }
 
 function BulkUp() {
@@ -4926,6 +4976,34 @@ function Mimic() {
     this.description = "Creates a copy with exhaust of the last card in the target's discard pile in the user's hand. Fails if target's discard pile is empty.";
 }
 
+function MorningSun() {
+    this.name = "Morning Sun";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        if (weather != undefined) {
+            if (weather.name === "Sun")
+                dealDamage(-pA.maxhp * .3, pA);
+            else
+                dealDamage(-pA.maxhp * .1, pA);
+        } else
+            dealDamage(-pA.maxhp * .2, pA);
+    };
+    this.description = "Restores 20% of maximum HP. Varies depending on the weather.";
+}
+
+function MysticalFire() {
+    this.name = "Mystical Fire";
+    this.type = "fire";
+    this.cat = "special";
+    this.bp = 75;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special attack by 1 stage.";
+}
+
 function NastyPlot() {
     this.name = "Nasty Plot";
     this.type = "dark";
@@ -5092,6 +5170,20 @@ function QuickAttack() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { drawMove(pA, false); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
+}
+
+function QuiverDance() {
+    this.name = "Quiver Dance";
+    this.type = "bug";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        boostStat(pA, "spattack", 1);
+        boostStat(pA, "spdefense", 1);
+        boostStat(pA, "speed", 1);
+    };
+    this.description = "Raises user's special attack, special defense and speed by 1 stage.";
 }
 
 function RainDance() {
@@ -5354,6 +5446,41 @@ function ShockWave() {
     this.description = "Deals 30 base power damage to the opponent. Base power doubles if user's energy reaches 0 upon use.";
 }
 
+function SignalBeam() {
+    this.name = "Signal Beam";
+    this.type = "bug";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        var c = 0;
+        for (let m of pA.draw) {
+            c += m.type === "bug";
+        }
+        if (c >= 2)
+            applyEffect("confusion", 1, pD);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target if the user's draw pile contains at least 2 bug type moves.";
+}
+
+function SilverWind() {
+    this.name = "Silver Wind";
+    this.type = "bug";
+    this.cat = "special";
+    this.bp = 60;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        if (pA.currenthp % 10 == 1) {
+            if (pA.statchanges.attack <= 0) boostStat(pA, "attack", 1);
+            if (pA.statchanges.defense <= 0) boostStat(pA, "defense", 1);
+            if (pA.statchanges.spattack <= 0) boostStat(pA, "spattack", 1);
+            if (pA.statchanges.spdefense <= 0) boostStat(pA, "spdefense", 1);
+            if (pA.statchanges.speed <= 0) boostStat(pA, "speed", 1);
+        }
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. If the user's HP ends with 1, raises all non-enhanced stats by one stage.";
+}
+
 function SkullBash() {
     this.name = "Skull Bash";
     this.type = "normal";
@@ -5540,6 +5667,16 @@ function StruggleBug() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent and lowers its special attack by one stage.";
+}
+
+function StringShot() {
+    this.name = "String Shot";
+    this.type = "bug";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "speed", -2); };
+    this.description = "Lowers target's speed by 2 stages.";
 }
 
 function Substitute() {
