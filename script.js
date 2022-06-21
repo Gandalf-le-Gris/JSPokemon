@@ -1167,15 +1167,6 @@ function useMove(move) {
             }
         }
 
-        if (!cancelled) {
-            if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0))
-                move.effect(move, team[activePokemon], opponent);
-            else if (!player && (move.cat === "status" || effectiveMultiplier(move, team[activePokemon]) > 0))
-                move.effect(move, opponent, team[activePokemon]);
-            if (move.fails)
-                cancelled = true;
-        }
-
         var desc = document.getElementById("movePreview");
         desc.className = "preview-on";
         if (!player) {
@@ -1189,6 +1180,15 @@ function useMove(move) {
             else {
                 desc.innerHTML += team[activePokemon].name + ' used ' + move.name + '!<br />';
             }
+        }
+
+        if (!cancelled) {
+            if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0))
+                move.effect(move, team[activePokemon], opponent);
+            else if (!player && (move.cat === "status" || effectiveMultiplier(move, team[activePokemon]) > 0))
+                move.effect(move, opponent, team[activePokemon]);
+            if (move.fails)
+                cancelled = true;
         }
 
         if (move.fails && message === "") {
@@ -3580,6 +3580,7 @@ function BatonPass() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 1;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) {
         switchesLeft += 1;
         removeEffect(pA, "Trap");
@@ -3592,7 +3593,7 @@ function BatonPass() {
         drawStats(player);
         drawEffects(player);
     };
-    this.description = "User shoves off all trapping effects, switches places with the first other party member and transfers all of its stats changes. Resets user's stats changes in the process.";
+    this.description = "User shoves off all trapping effects, switches places with the first other party member and transfers all of its stats changes. Resets user's stats changes in the process. Exhaust.";
 }
 
 function BeatUp() {
