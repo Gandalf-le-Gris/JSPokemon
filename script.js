@@ -2445,8 +2445,8 @@ function Blissey() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("echoed_voice"), createMove("toxic"), createMove("soft_boiled"), createMove("heal_pulse")];
-    this.movepool = ["echoed_voice", "soft_boiled", "heal_pulse", "toxic"];
+    this.moves = [createMove("echoed_voice"), createMove("toxic"), createMove("soft_boiled"), createMove("heal_pulse"), createMove("heal_bell"), createMove("teleport")];
+    this.movepool = ["echoed_voice", "soft_boiled", "heal_pulse", "toxic", "blizzard", "bubble_beam", "calm_mind", "charge_beam", "charm", "dazzling_gleam", "disarming_voice", "flamethrower", "focus_blast", "grass_knot", "heal_bell", "hyper_voice", "ice_beam", "life_dew", "metronome", "mimic", "protect", "psychic", "shadow_ball", "stealth_rock", "substitute", "thunderbolt", "thunder_wave", "toxic", "water_pulse", "wish", "rain_dance", "sunny_day", "hail", "sandstorm", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/blissey.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/blissey.gif';
     this.effects = [];
@@ -2947,7 +2947,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "string_shot", "signal_beam", "silver_wind", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell",
     "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave",
     "psybeam", "aerial_ace", "fly", "ice_punch", "steel_wing", "superpower", "explosion", "heavy_slam", "revenge", "seed_bomb", "spikes", "body_press",
-    "pin_missile", "rock_polish"];
+    "pin_missile", "rock_polish", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar"];
 
 function createMove(move) {
     switch (move) {
@@ -3337,6 +3337,8 @@ function createMove(move) {
             return new SignalBeam();
         case "silver_wind":
             return new SilverWind();
+        case "sing":
+            return new Sing();
         case "skull_bash":
             return new SkullBash();
         case "sleep_powder":
@@ -3389,12 +3391,16 @@ function createMove(move) {
             return new SurgingStrikes();
         case "swagger":
             return new Swagger();
+        case "sweet_kiss":
+            return new SweetKiss();
         case "swords_dance":
             return new SwordsDance();
         case "synthesis":
             return new Synthesis();
         case "tackle":
             return new Tackle();
+        case "teleport":
+            return new Teleport();
         case "thunder":
             return new Thunder();
         case "thunderbolt":
@@ -3413,8 +3419,12 @@ function createMove(move) {
             return new Toxic();
         case "toxic_spikes":
             return new ToxicSpikes();
+        case "tri_attack":
+            return new TriAttack();
         case "twister":
             return new Twister();
+        case "uproar":
+            return new Uproar();
         case "u_turn":
             return new UTurn();
         case "vacuum_wave":
@@ -5875,6 +5885,16 @@ function SilverWind() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. If the user's HP ends with 1, raises all non-enhanced stats by one stage.";
 }
 
+function Sing() {
+    this.name = "Sing";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("sleep", 1, pD); };
+    this.description = "Applies 1 stack of sleep to the target.";
+}
+
 function SkullBash() {
     this.name = "Skull Bash";
     this.type = "normal";
@@ -6225,6 +6245,16 @@ function Swagger() {
     this.description = "Raises target's attack by 2 stages and applies 2 stacks of confusion to it.";
 }
 
+function SweetKiss() {
+    this.name = "Sweet Kiss";
+    this.type = "fairy";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("confusion", 1, pD); };
+    this.description = "Applies 1 stack of confusion to the target.";
+}
+
 function SwordsDance() {
     this.name = "Swords Dance";
     this.type = "normal";
@@ -6261,6 +6291,16 @@ function Tackle() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function Teleport() {
+    this.name = "Teleport";
+    this.type = "psychic";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.effect = function (move, pA, pD) { switchesLeft = Math.max(1, switchesLeft); };
+    this.description = "User regains the opportunity to switch out.";
 }
 
 function Thrash() {
@@ -6373,6 +6413,22 @@ function ToxicSpikes() {
     this.description = "Scatters toxic spikes around the opposing team, applying 4 stacks of poison per stack of spikes (maximum 2) to grounded Pokémon at the end of each turn.";
 }
 
+function TriAttack() {
+    this.name = "Tri Attack";
+    this.type = "normal";
+    this.cat = "special";
+    this.bp = 80;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        if (weather != undefined) {
+            if (weather.name === "Rain") applyEffect("paralysis", 1, pD);
+            if (weather.name === "Sun") applyEffect("burn", 1, pD);
+            if (weather.name === "Freeze") applyEffect("freeze", 1, pD);
+        }
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies status conditions depending on the weather.";
+}
+
 function Twister() {
     this.name = "Twister";
     this.type = "dragon";
@@ -6381,6 +6437,20 @@ function Twister() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function Uproar() {
+    this.name = "Uproar";
+    this.type = "normal";
+    this.cat = "special";
+    this.bp = 90;
+    this.cost = 2;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) {
+        removeEffect("Sleep", pD);
+        pA.hand.push(new Uproar());
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Remains in hand. Wakes up sleeping Pokémon.";
 }
 
 function UTurn() {
@@ -6688,6 +6758,8 @@ function createEffect(type, stacks) {
             return new CurseE(stacks);
         case "fear":
             return new Fear(stacks);
+        case "freeze":
+            return new Freeze(stacks);
         case "grounded":
             return new Grounded(stacks);
         case "ingrain":
@@ -6776,6 +6848,16 @@ function Fear(stacks) {
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " has flinched!<br/>"
+    this.effect = (pA, pD) => { this.stacks--; };
+}
+
+function Freeze(stacks) {
+    this.name = "Freeze";
+    this.description = "Freeze\nNullify next attack's effects, then remove 1 stack.";
+    this.icon = 'resources/sprites/effect_icons/freeze.webp';
+    this.stacks = stacks;
+    this.cancel = true;
+    this.specialMessage = " is frozen solid!<br/>"
     this.effect = (pA, pD) => { this.stacks--; };
 }
 
