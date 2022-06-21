@@ -2399,8 +2399,8 @@ function Dragonite() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dragon", "flying"];
-    this.moves = [createMove("tackle"), createMove("tackle"), createMove("wing_attack"), createMove("twister")];
-    this.movepool = ["wing_attack", "twister", "extreme_speed", "roost"];
+    this.moves = [createMove("aerial_ace"), createMove("thunder_punch"), createMove("wing_attack"), createMove("twister"), createMove("ice_punch"), createMove("fire_punch")];
+    this.movepool = ["wing_attack", "air_cutter", "air_slash", "aqua_jet", "aqua_tail", "breaking_swipe", "brick_break", "bulldoze", "defog", "draco_meteor", "draon_claw", "dragon_dance", "dragon_pulse", "dragon_rush", "dragon_tail", "dual_wingbeat", "earthquake", "extreme_speed", "fire_punch", "hone_claws", "hurricane", "hydro_pump", "iron_tail", "outrage", "rain_dance", "rock_slide", "roost", "scale_shot", "stone_edge", "superpower", "surf", "twister", "waterfall", "aerial_ace", "fly", "ice_punch", "steel_wing", "thunder_punch"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/dragonite.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/dragonite.gif';
     this.effects = [];
@@ -2946,12 +2946,14 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance",
     "string_shot", "signal_beam", "silver_wind", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell",
     "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave",
-    "psybeam"];
+    "psybeam", "aerial_ace", "fly", "ice_punch", "steel_wing"];
 
 function createMove(move) {
     switch (move) {
         case "absorb":
             return new Absorb();
+        case "aerial_ace":
+            return new AerialAce();
         case "agility":
             return new Agility();
         case "air_cutter":
@@ -3118,6 +3120,8 @@ function createMove(move) {
             return new FlashCannon();
         case "flip_turn":
             return new FlipTurn();
+        case "fly":
+            return new Fly();
         case "focus_blast":
             return new FocusBlast();
         case "focus_punch":
@@ -3176,6 +3180,8 @@ function createMove(move) {
             return new Hypnosis();
         case "ice_beam":
             return new IceBeam();
+        case "ice_punch":
+            return new IcePunch();
         case "ice_shard":
             return new IceShard();
         case "inferno":
@@ -3336,6 +3342,8 @@ function createMove(move) {
             return new StealthRock();
         case "steel_beam":
             return new SteelBeam();
+        case "steel_wing":
+            return new SteelWing();
         case "sticky_web":
             return new StickyWeb();
         case "stomping_tantrum":
@@ -3442,6 +3450,19 @@ function Absorb() {
     this.recoil = -.5;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent and heals user for 50% of damage dealt.";
+}
+
+function AerialAce() {
+    this.name = "Aerial Ace";
+    this.type = "flying";
+    this.cat = "physical";
+    this.bp = 35;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        drawMove(pA, false);
+        this.bp = 35 + 25 * (pA.draw.length == 0);
+    };
+    this.description = "Deals 35 base power damage to the opponent. Draw a card. Base power increases if it was the last card in the draw pile.";
 }
 
 function Agility() {
@@ -4509,6 +4530,30 @@ function FlipTurn() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. User regains the opportunity to switch out and loses all trapping effects.";
 }
 
+function Fly() {
+    this.name = "Fly";
+    this.type = "flying";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new FlyStrike());
+        applyEffect("protection", 1, pA);
+    };
+    this.description = "Applies 1 stack of protection to the user and shuffles a Fly Strike into its deck.";
+}
+
+function FlyStrike() {
+    this.name = "Fly Strike";
+    this.type = "flying";
+    this.cat = "physical";
+    this.bp = 75;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Exhaust.";
+}
+
 function FocusBlast() {
     this.name = "Focus Blast";
     this.type = "fighting";
@@ -4900,6 +4945,16 @@ function IceBeam() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target in the hail.";
+}
+
+function IcePunch() {
+    this.name = "Ice Punch";
+    this.type = "ice";
+    this.cat = "physical";
+    this.bp = 35;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (isFrozen(pD)) applyEffect("burn", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target if it's frozen already.";
 }
 
 function IceShard() {
@@ -5873,6 +5928,16 @@ function SteelBeam() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Recoil is 50% - 10% per user stat raised.";
 }
 
+function SteelWing() {
+    this.name = "Steel Wing";
+    this.type = "steel";
+    this.cat = "physical";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (pA.statchanges.defense <= 0) boostStat(pA, "defense", 1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Raises user's defense by 1 stage if it hasn't been raised already.";
+}
+
 function StickyWeb() {
     this.name = "Sticky Web";
     this.type = "bug";
@@ -6106,10 +6171,10 @@ function ThunderPunch() {
     this.name = "Thunder Punch";
     this.type = "electric";
     this.cat = "physical";
-    this.bp = 80;
-    this.cost = 2;
-    this.effect = function (move, pA, pD) { if (energy == 2) applyEffect("paralysis", 1, pD); };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if user's energy is 4 upon use.";
+    this.bp = 35;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if it's already paralyzed.";
 }
 
 function ThunderShock() {
@@ -6787,6 +6852,11 @@ function isPoisoned(p) {
 
 function isParalyzed(p) {
     var i = p.effects.findIndex(e => e.name === "Paralysis");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
+function isFrozen(p) {
+    var i = p.effects.findIndex(e => e.name === "Freeze");
     return i >= 0 && p.effects[i].stacks > 0;
 }
 
