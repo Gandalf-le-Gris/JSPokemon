@@ -2377,7 +2377,7 @@ function Gardevoir() {
     this.currenthp = 0;
     this.types = ["psychic", "fairy"];
     this.moves = [createMove("confusion"), createMove("psychic"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("calm_mind"), createMove("hypnosis")];
-    this.movepool = ["confusion", "disarming_voice", "hypnosis", "dazzling_gleam", "ally_switch", "calm_mind", "charge_beam", "draining_kiss", "dream_eater", "echoed_voice", "energy_ball", "focus_blast", "grass_knot", "heal_pulse", "hidden_power", "hyper_beam", "hyper_voice", "moonblast", "psychic", "shadow_ball", "shock_wave", "signal_beam", "stored_power", "thunderbolt", "will_o_wisp", "wish", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave"];
+    this.movepool = ["confusion", "disarming_voice", "hypnosis", "dazzling_gleam", "ally_switch", "calm_mind", "charge_beam", "draining_kiss", "dream_eater", "echoed_voice", "energy_ball", "focus_blast", "grass_knot", "heal_pulse", "hidden_power", "hyper_beam", "hyper_voice", "moonblast", "psychic", "shadow_ball", "shock_wave", "signal_beam", "stored_power", "thunderbolt", "will_o_wisp", "wish", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave", "psybeam"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/gardevoir.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/gardevoir.gif';
     this.effects = [];
@@ -2945,7 +2945,8 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "zen_headbutt", "bulk_up", "protect", "super_fang", "ally_switch", "bone_rush", "close_combat", "cross_chop", "drain_punch", "focus_punch",
     "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance",
     "string_shot", "signal_beam", "silver_wind", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell",
-    "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave"];
+    "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave",
+    "psybeam"];
 
 function createMove(move) {
     switch (move) {
@@ -3255,6 +3256,8 @@ function createMove(move) {
             return new PowerWhip();
         case "protect":
             return new Protect();
+        case "psybeam":
+            return new Psybeam();
         case "psychic":
             return new Psychic();
         case "psych_up":
@@ -5115,6 +5118,20 @@ function MegaKick() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fails unless user has a raised stat.";
 }
 
+function Memento() {
+    this.name = "Memento";
+    this.type = "dark";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.effect = function (move, pA, pD) {
+        boostStat(pD, "attack", -2);
+        boostStat(pD, "spattack", -2);
+        dealDamage(9999, pA);
+    };
+    this.description = "Lowers target's attack and special attack by 2 stages. User faints.";
+}
+
 function MetalClaw() {
     this.name = "Metal Claw";
     this.type = "steel";
@@ -5346,6 +5363,16 @@ function Protect() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("protection", 1, pA); };
     this.description = "Applies one stack of protection to the user.";
+}
+
+function Psybeam() {
+    this.name = "Psybeam";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (pA.draw.length >= 5) applyEffect("confusion", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target if the user's draw pile contains at least 5 cards.";
 }
 
 function Psychic() {
