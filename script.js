@@ -2499,8 +2499,8 @@ function Scizor() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["bug", "steel"];
-    this.moves = [createMove("metal_claw"), createMove("metal_claw"), createMove("fury_cutter"), createMove("wing_attack")];
-    this.movepool = ["metal_claw", "fury_cutter", "wing_attack"];
+    this.moves = [createMove("metal_claw"), createMove("bullet_punch"), createMove("fury_cutter"), createMove("wing_attack"), createMove("x_scissor"), createMove("u_turn")];
+    this.movepool = ["metal_claw", "fury_cutter", "wing_attack", "aerial_ace", "agility", "assurance", "baton_pass", "brick_break", "bullet_punch", "cross_poison", "curse", "defog", "dual_wingbeat", "facade", "fling", "iron_defense", "iron_head", "morning_sun", "night_slash", "reversal", "rock_smash", "roost", "sand_tomb", "slash", "steel_wing", "superpower", "swords_dance", "u_turn", "bug_bite", "psycho_cut", "x_scissor"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/scizor.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/scizor.gif';
     this.effects = [];
@@ -2956,7 +2956,8 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "hyper_voice", "tickle", "leaf_blade", "moonblast", "snarl", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave",
     "psybeam", "aerial_ace", "fly", "ice_punch", "steel_wing", "superpower", "explosion", "heavy_slam", "revenge", "seed_bomb", "spikes", "body_press",
     "pin_missile", "rock_polish", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar", "aqua_jet", "astonish", "disable", "flatter", "foul_play",
-    "hex", "lash_out", "mean_look", "moonlight", "night_shade", "poltergeist", "power_gem", "spite", "recover"];
+    "hex", "lash_out", "mean_look", "moonlight", "night_shade", "poltergeist", "power_gem", "spite", "recover", "bug_bite", "psycho_cut", "x_scissor",
+    "cross_poison", "fling", "night_slash", "slash"];
 
 function createMove(move) {
     switch (move) {
@@ -3016,6 +3017,8 @@ function createMove(move) {
             return new Brine();
         case "bubble_beam":
             return new BubbleBeam();
+        case "bug_bite":
+            return new BugBite();
         case "bug_buzz":
             return new BugBuzz();
         case "bulk_up":
@@ -3042,6 +3045,8 @@ function createMove(move) {
             return new Confusion();
         case "cross_chop":
             return new CrossChop();
+        case "cross_poison":
+            return new CrossPoison();
         case "crunch":
             return new Crunch();
         case "curse":
@@ -3140,6 +3145,8 @@ function createMove(move) {
             return new FlashCannon();
         case "flatter":
             return new Flatter();
+        case "fling":
+            return new Fling();
         case "flip_turn":
             return new FlipTurn();
         case "fly":
@@ -3274,6 +3281,8 @@ function createMove(move) {
             return new NastyPlot();
         case "night_shade":
             return new NightShade();
+        case "night_slash":
+            return new NightSlash();
         case "nuzzle":
             return new Nuzzle();
         case "outrage":
@@ -3308,6 +3317,8 @@ function createMove(move) {
             return new Psybeam();
         case "psychic":
             return new Psychic();
+        case "psycho_cut":
+            return new PsychoCut();
         case "psych_up":
             return new PsychUp();
         case "pyro_ball":
@@ -3376,6 +3387,8 @@ function createMove(move) {
             return new Sing();
         case "skull_bash":
             return new SkullBash();
+        case "slash":
+            return new Slash();
         case "sleep_powder":
             return new SleepPowder();
         case "sludge":
@@ -3500,6 +3513,8 @@ function createMove(move) {
             return new WingAttack();
         case "wish":
             return new Wish();
+        case "x_scissor":
+            return new XScissor();
         case "zap_cannon":
             return new ZapCannon();
         case "zen_headbutt":
@@ -3864,6 +3879,21 @@ function BubbleBeam() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's speed by 1 stage in the rain.";
 }
 
+function BugBite() {
+    this.name = "Bug Bite";
+    this.type = "bug";
+    this.cat = "physical";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        this.bp = 30;
+        for (let m of pA.moves) {
+            if (m.type === "bug")
+                this.bp += 5;
+        } };
+    this.description = "Deals 35 base power damage to the opponent. Base power increases with each bug type move in the user's deck.";
+}
+
 function BugBuzz() {
     this.name = "Bug Buzz";
     this.type = "bug";
@@ -4015,6 +4045,20 @@ function CrossChop() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if user's HP is below 40% of maximum HP.";
 }
 
+function CrossPoison() {
+    this.name = "Cross Poison";
+    this.type = "poison";
+    this.cat = "physical";
+    this.bp = 70;
+    this.cost = 2;
+    this.crit = false;
+    this.effect = function (move, pA, pD) {
+        this.crit = isPoisoned(pD);
+        applyEffect("poison", 6 * isPoisoned(pD), pD);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and applies 6 stacks of poison to the target if it is poisoned.";
+}
+
 function Crunch() {
     this.name = "Crunch";
     this.type = "dark";
@@ -4077,7 +4121,7 @@ function Defog() {
         removeEffect(opponent, "Spikes");
         removeEffect(opponent, "Toxic Spikes");
         removeEffect(opponent, "Sticky Web");
-        for (let p of t) {
+        for (let p of team) {
             removeEffect(p, "Stealth Rock");
             removeEffect(p, "Spikes");
             removeEffect(p, "Toxic Spikes");
@@ -4645,6 +4689,17 @@ function Flatter() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { boostStat(pD, "spattack", 1); applyEffect("confusion", 2, pD); };
     this.description = "Raises target's special attack by 1 stage and applies 2 stacks of confusion to it.";
+}
+
+function Fling() {
+    this.name = "Fling";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 35;
+    this.cost = 1;
+    this.multihit = 0;
+    this.effect = function (move, pA, pD) { this.multihit = pA.items.length; };
+    this.description = "Deals 35 base power damage to the opponent per held item.";
 }
 
 function FlipTurn() {
@@ -5509,6 +5564,17 @@ function NightShade() {
     this.description = "Deals 40 damage to the opponent.";
 }
 
+function NightSlash() {
+    this.name = "Night Slash";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 80;
+    this.cost = 2;
+    this.crit = false;
+    this.effect = function (move, pA, pD) { this.crit = pA.discard.length >= 5; };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's discard pile contains at least 5 cards.";
+}
+
 function Nuzzle() {
     this.name = "Nuzzle";
     this.type = "electric";
@@ -5687,6 +5753,17 @@ function Psychic() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { if (pA.draw.length >= 5) boostStat(pD, "spdefense", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers its special defense by one stage if the user's draw pile contains at least 5 cards.";
+}
+
+function PsychoCut() {
+    this.name = "Psycho Cut";
+    this.type = "psychic";
+    this.cat = "physical";
+    this.bp = 75;
+    this.cost = 2;
+    this.crit = false;
+    this.effect = function (move, pA, pD) { this.crit = (pA.draw.length >= 5); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's draw pile contains at least 5 cards.";
 }
 
 function PsychUp() {
@@ -6114,6 +6191,17 @@ function SleepPowder() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("sleep", 1, pD); };
     this.description = "Applies 1 stack of sleep to the opponent.";
+}
+
+function Slash() {
+    this.name = "Slash";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 30;
+    this.cost = 1;
+    this.crit = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
 }
 
 function Sludge() {
@@ -6836,6 +6924,7 @@ function WickedBlow() {
     this.cat = "physical";
     this.bp = 90;
     this.cost = 3;
+    this.crit = true;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
 }
@@ -6879,6 +6968,23 @@ function Wish() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("wish", 2, pA); };
     this.description = "Applies 2 stacks of wish to the user.";
+}
+
+function XScissor() {
+    this.name = "X-Scissor";
+    this.type = "bug";
+    this.cat = "physical";
+    this.bp = 75;
+    this.cost = 2;
+    this.crit = false;
+    this.effect = function (move, pA, pD) {
+        var c = 0;
+        for (let m of pA.hand) {
+            c += m.type === "bug";
+        }
+        this.crit = c > 1;
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's hand contains another bug type move.";
 }
 
 function ZapCannon() {
@@ -6998,7 +7104,7 @@ function createEffect(type, stacks) {
         case "sticky_web":
             return new StickyWebE(stacks);
         case "taunt":
-            return new TauntE(stack);
+            return new TauntE(stacks);
         case "toxic_spikes":
             return new ToxicSpikesE(stacks);
         case "trap":
@@ -7024,6 +7130,7 @@ function Burn(stacks) {
     this.description = "Burn\nPhysical damage reduced by 40%. Remove 1 stack at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/burn.png';
     this.stacks = stacks;
+    this.immune = ["fire"];
     this.effect = (pA, pD) => { this.stacks--; };
 }
 
@@ -7073,6 +7180,7 @@ function Freeze(stacks) {
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " is frozen solid!<br/>"
+    this.immune = ["ice"];
     this.effect = (pA, pD) => { this.stacks--; };
 }
 
