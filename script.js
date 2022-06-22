@@ -1134,6 +1134,7 @@ function useMove(move) {
         var pCopied;
         var sCopied;
 
+        //cancelling status effects
         var cancelled = false;
         var message = "";
         if (player) {
@@ -1182,6 +1183,7 @@ function useMove(move) {
             }
         }
 
+        //taunt
         if (player && isTaunted(team[activePokemon]) && move.cat === "status") {
             cancelled = true;
             desc.innerHTML += team[activePokemon].name + "can't use " + move.name + " after the taunt!<br />";
@@ -1190,6 +1192,7 @@ function useMove(move) {
             desc.innerHTML += opponent.name + "can't use " + move.name + " after the taunt!<br />";
         }
 
+        //move effects
         if (!cancelled) {
             if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0))
                 move.effect(move, team[activePokemon], opponent);
@@ -1197,6 +1200,12 @@ function useMove(move) {
                 move.effect(move, opponent, team[activePokemon]);
             if (move.fails)
                 cancelled = true;
+        }
+
+        if (player && move.cat !== "status" && doesBlock(opponent)) {
+            desc.innerHTML += opponent.name + " protected itself!<br />";
+        } else if (!player && move.cat !== "status" && doesBlock(team[activePokemon])) {
+            desc.innerHTML += team[activePokemon].name + " protected itself!<br />";
         }
 
         if (move.fails && message === "") {
@@ -2522,8 +2531,8 @@ function Aegislash() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["steel", "ghost"];
-    this.moves = [createMove("metal_claw"), createMove("shadow_sneak"), createMove("swords_dance"), createMove("kings_shield")];
-    this.movepool = ["metal_claw", "shadow_sneak", "swords_dance", "kings_shield"];
+    this.moves = [createMove("metal_claw"), createMove("shadow_sneak"), createMove("swords_dance"), createMove("kings_shield"), createMove("sacred_sword"), createMove("shadow_ball")];
+    this.movepool = ["metal_claw", "shadow_sneak", "swords_dance", "kings_shield", "kings_shield", "kings_shield", "kings_shield", "air_slash", "brick_break", "close_combat", "flash_cannon", "fury_cutter", "gyro_ball", "hyper_beam", "iron_defense", "iron_head", "magnet_rise", "night_slash", "psycho_cut", "reversal", "rock_slide", "shadow_ball", "shadow_claw", "shock_wave", "slash", "spite", "steel_beam", "swagger", "toxic", "autotomize", "brutal_swing", "head_smash", "metal_sound", "sacred_sword", "solar_blade"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
     this.effects = [];
@@ -2957,7 +2966,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "psybeam", "aerial_ace", "fly", "ice_punch", "steel_wing", "superpower", "explosion", "heavy_slam", "revenge", "seed_bomb", "spikes", "body_press",
     "pin_missile", "rock_polish", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar", "aqua_jet", "astonish", "disable", "flatter", "foul_play",
     "hex", "lash_out", "mean_look", "moonlight", "night_shade", "poltergeist", "power_gem", "spite", "recover", "bug_bite", "psycho_cut", "x_scissor",
-    "cross_poison", "fling", "night_slash", "slash"];
+    "cross_poison", "fling", "night_slash", "slash", "autotomize", "brutal_swing", "head_smash", "metal_sound", "sacred_sword", "solar_blade"];
 
 function createMove(move) {
     switch (move) {
@@ -2987,6 +2996,8 @@ function createMove(move) {
             return new Astonish();
         case "aura_sphere":
             return new AuraSphere();
+        case "autotomize":
+            return new Autotomize();
         case "avalanche":
             return new Avalanche();
         case "baton_pass":
@@ -3015,6 +3026,8 @@ function createMove(move) {
             return new BrickBreak();
         case "brine":
             return new Brine();
+        case "brutal_swing":
+            return new BrutalSwing();
         case "bubble_beam":
             return new BubbleBeam();
         case "bug_bite":
@@ -3185,6 +3198,8 @@ function createMove(move) {
             return new HammerArm();
         case "headbutt":
             return new Headbutt();
+        case "head_smash":
+            return new HeadSmash();
         case "heal_bell":
             return new HealBell();
         case "heal_pulse":
@@ -3265,6 +3280,8 @@ function createMove(move) {
             return new MetalClaw();
         case "meteor_mash":
             return new MeteorMash();
+        case "metal_sound":
+            return new MetalSound();
         case "metronome":
             return new Metronome();
         case "mimic":
@@ -3353,6 +3370,8 @@ function createMove(move) {
             return new Rollout();
         case "roost":
             return new Roost();
+        case "sacred_sword":
+            return new SacredSword();
         case "sandstorm":
             return new Sandstorm();
         case "sand_tomb":
@@ -3401,6 +3420,8 @@ function createMove(move) {
             return new SoftBoiled();
         case "solar_beam":
             return new SolarBeam();
+        case "solar_blade":
+            return new SolarBlade();
         case "spark":
             return new Spark();
         case "spikes":
@@ -3668,6 +3689,16 @@ function AuraSphere() {
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
+function Autotomize() {
+    this.name = "Autotomize";
+    this.type = "steel";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pA, "speed", 2); };
+    this.description = "Raises user's speed by 2 stages.";
+}
+
 function Avalanche() {
     this.name = "Avalanche";
     this.type = "ice";
@@ -3867,6 +3898,24 @@ function Brine() {
             this.bp = 60;
     };
     this.description = "Deals 60 base power damage to the opponent. Base power doubles against targets below 50% of maximum HP.";
+}
+
+function BrutalSwing() {
+    this.name = "Brutal Swing";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 70;
+    this.cost = 1;
+    this.fails = false;
+    this.effect = function (move, pA, pD) {
+        var i = pA.hand.findIndex(e => e === this);
+        if (i < pA.hand.length - 1) {
+            discardCard(pA.hand[i + 1]);
+            this.fails = false;
+        } else
+            this.fails = true;
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Discard the next move in hand to use. Fails if no move can be discarded.";
 }
 
 function BubbleBeam() {
@@ -4955,6 +5004,17 @@ function Headbutt() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's attack has been raised.";
 }
 
+function HeadSmash() {
+    this.name = "Head Smash";
+    this.type = "rock";
+    this.cat = "physical";
+    this.bp = 200;
+    this.cost = 3;
+    this.recoil = .5;
+    this.effect = function (move, pA, pD) { this.recoil = .5 * (weather == undefined || weather.name !== "Sandstorm"); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. 50% recoil when not in a sandstorm.";
+}
+
 function HealBell() {
     this.name = "Heal Bell";
     this.type = "normal";
@@ -5439,6 +5499,16 @@ function MetalClaw() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function MetalSound() {
+    this.name = "Metal Sound";
+    this.type = "steel";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "spdefense", -2); };
+    this.description = "Lowers target's special defense by 2 stages.";
 }
 
 function MeteorMash() {
@@ -5966,6 +6036,16 @@ function Roost() {
     this.description = "Recover 20% of maximum HP.";
 }
 
+function SacredSword() {
+    this.name = "Sacred Sword";
+    this.type = "fighting";
+    this.cat = "physical";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { this.bp = 85 * statsChangeMultiplier ** pD.statchanges.defense; };
+    this.description = "Deals 85 base power damage to the opponent. Base power varies with the target's defense stat changes.";
+}
+
 function SandTomb() {
     this.name = "Sand Tomb";
     this.type = "ground";
@@ -6001,7 +6081,7 @@ function ScaleShot() {
     this.type = "dragon";
     this.cat = "physical";
     this.bp = 30;
-    this.cost = 1;
+    this.cost = 2;
     this.multihit = 3;
     this.effect = function (move, pA, pD) {
         boostStat(pA, "speed", 1);
@@ -6250,6 +6330,32 @@ function SoftBoiled() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { dealDamage(-pA.maxhp * .2, pA); };
     this.description = "Recover 20% of maximum HP.";
+}
+
+function SolarBlade() {
+    this.name = "Solar Blade";
+    this.type = "grass";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        if (weather != undefined && weather.name === "Sun")
+            pA.hand.push(new ChargedSolarBlade());
+        else
+            pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ChargedSolarBlade());
+    };
+    this.description = "Shuffles a Charged Solar Blade into the user's deck. Under the sun, places it in the user's hand instead.";
+}
+
+function ChargedSolarBlade() {
+    this.name = "Charged Solar Blade";
+    this.type = "grass";
+    this.cat = "physical";
+    this.bp = 120;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Exhaust.";
 }
 
 function SolarBeam() {
