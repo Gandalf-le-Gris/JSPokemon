@@ -2554,8 +2554,8 @@ function Meowth() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("scratch"), createMove("scratch"), createMove("pay_day"), createMove("fury_swipes")];
-    this.movepool = ["pay_day", "fury_swipes", "assurance"];
+    this.moves = [createMove("scratch"), createMove("assurance"), createMove("pay_day"), createMove("fury_swipes"), createMove("feint"), createMove("fake_out")];
+    this.movepool = ["pay_day", "fury_swipes", "assurance", "bite", "bubble_beam", "charm", "dark_pulse", "dig", "double_edge", "echoed_voice", "facade", "fake_out", "flail", "foul_play", "gunk_shot", "happy_hour", "hone_claws", "hyper_voice", "hypnosis", "iron_tail", "lash_out", "last_resort", "nasty_plot", "night_slash", "payback", "scratch", "seed_bomb", "shadow_claw", "slash", "swagger", "taunt", "thunderbolt", "uproar", "u_turn", "water_pulse", "feint", "happy_hour", "screech"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/meowth.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/meowth.gif';
     this.effects = [];
@@ -2577,8 +2577,8 @@ function Metagross() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["steel", "psychic"];
-    this.moves = [createMove("metal_claw"), createMove("hammer_arm"), createMove("confusion"), createMove("bullet_punch")];
-    this.movepool = ["metal_claw", "confusion", "bullet_punch", "hammer_arm"];
+    this.moves = [createMove("metal_claw"), createMove("hammer_arm"), createMove("confusion"), createMove("bullet_punch"), createMove("meteor_mash"), createMove("giga_impact")];
+    this.movepool = ["metal_claw", "confusion", "bullet_punch", "hammer_arm", "agility", "body_press", "brutal_swing", "bulldoze", "double_edge", "dynamic_punch", "earthquake", "explosion", "flash_cannon", "giga_impact", "gyro_ball", "headbutt", "hone_claws", "iron_defense", "iron_head", "magnet_rise", "meteor_mash", "power_up_punch", "psychic", "psycho_cut", "rest", "rock_slide", "sandstorm", "shadow_ball", "sludge_bomb", "stealth_rock", "steel_beam", "stomping_tantrum", "zen_headbutt", "meteor_beam"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/metagross.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/metagross.gif';
     this.effects = [];
@@ -2600,8 +2600,8 @@ function Weavile() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dark", "ice"];
-    this.moves = [createMove("scratch"), createMove("ice_shard"), createMove("assurance"), createMove("beat_up")];
-    this.movepool = ["ice_shard", "assurance", "beat_up"];
+    this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("assurance"), createMove("beat_up"), createMove("hail"), createMove("feint")];
+    this.movepool = ["ice_shard", "assurance", "beat_up", "assurance", "avalanche", "bite", "brick_break", "detect", "double_edge", "fake_out", "fake_tears", "feint", "fling", "focus_punch", "foul_play", "fury_cutter", "fury_swipes", "hail", "hone_claws", "ice_punch", "iron_tail", "lash_out", "low_kick", "metal_claw", "night_slash", "payback", "poison_jab", "psycho_cut", "revenge", "shadow_claw", "slash", "swords_dance", "taunt", "x_scissor", "crush_claw", "icicle_crash", "icicle_spear", "throat_chop", "triple_axel"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/weavile.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/weavile.gif';
     this.effects = [];
@@ -2623,8 +2623,8 @@ function Zeraora() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric"];
-    this.moves = [createMove("scratch"), createMove("volt_switch"), createMove("spark"), createMove("power_up_punch")];
-    this.movepool = ["spark", "power_up_punch", "volt_switch"];
+    this.moves = [createMove("plasma_fists"), createMove("volt_switch"), createMove("spark"), createMove("power_up_punch"), createMove("bulk_up"), createMove("charge")];
+    this.movepool = ["spark", "power_up_punch", "volt_switch", "aerial_ace", "assurance", "aura_sphere", "blaze_kick", "bounce", "bulk_up", "calm_mind", "charge", "close_combat", "discharge", "drain_punch", "dual_chop", "electro_ball", "electroweb", "focus_blast", "focus_punch", "grass_knot", "hone_claws", "iron_tail", "low_kick", "outrage", "plasma_fists", "play_rough", "revenge", "shock_wave", "slash", "throat_chop", "thunder", "thunderbolt", "thunder_punch", "thunder_wave", "wild_charge"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/zeraora.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/zeraora.gif';
     this.effects = [];
@@ -2646,8 +2646,8 @@ function Omanyte() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["rock", "water"];
-    this.moves = [createMove("water_gun"), createMove("water_gun"), createMove("rollout"), createMove("ancient_power")];
-    this.movepool = ["water_gun", "rollout", "ancient_power"];
+    this.moves = [createMove("water_gun"), createMove("icy_wind"), createMove("rollout"), createMove("ancient_power"), createMove("bubble_beam"), createMove("withdraw")];
+    this.movepool = ["water_gun", "rollout", "ancient_power", "aurora_beam", "blizzard", "brine", "bubble_beam", "earth_power", "hail", "hidden_power", "hydro_pump", "ice_beam", "iron_defense", "meteor_beam", "rain_dance", "rest", "rock_polish", "scald", "shell_smash", "spikes", "stealth_rock", "surf", "toxic_spikes", "water_gun", "water_pulse", "whirlpool", "haze", "icy_wind", "muddy_water", "withdraw"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/omanyte.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/omanyte.gif';
     this.effects = [];
@@ -2669,8 +2669,8 @@ function Tyranitar() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["rock", "dark"];
-    this.moves = [createMove("tackle"), createMove("stomping_tantrum"), createMove("rock_throw"), createMove("payback")];
-    this.movepool = ["rock_throw", "payback", "stomping_tantrum"];
+    this.moves = [createMove("rock_blast"), createMove("stomping_tantrum"), createMove("rock_throw"), createMove("payback"), createMove("crunch"), createMove("dragon_dance")];
+    this.movepool = ["rock_throw", "payback", "stomping_tantrum", "aqua_tail", "assurance", "avalanche", "bite", "body_press", "breaking_swipe", "brutal_swing", "crunch", "dragon_claw", "dragon_tail", "dragon_dance", "dynamic_punch", "earthquake", "fire_fang", "fling", "foul_play", "giga_impact", "heavy_slam", "hone_claws", "ice_fang", "iron_defense", "iron_head", "lash_out", "outrage", "payback", "revenge", "rock_polish", "rock_slide", "sandstorm", "sand_tomb", "shadow_claw", "stealth_rock", "stone_edge", "superpower", "thrash", "thunder_fang", "rock_blast", "rock_tomb", "smack_down"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/tyranitar.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/tyranitar.gif';
     this.effects = [];
@@ -2692,8 +2692,8 @@ function Gyarados() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["water", "flying"];
-    this.moves = [createMove("tackle"), createMove("bite"), createMove("waterfall"), createMove("rain_dance")];
-    this.movepool = ["bite", "waterfall", "rain_dance"];
+    this.moves = [createMove("aqua_tail"), createMove("bite"), createMove("waterfall"), createMove("rain_dance"), createMove("splash"), createMove("bounce")];
+    this.movepool = ["bite", "waterfall", "rain_dance", "aqua_tail", "avalanche", "body_slam", "bounce", "bulldoze", "brutal_swing", "crunch", "dive", "double_edge", "dragon_dance", "dragon_tail", "earthquake", "flail", "giga_impact", "headbutt", "ice_fang", "iron_head", "iron_tail", "lash_out", "payback", "power_whip", "rock_smash", "scale_shot", "stone_edge", "thrash", "scary_face", "splash"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/gyarados.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/gyarados.gif';
     this.effects = [];
@@ -2966,7 +2966,9 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "psybeam", "aerial_ace", "fly", "ice_punch", "steel_wing", "superpower", "explosion", "heavy_slam", "revenge", "seed_bomb", "spikes", "body_press",
     "pin_missile", "rock_polish", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar", "aqua_jet", "astonish", "disable", "flatter", "foul_play",
     "hex", "lash_out", "mean_look", "moonlight", "night_shade", "poltergeist", "power_gem", "spite", "recover", "bug_bite", "psycho_cut", "x_scissor",
-    "cross_poison", "fling", "night_slash", "slash", "autotomize", "brutal_swing", "head_smash", "metal_sound", "sacred_sword", "solar_blade"];
+    "cross_poison", "fling", "night_slash", "slash", "autotomize", "brutal_swing", "head_smash", "metal_sound", "sacred_sword", "solar_blade", "feint",
+    "happy_hour", "screech", "meteor_beam", "crush_claw", "icicle_crash", "icicle_spear", "throat_chop", "triple_axel", "hail", "plasma_fists", "haze",
+    "icy_wind", "muddy_water", "withdraw", "rock_blast", "rock_tomb", "smack_down", "scary_face", "splash"];
 
 function createMove(move) {
     switch (move) {
@@ -3062,6 +3064,8 @@ function createMove(move) {
             return new CrossPoison();
         case "crunch":
             return new Crunch();
+        case "crush_claw":
+            return new CrushClaw();
         case "curse":
             return new Curse();
         case "dark_pulse":
@@ -3136,6 +3140,8 @@ function createMove(move) {
             return new FakeOut();
         case "fake_tears":
             return new FakeTears();
+        case "feint":
+            return new Feint();
         case "fiery_dance":
             return new FieryDance();
         case "fire_blast":
@@ -3194,8 +3200,14 @@ function createMove(move) {
             return new Gust();
         case "gyro_ball":
             return new GyroBall();
+        case "hail":
+            return new Hail();
         case "hammer_arm":
             return new HammerArm();
+        case "happy_hour":
+            return new HappyHour();
+        case "haze":
+            return new Haze();
         case "headbutt":
             return new Headbutt();
         case "head_smash":
@@ -3234,6 +3246,12 @@ function createMove(move) {
             return new IcePunch();
         case "ice_shard":
             return new IceShard();
+        case "icicle_crash":
+            return new IcicleCrash();
+        case "icicle_spear":
+            return new IcicleSpear();
+        case "icy_wind":
+            return new IcyWind();
         case "inferno":
             return new Inferno();
         case "ingrain":
@@ -3278,6 +3296,8 @@ function createMove(move) {
             return new Memento();
         case "metal_claw":
             return new MetalClaw();
+        case "meteor_beam":
+            return new MeteorBeam();
         case "meteor_mash":
             return new MeteorMash();
         case "metal_sound":
@@ -3292,6 +3312,8 @@ function createMove(move) {
             return new Moonlight();
         case "morning_sun":
             return new MorningSun();
+        case "muddy_water":
+            return new MuddyWater();
         case "mystical_fire":
             return new MysticalFire();
         case "nasty_plot":
@@ -3312,6 +3334,8 @@ function createMove(move) {
             return new PayDay();
         case "pin_missile":
             return new PinMissile();
+        case "plasma_fists":
+            return new PlasmaFists();
         case "play_rough":
             return new PlayRough();
         case "poison_jab":
@@ -3358,6 +3382,8 @@ function createMove(move) {
             return new Revenge();
         case "reversal":
             return new Reversal();
+        case "rock_blast":
+            return new RockBlast();
         case "rock_polish":
             return new RockPolish();
         case "rock_slide":
@@ -3366,6 +3392,8 @@ function createMove(move) {
             return new RockSmash();
         case "rock_throw":
             return new RockThrow();
+        case "rock_tomb":
+            return new RockTomb();
         case "rollout":
             return new Rollout();
         case "roost":
@@ -3380,10 +3408,14 @@ function createMove(move) {
             return new Scald();
         case "scale_shot":
             return new ScaleShot();
+        case "scary_face":
+            return new ScaryFace();
         case "scorching_sands":
             return new ScorchingSands();
         case "scratch":
             return new Scratch();
+        case "screech":
+            return new Screech();
         case "seed_bomb":
             return new SeedBomb();
         case "seismic_toss":
@@ -3414,6 +3446,8 @@ function createMove(move) {
             return new Sludge();
         case "sludge_bomb":
             return new SludgeBomb();
+        case "smack_down":
+            return new SmackDown();
         case "snarl":
             return new Snarl();
         case "soft_boiled":
@@ -3428,6 +3462,8 @@ function createMove(move) {
             return new Spikes();
         case "spite":
             return new Spite();
+        case "splash":
+            return new Splash();
         case "stealth_rock":
             return new StealthRock();
         case "steel_beam":
@@ -3486,6 +3522,8 @@ function createMove(move) {
             return new ThunderWave();
         case "thrash":
             return new Thrash();
+        case "throat_chop":
+            return new ThroatChop();
         case "tickle":
             return new Tickle();
         case "toxic":
@@ -3494,6 +3532,8 @@ function createMove(move) {
             return new ToxicSpikes();
         case "tri_attack":
             return new TriAttack();
+        case "triple_axel":
+            return new TripleAxel();
         case "twister":
             return new Twister();
         case "uproar":
@@ -3522,7 +3562,7 @@ function createMove(move) {
             return new WaterSpout();
         case "weather_ball":
             return new WeatherBall();
-        case "Whirlpool":
+        case "whirlpool":
             return new Whirlpool();
         case "wicked_blow":
             return new WickedBlow();
@@ -3534,6 +3574,8 @@ function createMove(move) {
             return new WingAttack();
         case "wish":
             return new Wish();
+        case "withdraw":
+            return new Withdraw();
         case "x_scissor":
             return new XScissor();
         case "zap_cannon":
@@ -4118,6 +4160,16 @@ function Crunch() {
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
+function CrushClaw() {
+    this.name = "Crush Claw";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 75;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (pD.statchanges.defense >= 0) boostStat(pD, "defense", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers its defense by 1 stage if it hasn't been lowered already.";
+}
+
 function Curse() {
     this.name = "Curse";
     this.type = "ghost";
@@ -4609,9 +4661,9 @@ function FakeOut() {
         if (energy >= 4) {
             drawMove(pA, false);
             applyEffect("fear", 1, pD);
-            this.fails = true;
-        } else
             this.fails = false;
+        } else
+            this.fails = true;
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target. Draw a card. Fails if energy is below 5 upon use.";
 }
@@ -4624,6 +4676,16 @@ function FakeTears() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -2); };
     this.description = "Lowers target's special attack by 2 stages.";
+}
+
+function Feint() {
+    this.name = "Feint";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 15;
+    this.cost = 0;
+    this.effect = function (move, pA, pD) { drawMove(pA, false); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
 }
 
 function FieryDance() {
@@ -4918,7 +4980,7 @@ function GigaDrain() {
 }
 
 function GigaImpact() {
-    this.name = "GigaImpact";
+    this.name = "Giga Impact";
     this.type = "normal";
     this.cat = "physical";
     this.bp = 350;
@@ -4984,6 +5046,16 @@ function GyroBall() {
     this.description = "Deals between 25 and 125 base power damage to the opponent, depending on how slow the user is compared to the target.";
 }
 
+function Hail() {
+    this.name = "Hail";
+    this.type = "ice";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { setWeather("hail", 5); };
+    this.description = "Sets the weather to hail for 5 turns.";
+}
+
 function HammerArm() {
     this.name = "Hammer Arm";
     this.type = "fighting";
@@ -4992,6 +5064,30 @@ function HammerArm() {
     this.cost = 2;
     this.effect = function (move, pA, pD) { boostStat(pA, "speed", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's speed by one stage.";
+}
+
+function HappyHour() {
+    this.name = "Happy Hour";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 3;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { if (player) money += 100; };
+    this.description = "Gain " + String.fromCharCode(08381) + "100. Exhaust.";
+}
+
+function Haze() {
+    this.name = "Haze";
+    this.type = "ice";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        team[activePokemon].statchanges = new StatChanges();
+        opponent.statchanges = new StatChanges();
+    };
+    this.description = "Resets both Pokémon's stat changes.";
 }
 
 function Headbutt() {
@@ -5243,6 +5339,27 @@ function IceShard() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
 }
 
+function IcicleCrash() {
+    this.name = "Icicle Crash";
+    this.type = "ice";
+    this.cat = "physical";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("fear", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target in the hail.";
+}
+
+function IcicleSpear() {
+    this.name = "Icicle Spear";
+    this.type = "ice";
+    this.cat = "physical";
+    this.bp = 15;
+    this.cost = 1;
+    this.multihit = 3;
+    this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (weather != undefined && weather.name === "Hail"); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits 2 extra times in the hail.";
+}
+
 function Inferno() {
     this.name = "Inferno";
     this.type = "fire";
@@ -5258,6 +5375,16 @@ function Inferno() {
             this.fails = true;
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent and applies 2 stacks of burn. Fails if not under the sun.";
+}
+
+function IcyWind() {
+    this.name = "Icy Wind";
+    this.type = "ice";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if ((weather != undefined && weather.name === "Hail") || effectiveMultiplier(this, pD) > 1) boostStat(pD, "speed", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's speed by 1 stage if this move is super effective or in the hail.";
 }
 
 function Ingrain() {
@@ -5511,6 +5638,33 @@ function MetalSound() {
     this.description = "Lowers target's special defense by 2 stages.";
 }
 
+function MeteorBeam() {
+    this.name = "Meteor Beam";
+    this.type = "rock";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        boostStat(pA, "spattack", 1);
+        if (weather != undefined && weather.name === "Sandstorm")
+            pA.hand.push(new ChargedMeteorBeam());
+        else
+            pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ChargedMeteorBeam());
+    };
+    this.description = "Raises user's special attack by 1 stage. Shuffles a Charged Meteor Beam into the user's deck. In a sandstorm, places it in the user's hand instead.";
+}
+
+function ChargedMeteorBeam() {
+    this.name = "Charged Meteor Beam";
+    this.type = "rock";
+    this.cat = "special";
+    this.bp = 80;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Exhaust.";
+}
+
 function MeteorMash() {
     this.name = "Meteor Mash";
     this.type = "steel";
@@ -5602,6 +5756,16 @@ function MorningSun() {
             dealDamage(-pA.maxhp * .2, pA);
     };
     this.description = "Restores 20% of maximum HP. Varies depending on the weather.";
+}
+
+function MuddyWater() {
+    this.name = "Muddy Water";
+    this.type = "water";
+    this.cat = "special";
+    this.bp = 90;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
 function MysticalFire() {
@@ -5699,18 +5863,9 @@ function PayDay() {
     this.cat = "physical";
     this.bp = 25;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (player) money += 50; };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Gain " + String.fromCharCode(08381) + "50.";
-}
-
-function PlayRough() {
-    this.name = "Play Rough";
-    this.type = "fairy";
-    this.cat = "physical";
-    this.bp = 80;
-    this.cost = 2;
-    this.effect = function (move, pA, pD) { if (effectiveMultiplier(this, pD) > 1) boostStat(pD, "attack", -1); };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's attack by one stage if the move is super effective.";
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { if (player) money += 25; };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Gain " + String.fromCharCode(08381) + "25. Exhaust.";
 }
 
 function PinMissile() {
@@ -5722,6 +5877,33 @@ function PinMissile() {
     this.multihit = 3;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
+}
+
+function PlasmaFists() {
+    this.name = "Plasma Fists";
+    this.type = "electric";
+    this.cat = "physical";
+    this.bp = 95;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        for (let m of pD.draw) {
+            if (m.type === "normal") {
+                m.type = "electric";
+                return;
+            }
+        }
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. First normal type move in the target's draw pile becomes electric type.";
+}
+
+function PlayRough() {
+    this.name = "Play Rough";
+    this.type = "fairy";
+    this.cat = "physical";
+    this.bp = 80;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (effectiveMultiplier(this, pD) > 1) boostStat(pD, "attack", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's attack by one stage if the move is super effective.";
 }
 
 function Pound() {
@@ -5970,20 +6152,15 @@ function Reversal() {
     this.description = "Deals up to 200 base power damage to the opponent, depending on how low user's HP is.";
 }
 
-function Rollout() {
-    this.name = "Rollout";
+function RockBlast() {
+    this.name = "Rock Blast";
     this.type = "rock";
     this.cat = "physical";
-    this.bp = 40;
+    this.bp = 15;
     this.cost = 1;
-    this.exhaust = true;
-    this.effect = function (move, pA, pD) {
-        var next = new Rollout();
-        next.bp = this.bp + 20;
-        next.description = "Deals " + next.bp + " base power damage to the opponent. Base power increases with each use.";
-        pA.discard.push(next);
-    };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
+    this.multihit = 3;
+    this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (weather != undefined && weather.name === "Sanstorm"); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits 2 extra times in the sandstorm.";
 }
 
 function RockPolish() {
@@ -6024,6 +6201,32 @@ function RockThrow() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function RockTomb() {
+    this.name = "Rock Tomb";
+    this.type = "rock";
+    this.cat = "physical";
+    this.bp = 45;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sandstorm") boostStat(pD, "speed", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's speed by 1 stage in the sandstorm.";
+}
+
+function Rollout() {
+    this.name = "Rollout";
+    this.type = "rock";
+    this.cat = "physical";
+    this.bp = 40;
+    this.cost = 1;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) {
+        var next = new Rollout();
+        next.bp = this.bp + 20;
+        next.description = "Deals " + next.bp + " base power damage to the opponent. Base power increases with each use.";
+        pA.discard.push(next);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
 }
 
 function Roost() {
@@ -6090,6 +6293,17 @@ function ScaleShot() {
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Raises the user's speed by 1 stage and lowers its defense by 1 stage.";
 }
 
+function ScaryFace() {
+    this.name = "Scary Face";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { boostStat(pD, "speed", -2); };
+    this.description = "Lowers target's speed by 2 stages. Exhaust.";
+}
+
 function ScorchingSands() {
     this.name = "Scorching Sands";
     this.type = "ground";
@@ -6108,6 +6322,16 @@ function Scratch() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function Screech() {
+    this.name = "Screech";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "defense", -2); };
+    this.description = "Lowers target's defense by 2 stages.";
 }
 
 function SeedBomb() {
@@ -6384,6 +6608,16 @@ function ChargedSolarBeam() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Exhaust.";
 }
 
+function SmackDown() {
+    this.name = "Smack Down";
+    this.type = "rock";
+    this.cat = "physical";
+    this.bp = 45;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("grounded", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Grounds target.";
+}
+
 function Spark() {
     this.name = "Spark";
     this.type = "electric";
@@ -6426,6 +6660,17 @@ function Spite() {
         }
     };
     this.description = "First move in target's draw pile acquires exhaust. Exhaust.";
+}
+
+function Splash() {
+    this.name = "Splash";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.fails = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Does nothing.";
 }
 
 function StealthRock() {
@@ -6723,6 +6968,16 @@ function Thrash() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Remains in hand.";
 }
 
+function ThroatChop() {
+    this.name = "Throat Chop";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (isScared(pD)) boostStat(pD, "spattack", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers the target's special attack by 1 stage if it's scared.";
+}
+
 function Thunder() {
     this.name = "Thunder";
     this.type = "electric";
@@ -6834,6 +7089,17 @@ function TriAttack() {
         }
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies status conditions depending on the weather.";
+}
+
+function TripleAxel() {
+    this.name = "Triple Axel";
+    this.type = "ice";
+    this.cat = "physical";
+    this.bp = 45;
+    this.cost = 3;
+    this.multihit = 3;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
 }
 
 function Twister() {
@@ -7076,6 +7342,17 @@ function Wish() {
     this.description = "Applies 2 stacks of wish to the user.";
 }
 
+function Withdraw() {
+    this.name = "Withdraw";
+    this.type = "water";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { boostStat(pA, "defense", 1); };
+    this.description = "Raises user's defense by 1 stage. Exhaust.";
+}
+
 function XScissor() {
     this.name = "X-Scissor";
     this.type = "bug";
@@ -7242,7 +7519,7 @@ function Burn(stacks) {
 
 function ChargeE(stacks) {
     this.name = "Charge";
-    this.description = "Chargen\nIncreases the damage of eletric type moves. Remove 1 stack at the end of each turn.";
+    this.description = "Charge\nIncreases the damage of eletric type moves. Remove 1 stack at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/charge.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
