@@ -445,6 +445,10 @@ terrain = undefined;
 environment = [];
 encounterType = undefined;
 
+battleFilter = document.createElement('div');
+battleFilter.className = "filter-clear";
+battleFilter.id = "battleFilter";
+
 function startEncounter(encounter) {
     if (encounter === "pokemon_center") {
         pokemonCenterEncounter();
@@ -742,8 +746,11 @@ function startTurn() {
             drawMove(p, true);
         }
         drawHand();
+        if (document.body.contains(battleFilter))
+            document.body.removeChild(battleFilter);
     } else {
         drawMove(opponent, true);
+        document.body.appendChild(battleFilter);
         aiActions();
     }
 }
@@ -1159,6 +1166,7 @@ function useMove(move) {
                         cancelled = true;
                         e.effect(opponent, team[activePokemon]);
                         message = e.specialMessage;
+                        drawEffects(false);
                     }
                 }
             }
@@ -1231,7 +1239,7 @@ function useMove(move) {
             if (player) {
                 for (let i = 0; i < hits; i++) {
                     var damage = damageCalculator(move, team[activePokemon], opponent);
-                    dealDamage(damage, opponent);
+                    dealDamage(damage, opponent, move);
                     if (move.recoil != undefined)
                         dealDamage(Math.floor(move.recoil * damage), team[activePokemon]);
                 }
@@ -1239,7 +1247,7 @@ function useMove(move) {
             } else {
                 for (let i = 0; i < hits; i++) {
                     var damage = damageCalculator(move, opponent, team[activePokemon]);
-                    dealDamage(damage, team[activePokemon]);
+                    dealDamage(damage, team[activePokemon], move);
                     if (move.recoil != undefined)
                         dealDamage(Math.floor(move.recoil * damage), opponent);
                     if (damage > 0) {
@@ -1273,12 +1281,13 @@ function useMove(move) {
     }
 }
 
-function dealDamage(damage, p) {
+function dealDamage(damage, p, move) {
     if (p.currenthp > 0)
         p.currenthp = Math.min(Math.max(0, Math.floor(p.currenthp - damage)), p.maxhp);
     refreshHealthBar(true);
     refreshHealthBar(false);
     checkKO();
+    moveAnimation(move, damage, p);
 }
 
 function checkKO() {
@@ -1288,17 +1297,69 @@ function checkKO() {
         for (let p of team) {
             gameO = gameO && p.currenthp == 0;
         }
-        if (gameO && gameOverTimeout == -1)
+        if (gameO && gameOverTimeout == -1) {
             gameOverTimeout = setTimeout(gameOver, 3000);
+            if (document.body.contains(battleFilter))
+                document.body.removeChild(battleFilter);
+        }
     }
     if (opponent.currenthp == 0) {
         rightSprite.className += " fainted";
-        if (rewardTimeout == -1)
+        if (rewardTimeout == -1) {
+            if (document.body.contains(battleFilter))
+                document.body.removeChild(battleFilter);
             if (area < 10 || world < 3)
                 rewardTimeout = setTimeout(rewardScreen, 3000);
             else
                 rewardTimeout = setTimeout(nextEncounter, 3000);
+        }
     }
+}
+
+function moveAnimation(move, damage, target) {
+    if (move != undefined && move.cat !== "status" && damage > 0) {
+        if (player) {
+            document.getElementById('rightSprite').classList.add("blink");
+            setTimeout(endMoveAnimation, 600);
+        } else {
+            document.getElementById('leftSprite').classList.add("blink");
+            setTimeout(endMoveAnimation, 600);
+        }
+    }
+
+    if (damage != 0 && (target === opponent || target === team[activePokemon])) {
+        var damageIndicator = document.createElement('div');
+        damageIndicator.className = "damage-indicator";
+        document.body.appendChild(damageIndicator);
+        if (damage < 0) {
+            damageIndicator.style.color = "green";
+            damageIndicator.innerHTML = "+" + Math.abs(damage);
+        } else
+            damageIndicator.innerHTML = "-" + damage;
+        var sprite = document.getElementById(!contains(team, target) ? 'rightSprite' : 'leftSprite');
+        var xm = Math.floor(sprite.getBoundingClientRect().x);
+        var xM = xm + sprite.clientWidth;
+        var ym = Math.floor(sprite.getBoundingClientRect().y);
+        var yM = ym + sprite.clientHeight;
+        xm += (xM - xm) / 8;
+        xM -= (xM - xm) / 8;
+        ym += (yM - ym) / 8;
+        yM -= (yM - ym) / 8;
+        var x = 0;
+        var y = 0;
+        do {
+            x = xm + Math.floor(Math.random() * (xM - xm));
+            y = ym + Math.floor(Math.random() * (yM - ym));
+            damageIndicator.style.left = x + 'px';
+            damageIndicator.style.top = y + 'px';
+        } while (x + damageIndicator.clientWidth > xM || y + damageIndicator.clientHeight > yM)
+        setTimeout(() => { document.body.removeChild(damageIndicator); }, 1000);
+    }
+}
+
+function endMoveAnimation() {
+    document.getElementById('rightSprite').classList.remove("blink");
+    document.getElementById('leftSprite').classList.remove("blink");
 }
 
 function discardCard(move) {
@@ -1376,14 +1437,15 @@ function aiActions() {
     desc.className = "preview-on";
     desc.innerHTML = "";
     var i = aiPlayable();
-    while (i >= 0 && opponent.currenthp > 0) {
+    if (i >= 0 && opponent.currenthp > 0 && team[activePokemon].currenthp > 0) {
         useMove(opponent.hand[i]);
-        i = aiPlayable();
+        setTimeout(aiActions, 1000);
+    } else {
+        if (team[activePokemon].currenthp == 0) {
+            desc.innerHTML += team[activePokemon].name + ' fainted!<br />Choose a new Pokémon to send out.<br />';
+        }
+        endTurn();
     }
-    if (team[activePokemon].currenthp == 0) {
-        desc.innerHTML += '<br />' + team[activePokemon].name + ' fainted!<br />Choose a new Pokémon to send out.<br />';
-    }
-    endTurn();
 }
 
 function aiPlayable() {
@@ -1419,7 +1481,7 @@ function nextEncounter() {
             return;
         } else {
             for (let p of team) {
-                p.currenthp = Math.min(p.maxhp, p.currenthp + .5 * p.maxhp);
+                p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
             }
             area = 1;
             world += 1;
@@ -1718,7 +1780,7 @@ function pokemonCenterEncounter() {
     document.body.appendChild(grid);
 
     for (let p of team) {
-        p.currenthp = Math.min(p.maxhp, p.currenthp + .5 * p.maxhp);
+        p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
     }
 }
 

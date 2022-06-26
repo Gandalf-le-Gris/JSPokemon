@@ -669,6 +669,33 @@ button.launch-tuto:hover {
     overflow-y: auto;
 }
 
+.blink {
+    animation: blink-animation .2s steps(5, start) infinite;
+    -webkit-animation: blink-animation .2s steps(5, start) infinite;
+}
+
+.damage-indicator {
+    position: absolute;
+    font-size: 5vh;
+    font-weight: bold;
+    color: red;
+    font-family: 'Copperplate Gothic';
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+    animation: fadeShift 1s;
+    -webkit-animation: fadeShift 1s;
+    animation-fill-mode: forwards;
+}
+
+.damage-particles {
+    max-height: 50%;
+    width: auto;
+    vertical-align: middle;
+    text-align: center;
+}
+
+
+
 
 
 
@@ -715,5 +742,41 @@ button.launch-tuto:hover {
 
     100% {
         opacity: 0;
+    }
+}
+
+@keyframes blink-animation {
+    to {
+        opacity: .5;
+    }
+}
+
+@-webkit-keyframes blink-animation {
+    to {
+        opacity: .5;
+    }
+}
+
+@keyframes fadeShift {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: translateY(-3vh);
+    }
+}
+
+@-webkit-keyframes fadeShift {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: translateY(-3vh);
     }
 }
