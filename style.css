@@ -154,7 +154,7 @@ button.start:hover {
 
 .pokemon-displayer-left {
     display: grid;
-    grid-template-rows: auto 15vw auto;
+    grid-template-rows: auto auto auto;
     grid-row-gap: 3vh;
     font-family: 'Copperplate Gothic';
     text-align: left;
@@ -166,14 +166,16 @@ button.start:hover {
 }
 
 .pokemon-sprite {
-    width: auto;
     height: 100%;
+    width: auto;
     justify-self: center;
+    vertical-align: middle;
+    display: block;
 }
 
 .pokemon-displayer-right {
     display: grid;
-    grid-template-rows: auto 15vw;
+    grid-template-rows: auto auto auto;
     grid-row-gap: 3vh;
     font-family: 'Copperplate Gothic';
     text-align: left;
@@ -544,6 +546,8 @@ button.start:hover {
 }
 
 .wrapper {
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
 }

@@ -51,10 +51,35 @@ function startGame() {
 }
 
 const init = (e) => {
+    window.addEventListener('resize', resizeSprites)
     startGame();
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+function resizeSprites(both) {
+    var scale = .25 * document.body.getBoundingClientRect().height / 100;
+    var sprite = document.getElementById("leftSprite");
+    sprite.onload = () => {
+        var view = document.getElementById("pLeftView");
+        if (view != undefined)
+            view.style.gridTemplateRows = "auto " + sprite.naturalHeight * scale + "px auto";
+
+        if (both != undefined) {
+            scale = .25 * document.body.getBoundingClientRect().height / 100;
+            sprite = document.getElementById("rightSprite");
+            sprite.onload = () => {
+                var view = document.getElementById("pRightView");
+                if (view != undefined)
+                    view.style.gridTemplateRows = "auto " + sprite.naturalHeight * scale + "px auto";
+            }
+            if (sprite != undefined)
+                sprite.src = opponent.imgf;
+        }
+    }
+    if (sprite != undefined)
+        sprite.src = team[activePokemon].imgb;
+}
 
 
 
@@ -493,6 +518,7 @@ function battleEncounter(encounter) {
 
     pLeftView = document.createElement('div');
     pLeftView.className = "pokemon-displayer-left";
+    pLeftView.id = "pLeftView";
     document.body.appendChild(pLeftView);
     leftHeader = document.createElement('div');
     leftHeader.className = "pokemon-header";
@@ -529,6 +555,7 @@ function battleEncounter(encounter) {
 
     pRightView = document.createElement('div');
     pRightView.className = "pokemon-displayer-right";
+    pRightView.id = "pRightView";
     document.body.appendChild(pRightView);
     rightHeader = document.createElement('div');
     rightHeader.className = "pokemon-header";
@@ -562,6 +589,8 @@ function battleEncounter(encounter) {
     rightStats.className = "effect-section";
     rightStats.id = "rightStats";
     pRightView.appendChild(rightStats);
+
+    resizeSprites(true);
 
     actions = document.createElement('div');
     actions.className = "action-section";
@@ -1044,6 +1073,8 @@ function switchPokemon(ind) {
         drawStats(true);
         if (pS.currenthp > 0)
             switchesLeft--;
+
+        resizeSprites();
     } else if (switchesLeft == 0) {
         var preview = document.getElementById("movePreview");
         preview.className = "preview-on";
@@ -2764,6 +2795,7 @@ function switchAegislash(p, shield) {
             p.spdefense = temp;
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+            resizeSprites(true);
             p.stance = "shield";
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
@@ -2779,6 +2811,7 @@ function switchAegislash(p, shield) {
             p.spdefense = temp;
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
+            resizeSprites(true);
             p.stance = "blade";
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
@@ -3166,6 +3199,7 @@ function switchMimikyu(p, disguise) {
         if (disguise && !p.disguise) {
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+            resizeSprites(true);
             p.disguise = true;
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
@@ -3175,6 +3209,7 @@ function switchMimikyu(p, disguise) {
         } else if (!disguise && p.disguise) {
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
+            resizeSprites(true);
             p.disguise = false;
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
@@ -3660,6 +3695,8 @@ function createMove(move) {
             return new LifeDew();
         case "liquidation":
             return new Liquidation();
+        case "low_kick":
+            return new LowKick();
         case "low_sweep":
             return new LowSweep();
         case "magical_leaf":
@@ -6055,6 +6092,16 @@ function LowSweep() {
     this.name = "Low Sweep";
     this.type = "fighting";
     this.cat = "physical";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = Math.max(1, Math.min(125, 25 * 180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
+    this.description = "Deals up to 125 base power damage to the opponent depending on how slow it is.";
+}
+
+function LowSweep() {
+    this.name = "Low Sweep";
+    this.type = "fighting";
+    this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
@@ -8223,7 +8270,8 @@ function Disguise(stacks) {
     this.block = true;
     this.effect = (pA, pD) => { };
     this.bEffect = (move, pA, pD) => {
-        this.stacks--;
+        if (move.cat !== "status")
+            this.stacks--;
         if (this.stacks == 0)
             switchMimikyu(pA, false);
     };
