@@ -466,7 +466,7 @@ function pathSelector() {
 /* ------------------------------------------------------ */
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"];
-bossList = ["arceus"];
+bossList = ["arceus", "heatran", "mewtwo"];
 
 energy = 5;
 maxEnergy = 5;
@@ -1574,9 +1574,11 @@ function createOpponent(encounter) {
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"));
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
-    for (let i = 0; i <= Math.floor(Math.random() * 3); i++) {
-        if (opponent.moves.length > 0)
-            opponent.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+    if (area < 10) {
+        for (let i = 0; i <= Math.floor(Math.random() * 3); i++) {
+            if (opponent.moves.length > 0)
+                opponent.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+        }
     }
     while (opponent.moves.length < 10) {
         opponent.moves.push(createMove(opponent.movepool[Math.floor(Math.random() * opponent.movepool.length)]));
@@ -2320,6 +2322,8 @@ function createPokemon(pokemon) {
             return new Mamoswine();
         case "arceus":
             return new Arceus();
+        case "heatran":
+            return new Heatran();
         default:
             return new MissingNo();
     }
@@ -3350,9 +3354,8 @@ function Arceus() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("judgment"), createMove("hyper_beam"), createMove("extreme_speed"), createMove("ancient_power")];
-    this.opponentMoves =
-        [[createMove("judgment"), createMove("judgment"), createMove("hyper_beam"), createMove("extreme_speed"), createMove("extreme_speed"), createMove("ancient_power"), createMove("shadow_claw"), createMove("earth_power"), createMove("calm_mind"), createMove("swords_dance")]];
+    this.moves = [];
+    this.opponentMoves = [[createMove("judgment"), createMove("judgment"), createMove("hyper_beam"), createMove("extreme_speed"), createMove("extreme_speed"), createMove("ancient_power"), createMove("shadow_claw"), createMove("earth_power"), createMove("calm_mind"), createMove("swords_dance")]];
     this.movepool = ["struggle"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/arceus.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/arceus.gif';
@@ -3370,6 +3373,60 @@ function Arceus() {
         removeEffect(this, "Type changed");
         applyEffect("type_changed", 1, this, this.types[0]);
     }
+}
+
+function Heatran() {
+    this.name = "Heatran";
+    this.hp = 91;
+    this.attack = 90;
+    this.defense = 106;
+    this.spattack = 130;
+    this.spdefense = 106;
+    this.speed = 77;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["fire", "steel"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("magma_storm"), createMove("sunny_day"), createMove("solar_beam"), createMove("lava_plume"), createMove("flash_cannon"), createMove("flash_cannon"), createMove("earth_power"), createMove("will_o_wisp"), createMove("fire_blast"), createMove("stone_edge")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/heatran.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/heatran.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Flash fire";
+    this.talentDesc = "Immunity to fire type moves.";
+    this.init = function () { applyEffect("immunity", 1, this, "fire"); }
+}
+
+function Mewtwo() {
+    this.name = "Mewtwo";
+    this.hp = 106;
+    this.attack = 110;
+    this.defense = 90;
+    this.spattack = 154;
+    this.spdefense = 90;
+    this.speed = 130;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["psychic"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("psystrike"), createMove("psystrike"), createMove("psychic"), createMove("fire_blast"), createMove("ice_beam"), createMove("focus_blast"), createMove("nasty_plot"), createMove("calm_mind"), createMove("energy_ball"), createMove("shadow_ball")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/mewtwo.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/mewtwo.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Pressure"
+    this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
+    this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
 }
 
 function StatChanges() {
@@ -3454,7 +3511,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "happy_hour", "screech", "meteor_beam", "crush_claw", "icicle_crash", "icicle_spear", "throat_chop", "triple_axel", "hail", "plasma_fists", "haze",
     "icy_wind", "muddy_water", "withdraw", "rock_blast", "rock_tomb", "smack_down", "scary_face", "splash", "acupressure", "bind", "infestation",
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
-    "feint_attack", "high_horsepower", "leech_life", "aurora_beam"];
+    "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume"];
 
 function createMove(move) {
     switch (move) {
@@ -3774,6 +3831,8 @@ function createMove(move) {
             return new LashOut();
         case "last_resort":
             return new LastResort();
+        case "lava_plume":
+            return new LavaPlume();
         case "leaf_blade":
             return new LeafBlade();
         case "leaf_storm":
@@ -3794,6 +3853,8 @@ function createMove(move) {
             return new LowSweep();
         case "magical_leaf":
             return new MagicalLeaf();
+        case "magma_storm":
+            return new MagmaStorm();
         case "magnet_rise":
             return new MagnetRise();
         case "mean_look":
@@ -3876,6 +3937,8 @@ function createMove(move) {
             return new PsychoCut();
         case "psych_up":
             return new PsychUp();
+        case "psystrike":
+            return new Psystrike();
         case "pyro_ball":
             return new PyroBall();
         case "quick_attack":
@@ -6149,6 +6212,16 @@ function LastResort() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fails unless it is the last card in the user's hand.";
 }
 
+function LavaPlume() {
+    this.name = "Lava Plume";
+    this.type = "fire";
+    this.cat = "special";
+    this.bp = 90;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (!isBurned(pD)) applyEffect("burn", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target if it's not burned already.";
+}
+
 function LeafBlade() {
     this.name = "Leaf Blade";
     this.type = "grass";
@@ -6264,6 +6337,16 @@ function MagicalLeaf() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { this.bp = 40 + 15 * Math.max(0, pA.statchanges.spattack); };
     this.description = "Deals 40 base power damage to the opponent. Base power increases with user's special attack boosts.";
+}
+
+function MagmaStorm() {
+    this.name = "Magma Storm";
+    this.type = "fire";
+    this.cat = "special";
+    this.bp = 100;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 1 turn.";
 }
 
 function MagnetRise() {
@@ -6772,6 +6855,16 @@ function PsychUp() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { (player ? team[activePokemon] : opponent).statchanges = JSON.parse(JSON.stringify((player ? opponent : team[activePokemon]).statchanges)); };
     this.description = "User copies target's stat changes.";
+}
+
+function PsyStrike() {
+    this.name = "Psy Strike";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 100;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { this.bp = 100 * (pD.spdefense * statsChangeMultiplier ** pD.statchanges.spdefense) / (pD.defense * statsChangeMultiplier ** pD.statchanges.defense) };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Base power varies depending on target's defense.";
 }
 
 function PyroBall() {
