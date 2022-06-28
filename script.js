@@ -33,19 +33,6 @@ function gameArea(img, updater) {
     };
 }
 
-function component(width, height, img, x, y) {
-    this.width = width;
-    this.height = height;
-    this.x = x;
-    this.y = y;
-    this.image = new Image();
-    this.image.src = img;
-    this.update = function () {
-        ctx = gameArea.context;
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    };
-}
-
 function startGame() {
     drawStartingMenu();
 }
@@ -58,20 +45,32 @@ const init = (e) => {
 document.addEventListener('DOMContentLoaded', init);
 
 function resizeSprites(both) {
-    var scale = .25 * document.body.getBoundingClientRect().height / 100;
+    var scale = .3 * document.body.getBoundingClientRect().height / 100;
     var sprite = document.getElementById("leftSprite");
     sprite.onload = () => {
         var view = document.getElementById("pLeftView");
-        if (view != undefined)
-            view.style.gridTemplateRows = "auto " + sprite.naturalHeight * scale + "px auto";
+        if (view != undefined) {
+            view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
+            view.style.top = .64 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
+        }
+        if (sprite.naturalHeight > 130)
+            sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
+        else 
+            sprite.style.transform = "scale(1,1)";
 
         if (both != undefined) {
             scale = .25 * document.body.getBoundingClientRect().height / 100;
             sprite = document.getElementById("rightSprite");
             sprite.onload = () => {
                 var view = document.getElementById("pRightView");
-                if (view != undefined)
-                    view.style.gridTemplateRows = "auto " + sprite.naturalHeight * scale + "px auto";
+                if (view != undefined) {
+                    view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
+                    view.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
+                }
+                if (sprite.naturalHeight > 130)
+                    sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
+                else
+                    sprite.style.transform = "scale(1,1)";
             }
             if (sprite != undefined)
                 sprite.src = opponent.imgf;
@@ -182,12 +181,13 @@ var money = 0;
 var extraLoot = 0;
 
 var im = 0;
-var nve = .6;
 var se = 1.6;
+var nve = 1 / se;
 var n = 1;
 var stab = 1.25;
 
-const typetable = [[n, se, n, n, nve, nve, nve, nve, nve, se, n, n, n, nve, se, n, nve, n],
+const typetable =
+   [[n, se, n, n, nve, nve, nve, nve, nve, se, n, n, n, nve, se, n, nve, n],
     [n, nve, n, n, nve, nve, n, n, se, n, n, n, n, n, se, n, n, n],
     [n, n, se, n, im, n, n, n, n, n, n, n, n, n, n, n, nve, n],
     [n, n, nve, nve, n, n, n, se, n, nve, im, n, n, n, n, n, n, se],
