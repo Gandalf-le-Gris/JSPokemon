@@ -466,7 +466,8 @@ function pathSelector() {
 /* ------------------------------------------------------ */
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"];
-bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza"];
+bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
+bossList = ["diancie"]
 
 energy = 5;
 maxEnergy = 5;
@@ -1323,10 +1324,6 @@ function useMove(move) {
                     dealDamage(damage, opponent, move);
                     if (move.recoil != undefined)
                         dealDamage(Math.floor(move.recoil * damage), team[activePokemon]);
-                    if (damage > 0) {
-                        if (opponent.revenge != undefined)
-                            opponent.revenge(move, team[activePokemon]);
-                    }
                 }
 
             } else {
@@ -1340,8 +1337,6 @@ function useMove(move) {
                             if (j.revenge != undefined)
                                 j.effectR(move, team[activePokemon], opponent);
                         }
-                        if (team[activePokemon].revenge != undefined)
-                            team[activePokemon].revenge(move, opponent);
                     }
                 }
             }
@@ -1377,6 +1372,16 @@ function dealDamage(damage, p, move) {
     refreshHealthBar(false);
     checkKO();
     moveAnimation(move, damage, p);
+
+    if (damage != 0) {
+        var pD = contains(team, p) ? opponent : team[activePokemon];
+        if (p.revenge != undefined)
+            p.revenge(move, pD);
+        for (let j of p.items) {
+            if (j.revenge != undefined)
+                j.effectR(move, p, pD);
+        }
+    }
 }
 
 function checkKO() {
@@ -2341,6 +2346,14 @@ function createPokemon(pokemon) {
             return new Kyogre();
         case "rayquaza":
             return new Rayquaza();
+        case "giratina":
+            return new Giratina();
+        case "eternatus":
+            return new Eternatus();
+        case "regigigas":
+            return new Regigigas();
+        case "diancie":
+            return new Diancie();
         default:
             return new MissingNo();
     }
@@ -2482,7 +2495,7 @@ function Pikachu() {
     this.items = [];
     this.talent = "Static";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are paralyzed."
-    this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
 }
 
 function Garchomp() {
@@ -2511,7 +2524,7 @@ function Garchomp() {
     this.items = [];
     this.talent = "Rough skin"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
-    this.revenge = function (move, pD) { if (move.cat === "physical") dealDamage(10, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
 }
 
 function Cinderace() {
@@ -2604,7 +2617,7 @@ function Volcarona() {
     this.items = [];
     this.talent = "Flame body";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are burned."
-    this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
 }
 
 function Eevee() {
@@ -2726,7 +2739,7 @@ function Ferrothorn() {
     this.items = [];
     this.talent = "Iron barbs"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
-    this.revenge = function (move, pD) { if (move.cat === "physical") dealDamage(10, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
 }
 
 function Blissey() {
@@ -2991,7 +3004,7 @@ function Weavile() {
     this.items = [];
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
-    this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
 }
 
 function Zeraora() {
@@ -3443,7 +3456,7 @@ function Mewtwo() {
     this.items = [];
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
-    this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
 }
 
 function Hoopa() {
@@ -3574,6 +3587,150 @@ function Rayquaza() {
     this.init = function () { setWeather("air_lock", 99); }
 }
 
+function Giratina() {
+    this.name = "Giratina";
+    this.hp = 150;
+    this.attack = 100;
+    this.defense = 120;
+    this.spattack = 100;
+    this.spdefense = 120;
+    this.speed = 90;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["ghost", "dragon"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("will_o_wisp"), createMove("hex"), createMove("shadow_force"), createMove("shadow_claw"), createMove("draco_meteor"), createMove("shadow_force"), createMove("dragon_claw"), createMove("dragon_claw"), createMove("dragon_tail"), createMove("steel_wing")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/giratina.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/giratina.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Pressure"
+    this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
+    this.revenge = function (move, pD) {
+        if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1);
+        if (this.currenthp < .5 * this.maxhp) switchGiratina(this);
+    }
+}
+
+function switchGiratina(p) {
+    if (p.name === "Giratina") {
+        p.imgf = 'resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
+        p.imgb = 'resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
+        if (team[activePokemon] === p) {
+            document.getElementById("leftSprite").src = p.imgb;
+        } else if (opponent === p) {
+            document.getElementById("rightSprite").src = p.imgf;
+        }
+        resizeSprites(true);
+        var temp = p.attack;
+        p.attack = p.defense;
+        p.defense = temp;
+        temp = p.spattack;
+        p.spattack = p.spdefense;
+        p.spdefense = temp;
+        dealDamage(-.1 * p.maxhp, p);
+        this.revenge = function (move, pD) { };
+        applyEffect("levitation", 99, p);
+        p.talent = "Levitation"
+        p.talentDesc = "Levitates above the ground, granting ground type immunity."
+    }
+}
+
+function Eternatus() {
+    this.name = "Eternatus";
+    this.hp = 140;
+    this.attack = 85;
+    this.defense = 95;
+    this.spattack = 145;
+    this.spdefense = 95;
+    this.speed = 130;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["poison", "dragon"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("sludge_bomb"), createMove("sludge_wave"), createMove("toxic"), createMove("toxic"), createMove("venoshock"), createMove("eternabeam"), createMove("dynamax_cannon"), createMove("dragon_pulse"), createMove("flamethrower"), createMove("shadow_ball")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/eternatus.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/eternatus.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Pressure"
+    this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+}
+
+function Regigigas() {
+    this.name = "Regigigas";
+    this.hp = 110;
+    this.attack = 160;
+    this.defense = 110;
+    this.spattack = 80;
+    this.spdefense = 110;
+    this.speed = 100;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["normal"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("crush_grip"), createMove("crush_grip"), createMove("body_slam"), createMove("body_slam"), createMove("drain_punch"), createMove("brick_break"), createMove("darkest_lariat"), createMove("payback"), createMove("high_horsepower"), createMove("smack_down")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/regigigas.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/regigigas.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.slowStart = true;
+    this.talent = "Slow start"
+    this.talentDesc = "Reduced attack at the beginning of the battle."
+    this.boost = function (move) { return 1 - .4 * (this.slowStart && move.cat === "physical"); }
+    this.init = function (move, pD) { applyEffect("slow_start", 3, this); }
+}
+
+function Diancie() {
+    this.name = "Diancie";
+    this.hp = 50;
+    this.attack = 100;
+    this.defense = 150;
+    this.spattack = 100;
+    this.spdefense = 150;
+    this.speed = 50;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["rock", "fairy"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("diamond_storm"), createMove("diamond_storm"), createMove("body_press"), createMove("body_press"), createMove("moonblast"), createMove("moonblast"), createMove("sandstorm"), createMove("rock_polish"), createMove("power_gem"), createMove("draining_kiss")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/diancie.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/diancie.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Clear body"
+    this.talentDesc = "Lowered stats are restored at the end of eah turn."
+    this.endTurn = function () {
+        this.statchanges.attack = Math.max(0, this.statchanges.attack);
+        this.statchanges.defense = Math.max(0, this.statchanges.defense);
+        this.statchanges.spattack = Math.max(0, this.statchanges.spattack);
+        this.statchanges.spdefense = Math.max(0, this.statchanges.spdefense);
+        this.statchanges.speed = Math.max(0, this.statchanges.speed);
+        drawStats(contains(team, this));
+    }
+}
+
 function StatChanges() {
     this.attack = 0;
     this.defense = 0;
@@ -3591,7 +3748,7 @@ function adjustBST(pokemon, target, boss) {
     pokemon.spattack = Math.round(pokemon.spattack * ratio);
     pokemon.spdefense = Math.round(pokemon.spdefense * ratio);
     pokemon.speed = Math.round(pokemon.speed * ratio);
-    pokemon.maxhp = (5 + 5 * boss) * pokemon.hp;
+    pokemon.maxhp = (5 + 3 * boss) * pokemon.hp;
     pokemon.currenthp = pokemon.maxhp;
 }
 
@@ -3657,7 +3814,8 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "icy_wind", "muddy_water", "withdraw", "rock_blast", "rock_tomb", "smack_down", "scary_face", "splash", "acupressure", "bind", "infestation",
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
     "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume", "psystrike", "hyperspace_fury", "hyperspace_hole",
-    "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create"];
+    "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create", "shadow_force", "eternabeam", "dynamax_cannon", "crush_grip",
+    "diamond_storm"];
 
 function createMove(move) {
     switch (move) {
@@ -3763,6 +3921,8 @@ function createMove(move) {
             return new Crunch();
         case "crush_claw":
             return new CrushClaw();
+        case "crush_grip":
+            return new CrushGrip();
         case "curse":
             return new Curse();
         case "darkest_lariat":
@@ -3775,6 +3935,8 @@ function createMove(move) {
             return new Defog();
         case "detect":
             return new Detect();
+        case "diamond_storm":
+            return new DiamondStorm();
         case "dig":
             return new Dig();
         case "disable":
@@ -3813,6 +3975,8 @@ function createMove(move) {
             return new DualChop();
         case "dual_wingbeat":
             return new DualWingbeat();
+        case "dynamax_cannon":
+            return new DynamaxCannon();
         case "dynamic_punch":
             return new DynamicPunch();
         case "earth_power":
@@ -3829,6 +3993,8 @@ function createMove(move) {
             return new Ember();
         case "energy_ball":
             return new EnergyBall();
+        case "eternabeam":
+            return new Eternabeam();
         case "explosion":
             return new Explosion();
         case "extreme_evoboost":
@@ -4159,6 +4325,8 @@ function createMove(move) {
             return new ShadowBall();
         case "shadow_claw":
             return new ShadowClaw();
+        case "shadow_force":
+            return new ShadowForce();
         case "shadow_sneak":
             return new ShadowSneak();
         case "shell_smash":
@@ -4998,6 +5166,16 @@ function CrushClaw() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers its defense by 1 stage if it hasn't been lowered already.";
 }
 
+function CrushGrip() {
+    this.name = "Crush Grip";
+    this.type = "normal";
+    this.cat = "physical";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = Math.max(1, 125 * pD.currenthp / pD.maxhp); };
+    this.description = "Deals up to 125 base power damage to the opponent, depending on how high its HP is.";
+}
+
 function Curse() {
     this.name = "Curse";
     this.type = "ghost";
@@ -5078,6 +5256,17 @@ function Detect() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("protection", 1, pA); };
     this.description = "Applies one stack of protection to the user.";
+}
+
+function DiamondStorm() {
+    this.name = "Diamond Storm";
+    this.type = "rock";
+    this.cat = "physical";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) { if (effectiveMultiplier(this, pD) >= 1) boostStat(pA, "defense", 2); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Raises user's defense by 2 stages unless this move is not very effective.";
 }
 
 function Dig() {
@@ -5359,6 +5548,16 @@ function DualWingbeat() {
     this.description = "Deals " + this.bp + " base power damage to the opponent twice.";
 }
 
+function DynamaxCannon() {
+    this.name = "Dynamax Cannon";
+    this.type = "dragon";
+    this.cat = "special";
+    this.bp = 90;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { this.bp = 90 + 40 * (pD.currenthp > .9 * pD.maxhp); };
+    this.description = "Deals 90 base power damage to the opponent. Base power increases against healthy foes.";
+}
+
 function DynamicPunch() {
     this.name = "Dynamic Punch";
     this.type = "fighting";
@@ -5450,6 +5649,19 @@ function EnergyBall() {
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sun") boostStat(pD, "spdefense", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special defense by 1 stage under the sun.";
+}
+
+function Eternabeam() {
+    this.name = "Eternabeam";
+    this.type = "dragon";
+    this.cat = "special";
+    this.bp = 210;
+    this.cost = 3;
+    this.effect = function (move, pA, pD) {
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Shuffles 2 Recharge into the user's draw pile.";
 }
 
 function Explosion() {
@@ -6890,7 +7102,7 @@ function PhantomForce() {
 }
 
 function PhantomForceStrike() {
-    this.name = "PhantomForce Strike";
+    this.name = "Phantom Force Strike";
     this.type = "ghost";
     this.cat = "physical";
     this.bp = 75;
@@ -7237,7 +7449,7 @@ function RockPolish() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { };
+    this.effect = function (move, pA, pD) { boostStat(pA, "speed", 2); };
     this.description = "Raises user's speed by 2 stages.";
 }
 
@@ -7448,6 +7660,31 @@ function ShadowClaw() {
     this.crit = true;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
+}
+
+function ShadowForce() {
+    this.name = "Shadow Force";
+    this.type = "ghost";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ShadowForceStrike());
+        applyEffect("protection", 1, pA);
+    };
+    this.description = "Applies 1 stack of protection to the user and shuffles a Shadow Force Strike into its deck.";
+}
+
+function ShadowForceStrike() {
+    this.name = "Shadow Force Strike";
+    this.type = "ghost";
+    this.cat = "physical";
+    this.bp = 90;
+    this.cost = 0;
+    this.exhaust = true;
+    this.noBlock = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Breaks protections. Exhaust.";
 }
 
 function ShadowSneak() {
@@ -8634,6 +8871,8 @@ function createEffect(type, stacks, extra) {
             return new Protection(stacks);
         case "sleep":
             return new Sleep(stacks);
+        case "slow_start":
+            return new SlowStart(stacks);
         case "spikes":
             return new SpikesE(stacks);
         case "stealth_rock":
@@ -8862,6 +9101,18 @@ function Sleep(stacks) {
     this.cancel = true;
     this.specialMessage = " is fast asleep!<br/>"
     this.effect = (pA, pD) => { this.stacks--; };
+}
+
+function SlowStart(stacks) {
+    this.name = "Slow Start";
+    this.description = "Slow Start\nPhysical damage reduced by 40%.";
+    this.icon = 'resources/sprites/effect_icons/slow_start.webp';
+    this.stacks = stacks;
+    this.effect = (pA, pD) => {
+        this.stacks--;
+        if (this.stacks == 0)
+            pA.slowStart = false;
+    };
 }
 
 function SpikesE(stacks) {
@@ -9747,7 +9998,7 @@ function RockyHelmet() {
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
-        if (move.cat === "physical")
+        if (move != undefined && move.cat === "physical")
             dealDamage(10, pD);
     };
 }
@@ -9759,7 +10010,7 @@ function WeaknessPolicy() {
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
-        if (effectiveMultiplier(move, pA) > 1 && !this.consumed) {
+        if ( move != undefined && effectiveMultiplier(move, pA) > 1 && !this.consumed) {
             boostStat(pA, "attack", 1);
             boostStat(pA, "spattack", 1);
             this.consumed = true;
