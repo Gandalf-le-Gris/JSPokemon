@@ -321,13 +321,13 @@ function effectiveMultiplier(move, pD) {
 
 function launchGame() {
     world = 1;
-    area = 1;
+    area = 10;
     money = 0;
     removePrice = 500;
     extraLoot = 0;
     for (let i = 0; i < pSelected.length; i++) {
         pokemon = createPokemon(pSelected[i]);
-        adjustBST(pokemon, 600);
+        adjustBST(pokemon, 600, false);
         team[i] = pokemon;
     }
     mapSelection();
@@ -466,7 +466,7 @@ function pathSelector() {
 /* ------------------------------------------------------ */
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"];
-bossList = ["arceus", "heatran", "mewtwo"];
+bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza"];
 
 energy = 5;
 maxEnergy = 5;
@@ -1263,6 +1263,13 @@ function useMove(move) {
             desc.innerHTML += opponent.name + "can't use " + move.name + " after the taunt!<br />";
         }
 
+        //protection break
+        if (move.noBlock != undefined) {
+            removeEffect(player ? opponent : team[activePokemon], "Protection");
+            removeEffect(player ? opponent : team[activePokemon], "King's Protection");
+            drawEffects(!player);
+        }
+
         var boostMul = 1;
         //move effects
         var target;
@@ -1571,7 +1578,7 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
-    adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"));
+    adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
     if (area < 10) {
@@ -2324,6 +2331,16 @@ function createPokemon(pokemon) {
             return new Arceus();
         case "heatran":
             return new Heatran();
+        case "mewtwo":
+            return new Mewtwo();
+        case "hoopa":
+            return new Hoopa();
+        case "groudon":
+            return new Groudon();
+        case "kyogre":
+            return new Kyogre();
+        case "rayquaza":
+            return new Rayquaza();
         default:
             return new MissingNo();
     }
@@ -3429,6 +3446,134 @@ function Mewtwo() {
     this.revenge = function (move, pD) { if (effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
 }
 
+function Hoopa() {
+    this.name = "Hoopa";
+    this.hp = 80;
+    this.attack = 110;
+    this.defense = 60;
+    this.spattack = 150;
+    this.spdefense = 130;
+    this.speed = 70;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["psychic", "ghost"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("nasty_plot"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("hyperspace_hole"), createMove("focus_blast"), createMove("thunderbolt"), createMove("substitute"), createMove("hyperspace_hole"), createMove("grass_knot"), createMove("psychic")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/hoopa.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/hoopa.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Confined"
+    this.talentDesc = "Breaks free after 3 turns."
+    this.init = function () { applyEffect("confined", 3, this); }
+}
+
+function switchHoopa(p) {
+    if (p.name === "Hoopa") {
+        p.imgf = 'resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
+        p.imgb = 'resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
+        resizeSprites(true);
+        p.types = ["psychic", "dark"];
+        if (team[activePokemon] === p) {
+            document.getElementById("leftSprite").src = p.imgb;
+        } else if (opponent === p) {
+            document.getElementById("rightSprite").src = p.imgf;
+        }
+        p.attack = Math.floor(p.attack * 16 / 11);
+        p.spattack = Math.floor(p.spattack * 17 / 15);
+        p.speed = Math.floor(p.speed * 8 / 7);
+        dealDamage(-.3 * p.maxhp, p);
+        p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
+        initDeck(p);
+    }
+}
+
+function Groudon() {
+    this.name = "Groudon";
+    this.hp = 100;
+    this.attack = 150;
+    this.defense = 140;
+    this.spattack = 100;
+    this.spdefense = 90;
+    this.speed = 90;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["ground"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("swords_dance"), createMove("precipice_blades"), createMove("precipice_blades"), createMove("stone_edge"), createMove("rock_tomb"), createMove("heat_crash"), createMove("heat_crash"), createMove("rock_polish"), createMove("bulldoze"), createMove("rock_smash")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/groudon.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/groudon.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Drought"
+    this.talentDesc = "Changes the weather to sun at the beginning of the battle."
+    this.init = function () { setWeather("sun", 99); }
+}
+
+function Kyogre() {
+    this.name = "Kyogre";
+    this.hp = 100;
+    this.attack = 100;
+    this.defense = 90;
+    this.spattack = 150;
+    this.spdefense = 140;
+    this.speed = 90;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["water"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("calm_mind"), createMove("origin_pulse"), createMove("origin_pulse"), createMove("water_spout"), createMove("ice_beam"), createMove("ice_beam"), createMove("thunder"), createMove("scald"), createMove("hydro_pump"), createMove("thunder")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/kyogre.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/kyogre.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Drizzle"
+    this.talentDesc = "Changes the weather to rain at the beginning of the battle."
+    this.init = function () { setWeather("rain", 99); }
+}
+
+function Rayquaza() {
+    this.name = "Rayquaza";
+    this.hp = 105;
+    this.attack = 150;
+    this.defense = 90;
+    this.spattack = 150;
+    this.spdefense = 90;
+    this.speed = 95;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["dragon", "flying"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("dragon_ascent"), createMove("dragon_ascent"), createMove("v_create"), createMove("haze"), createMove("extreme_speed"), createMove("earthquake"), createMove("dragon_claw"), createMove("draco_meteor"), createMove("dragon_dance"), createMove("scale_shot")]];
+    this.movepool = ["struggle"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/rayquaza.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/rayquaza.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Air lock"
+    this.talentDesc = "Prevents weather changes."
+    this.init = function () { setWeather("air_lock", 99); }
+}
+
 function StatChanges() {
     this.attack = 0;
     this.defense = 0;
@@ -3437,7 +3582,7 @@ function StatChanges() {
     this.speed = 0;
 }
 
-function adjustBST(pokemon, target) {
+function adjustBST(pokemon, target, boss) {
     n = pokemon.hp + pokemon.attack + pokemon.defense + pokemon.spattack + pokemon.spdefense + pokemon.speed;
     ratio = target / n;
     pokemon.hp = Math.round(pokemon.hp * ratio);
@@ -3446,7 +3591,7 @@ function adjustBST(pokemon, target) {
     pokemon.spattack = Math.round(pokemon.spattack * ratio);
     pokemon.spdefense = Math.round(pokemon.spdefense * ratio);
     pokemon.speed = Math.round(pokemon.speed * ratio);
-    pokemon.maxhp = 5 * pokemon.hp;
+    pokemon.maxhp = (5 + 5 * boss) * pokemon.hp;
     pokemon.currenthp = pokemon.maxhp;
 }
 
@@ -3511,7 +3656,8 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "happy_hour", "screech", "meteor_beam", "crush_claw", "icicle_crash", "icicle_spear", "throat_chop", "triple_axel", "hail", "plasma_fists", "haze",
     "icy_wind", "muddy_water", "withdraw", "rock_blast", "rock_tomb", "smack_down", "scary_face", "splash", "acupressure", "bind", "infestation",
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
-    "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume"];
+    "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume", "psystrike", "hyperspace_fury", "hyperspace_hole",
+    "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create"];
 
 function createMove(move) {
     switch (move) {
@@ -3643,6 +3789,8 @@ function createMove(move) {
             return new DoubleKick();
         case "draco_meteor":
             return new DracoMeteor();
+        case "dragon_ascent":
+            return new DragonAscent();
         case "dragon_claw":
             return new DragonClaw();
         case "dragon_dance":
@@ -3771,6 +3919,8 @@ function createMove(move) {
             return new HealBell();
         case "heal_pulse":
             return new HealPulse();
+        case "heat_crash":
+            return new HeatCrash();
         case "heat_wave":
             return new HeatWave();
         case "heavy_slam":
@@ -3793,6 +3943,10 @@ function createMove(move) {
             return new HydroPump();
         case "hyper_beam":
             return new HyperBeam();
+        case "hyperspace_fury":
+            return new HyperspaceFury();
+        case "hyperspace_hole":
+            return new HyperspaceHole();
         case "hyper_voice":
             return new HyperVoice();
         case "hypnosis":
@@ -3895,6 +4049,8 @@ function createMove(move) {
             return new NightSlash();
         case "nuzzle":
             return new Nuzzle();
+        case "origin_pulse":
+            return new OriginPulse();
         case "outrage":
             return new Outrage();
         case "overheat":
@@ -3927,6 +4083,8 @@ function createMove(move) {
             return new PowerUpPunch();
         case "power_whip":
             return new PowerWhip();
+        case "precipice_blades":
+            return new PrecipiceBlades();
         case "protect":
             return new Protect();
         case "psybeam":
@@ -4127,6 +4285,8 @@ function createMove(move) {
             return new UTurn();
         case "vacuum_wave":
             return new VacuumWave();
+        case "v_create":
+            return new VCreate();
         case "venom_drench":
             return new VenomDrench();
         case "venoshock":
@@ -5061,6 +5221,20 @@ function DragonClaw() {
     this.description = "Deals 70 base power damage to the opponent. Base damage increases by 10 for each dragon move in the user's deck.";
 }
 
+function DragonAscent() {
+    this.name = "Dragon Ascent";
+    this.type = "flying";
+    this.cat = "physical";
+    this.bp = 130;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) {
+        boostStat(pA, "defense", -1);
+        boostStat(pA, "spdefense", -1);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense and special defense by 1 stage.";
+}
+
 function DragonDance() {
     this.name = "Dragon Dance";
     this.type = "dragon";
@@ -5779,6 +5953,8 @@ function Haze() {
     this.effect = function (move, pA, pD) {
         team[activePokemon].statchanges = new StatChanges();
         opponent.statchanges = new StatChanges();
+        drawStats(true);
+        drawStats(false);
     };
     this.description = "Resets both Pokémon's stat changes.";
 }
@@ -5849,6 +6025,16 @@ function HealPulse() {
         }
     };
     this.description = "Heals all Pokémon in the user's party for 10% of maximum HP.";
+}
+
+function HeatCrash() {
+    this.name = "Heat Crash";
+    this.type = "fire";
+    this.cat = "physical";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { this.bp = 80 + 30 * (weather != undefined && weather.name === "Sun"); };
+    this.description = "Deals 80 base power damage to the opponent. Base power increases in the sun.";
 }
 
 function HeatWave() {
@@ -5992,6 +6178,28 @@ function HyperBeam() {
         energy = 0;
     };
     this.description = "Deals 50 base power damage per energy point left to the opponent. Consumes all energy left.";
+}
+
+function HyperspaceFury() {
+    this.name = "Hyperspace Fury";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 100;
+    this.cost = 2;
+    this.noBlock = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Breaks protections.";
+}
+
+function HyperspaceHole() {
+    this.name = "Hyperspace Hole";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 100;
+    this.cost = 2;
+    this.noBlock = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Breaks protections.";
 }
 
 function HyperVoice() {
@@ -6265,8 +6473,8 @@ function LeechSeed() {
     this.description = "Drains a little HP from the opponent at the end of every turn for 5 turns. Grass type Pokémon are immune.";
 }
 
-function LowSweep() {
-    this.name = "Low Sweep";
+function LowKick() {
+    this.name = "Low Kick";
     this.type = "fighting";
     this.cat = "physical";
     this.bp = 0;
@@ -6608,6 +6816,16 @@ function Nuzzle() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the opponent.";
 }
 
+function OriginPulse() {
+    this.name = "Origin Pulse";
+    this.type = "water";
+    this.cat = "special";
+    this.bp = 100;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Rain") setWeather("rain", 3); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Sets the weather to rain for 3 turns if not in the rain.";
+}
+
 function Outrage() {
     this.name = "Outrage";
     this.type = "dragon";
@@ -6805,6 +7023,16 @@ function PowerWhip() {
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
+function PrecipiceBlades() {
+    this.name = "Precipice Blades";
+    this.type = "ground";
+    this.cat = "physical";
+    this.bp = 100;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Sun") setWeather("sun", 3); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Sets the weather to sun for 3 turns if not in the sun.";
+}
+
 function Protect() {
     this.name = "Protect";
     this.type = "normal";
@@ -6857,8 +7085,8 @@ function PsychUp() {
     this.description = "User copies target's stat changes.";
 }
 
-function PsyStrike() {
-    this.name = "Psy Strike";
+function Psystrike() {
+    this.name = "Psystrike";
     this.type = "psychic";
     this.cat = "special";
     this.bp = 100;
@@ -8042,6 +8270,21 @@ function VacuumWave() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
 }
 
+function VCreate() {
+    this.name = "V-Create";
+    this.type = "fire";
+    this.cat = "physical";
+    this.bp = 170;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) {
+        boostStat(pA, "defense", -1);
+        boostStat(pA, "spdefense", -1);
+        boostStat(pA, "speed", -1);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense, special defense and speed by 1 stage.";
+}
+
 function VenomDrench() {
     this.name = "Venom Drench";
     this.type = "poison";
@@ -8357,6 +8600,8 @@ function createEffect(type, stacks, extra) {
             return new Burn(stacks);
         case "charge":
             return new ChargeE(stacks);
+        case "confined":
+            return new Confined(stacks);
         case "confusion":
             return new ConfusionE(stacks);
         case "curse":
@@ -8436,6 +8681,18 @@ function ChargeE(stacks) {
     this.icon = 'resources/sprites/effect_icons/charge.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
+}
+
+function Confined(stacks) {
+    this.name = "Confined";
+    this.description = "Confined\nTries to break free from its prison bottle...";
+    this.icon = 'resources/sprites/effect_icons/confined.webp';
+    this.stacks = stacks;
+    this.effect = (pA, pD) => {
+        this.stacks--;
+        if (this.stacks == 0)
+            switchHoopa(pA);
+    };
 }
 
 function ConfusionE(stacks) {
@@ -8789,20 +9046,25 @@ function hasThickFat(p) {
 /* ------------------------------------------------------ */
 
 function setWeather(w, turns) {
-    switch (w) {
-        case "rain":
-            weather = new Rain(turns);
-            break;
-        case "sun":
-            weather = new Sun(turns);
-            break;
-        case "sandstorm":
-            weather = new SandstormW(turns);
-            break;
-        case "hail":
-            weather = new HailW(turns);
-            break;
-        default:
+    if (weather == undefined || weather.name !== "Air Lock") {
+        switch (w) {
+            case "rain":
+                weather = new Rain(turns);
+                break;
+            case "sun":
+                weather = new Sun(turns);
+                break;
+            case "sandstorm":
+                weather = new SandstormW(turns);
+                break;
+            case "hail":
+                weather = new HailW(turns);
+                break;
+            case "air_lock":
+                weather = new AirLock(turns);
+                break;
+            default:
+        }
     }
     drawEnvironment();
 }
@@ -8847,6 +9109,15 @@ function HailW(turns) {
             dealDamage(10, team[activePokemon]);
         if (!contains(opponent.types, "ice"))
             dealDamage(10, opponent);
+        this.turns--;
+    };
+}
+
+function AirLock(turns) {
+    this.name = "Air Lock";
+    this.turns = turns;
+    this.description = "Cannot be replaced by another weather.";
+    this.effect = () => {
         this.turns--;
     };
 }
