@@ -129,6 +129,10 @@ button.start:hover {
     text-align: center;
 }
 
+.not-unlocked {
+    filter: brightness(0);
+}
+
 .team-selector-element:hover, .selected-cell:hover {
     color: goldenrod;
 }
@@ -696,6 +700,18 @@ button.launch-tuto:hover {
     width: auto;
     vertical-align: middle;
     text-align: center;
+}
+
+.sound-button {
+    height: 8vh;
+    width: auto;
+    position: absolute;
+    top: 3vh;
+    left: 3vh;
+}
+
+.sound-button:hover {
+    filter: invert()
 }
 
 

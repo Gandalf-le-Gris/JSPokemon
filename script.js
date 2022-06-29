@@ -2,19 +2,44 @@
 /* -------------------- Home screen -------------------- */
 /* ----------------------------------------------------- */
 
+music = false;
+
 function drawStartingMenu() {
+    ambientMusic = "resources/sounds/musics/title_screen.mp3";
     document.body.innerHTML = "";
-    startButton = document.createElement('button');
+    var startButton = document.createElement('button');
     startButton.className = "start";
     startButton.innerText = "start";
     startButton.addEventListener('click', () => { tuto = false; drawTeamSelection(); });
     document.body.appendChild(startButton);
-    tutoButton = document.createElement('button');
+    var tutoButton = document.createElement('button');
     tutoButton.className = "launch-tuto";
     tutoButton.innerText = "how to play?";
     tutoButton.addEventListener('click', () => { startTuto() });
     document.body.appendChild(tutoButton);
-    gArea = new gameArea('resources/homescreen.jfif', () => {});
+    var soundButton = document.createElement('div');
+    soundButton.className = "sound-button";
+    soundButton.addEventListener('click', () => {
+        if (music) {
+            soundImage.src = "resources/sprites/ui_icons/mute.webp"
+            var audios = document.getElementsByTagName('audio');
+            for (let a of audios) {
+                a.pause();
+                a = null;
+            }
+            music = false;
+        } else {
+            soundImage.src = "resources/sprites/ui_icons/sound.webp"
+            playMusic(ambientMusic, true);
+            music = true;
+        }
+    });
+    document.body.appendChild(soundButton);
+    var soundImage = new Image();
+    soundImage.className = "pixel-sprite";
+    soundImage.src = "resources/sprites/ui_icons/mute.webp"
+    soundButton.appendChild(soundImage);
+    var gArea = new gameArea('resources/homescreen.jfif', () => {});
     gArea.start();
 }
 
@@ -38,7 +63,12 @@ function startGame() {
 }
 
 const init = (e) => {
-    window.addEventListener('resize', resizeSprites)
+    window.addEventListener('resize', resizeSprites);
+    window.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") {
+            toggleEscapeScreen();
+        }
+    });
     startGame();
 }
 
@@ -47,37 +77,93 @@ document.addEventListener('DOMContentLoaded', init);
 function resizeSprites(both) {
     var scale = .3 * document.body.getBoundingClientRect().height / 100;
     var sprite = document.getElementById("leftSprite");
-    sprite.onload = () => {
-        var view = document.getElementById("pLeftView");
-        if (view != undefined) {
-            view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
-            view.style.top = .64 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
-        }
-        if (sprite.naturalHeight > 130)
-            sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
-        else 
-            sprite.style.transform = "scale(1,1)";
-
-        if (both != undefined) {
-            scale = .25 * document.body.getBoundingClientRect().height / 100;
-            sprite = document.getElementById("rightSprite");
-            sprite.onload = () => {
-                var view = document.getElementById("pRightView");
-                if (view != undefined) {
-                    view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
-                    view.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
-                }
-                if (sprite.naturalHeight > 130)
-                    sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
-                else
-                    sprite.style.transform = "scale(1,1)";
+    if (sprite != undefined) {
+        sprite.onload = () => {
+            var view = document.getElementById("pLeftView");
+            if (view != undefined) {
+                view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
+                view.style.top = .64 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
             }
-            if (sprite != undefined)
-                sprite.src = opponent.imgf;
+            if (sprite.naturalHeight > 130)
+                sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
+            else
+                sprite.style.transform = "scale(1,1)";
+
+            if (both != undefined) {
+                scale = .25 * document.body.getBoundingClientRect().height / 100;
+                sprite = document.getElementById("rightSprite");
+                sprite.onload = () => {
+                    var view = document.getElementById("pRightView");
+                    if (view != undefined) {
+                        view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
+                        view.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
+                    }
+                    if (sprite.naturalHeight > 130)
+                        sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
+                    else
+                        sprite.style.transform = "scale(1,1)";
+                }
+                if (sprite != undefined)
+                    sprite.src = opponent.imgf;
+            }
         }
+        if (sprite != undefined)
+            sprite.src = team[activePokemon].imgb;
     }
-    if (sprite != undefined)
-        sprite.src = team[activePokemon].imgb;
+}
+
+function playMusic(src, repeat) {
+    music = document.createElement("audio");
+    music.autoplay = true;
+    music.loop = repeat;
+    music.onended = function () {
+        music.pause();
+        music = null;
+    }
+    music.src = src;
+    document.body.appendChild(music);
+    music.play();
+}
+
+function toggleEscapeScreen() {
+    if (document.getElementById('escapeScreen') != undefined)
+        document.body.removeChild(document.getElementById('escapeScreen'));
+    else {
+        var filter = document.createElement('div');
+        filter.className = "filter";
+        filter.id = "escapeScreen";
+        document.body.appendChild(filter);
+        var grid = document.createElement('div');
+        grid.className = "gameover_grid";
+        filter.appendChild(grid);
+
+        var soundButton = document.createElement('div');
+        soundButton.className = "sound-button";
+        soundButton.addEventListener('click', () => {
+            if (music) {
+                soundImage.src = "resources/sprites/ui_icons/mute.webp"
+                var audios = document.getElementsByTagName('audio');
+                for (let a of audios) {
+                    a.pause();
+                    a = null;
+                }
+                music = false;
+            } else {
+                soundImage.src = "resources/sprites/ui_icons/sound.webp"
+                playMusic(ambientMusic, true);
+                music = true;
+            }
+        });
+        soundButton.style.filter = "invert()";
+        filter.appendChild(soundButton);
+        var soundImage = new Image();
+        soundImage.className = "pixel-sprite";
+        if (!music)
+            soundImage.src = "resources/sprites/ui_icons/mute.webp"
+        else
+            soundImage.src = "resources/sprites/ui_icons/sound.webp"
+        soundButton.appendChild(soundImage);
+    }
 }
 
 
@@ -94,10 +180,72 @@ var cSelected = 0;
 var pSelected = ["", "", ""];
 var tuto = false;
 
+function loadProgress() {
+    defeatedPokemon = window.localStorage.getItem('defeatedPokemon') != null ? parseInt(JSON.parse(window.localStorage.getItem('defeatedPokemon'))) : 0;
+    victories = window.localStorage.getItem('victories') != null ? parseInt(JSON.parse(window.localStorage.getItem('victories'))) : 0;
+    flawlessVictories = window.localStorage.getItem('flawlessVictories') != null ? parseInt(JSON.parse(window.localStorage.getItem('flawlessVictories'))) : 0;
+    starterVictories = window.localStorage.getItem('starterVictories') != null ? parseInt(JSON.parse(window.localStorage.getItem('starterVictories'))) : 0;
+    physicalDamageTaken = window.localStorage.getItem('physicalDamageTaken') != null ? parseInt(JSON.parse(window.localStorage.getItem('physicalDamageTaken'))) : 0;
+    specialDamageTaken = window.localStorage.getItem('specialDamageTaken') != null ? parseInt(JSON.parse(window.localStorage.getItem('specialDamageTaken'))) : 0;
+    statusMovesUsed = window.localStorage.getItem('statusMovesUsed') != null ? parseInt(JSON.parse(window.localStorage.getItem('statusMovesUsed'))) : 0;
+    damageDealt = window.localStorage.getItem('damageDealt') != null ? parseInt(JSON.parse(window.localStorage.getItem('damageDealt'))) : 0;
+    blockedHits = window.localStorage.getItem('blockedHits') != null ? parseInt(JSON.parse(window.localStorage.getItem('blockedHits'))) : 0;
+    earnedMoney = window.localStorage.getItem('earnedMoney') != null ? parseInt(JSON.parse(window.localStorage.getItem('earnedMoney'))) : 0;
+    drawnCards = window.localStorage.getItem('drawnCards') != null ? parseInt(JSON.parse(window.localStorage.getItem('drawnCards'))) : 0;
+    fastBoss = window.localStorage.getItem('fastBoss') != null ? parseInt(JSON.parse(window.localStorage.getItem('fastBoss'))) : 0;
+    cardsPerTurn = window.localStorage.getItem('cardsPerTurn') != null ? parseInt(JSON.parse(window.localStorage.getItem('cardsPerTurn'))) : 0;
+    helixQuest = window.localStorage.getItem('helixQuest') != null ? parseInt(JSON.parse(window.localStorage.getItem('helixQuest'))) : 0;
+    sandstormDamage = window.localStorage.getItem('sandstormDamage') != null ? parseInt(JSON.parse(window.localStorage.getItem('sandstormDamage'))) : 0;
+    survive1hp = window.localStorage.getItem('survive1hp') != null ? parseInt(JSON.parse(window.localStorage.getItem('survive1hp'))) : 0;
+    unlockedPokemon = window.localStorage.getItem('unlockedPokemon') != null ? parseInt(JSON.parse(window.localStorage.getItem('unlockedPokemon'))) : 0;
+    transforms = window.localStorage.getItem('transforms') != null ? parseInt(JSON.parse(window.localStorage.getItem('transforms'))) : 0;
+    flawlessKO = window.localStorage.getItem('flawlessKO') != null ? parseInt(JSON.parse(window.localStorage.getItem('flawlessKO'))) : 0;
+    area1loss = window.localStorage.getItem('area1loss') != null ? parseInt(JSON.parse(window.localStorage.getItem('area1loss'))) : 0;
+    maxRound = window.localStorage.getItem('maxRound') != null ? parseInt(JSON.parse(window.localStorage.getItem('maxRound'))) : 0;
+    pikachuVictory = window.localStorage.getItem('pikachuVictory') != null ? parseInt(JSON.parse(window.localStorage.getItem('pikachuVictory'))) : 0;
+    rockIceKO = window.localStorage.getItem('rockIceKO') != null ? parseInt(JSON.parse(window.localStorage.getItem('rockIceKO'))) : 0;
+    unlockedPokemon = -3;
+    for (let p of pokemonList) {
+        unlockedPokemon += createPokemon(p).unlocked;
+    }
+}
+
+function saveProgress() {
+    window.localStorage.setItem('defeatedPokemon', JSON.stringify(defeatedPokemon));
+    window.localStorage.setItem('victories', JSON.stringify(victories));
+    window.localStorage.setItem('flawlessVictories', JSON.stringify(flawlessVictories));
+    window.localStorage.setItem('starterVictories', JSON.stringify(starterVictories));
+    window.localStorage.setItem('physicalDamageTaken', JSON.stringify(physicalDamageTaken));
+    window.localStorage.setItem('specialDamageTaken', JSON.stringify(specialDamageTaken));
+    window.localStorage.setItem('statusMovesUsed', JSON.stringify(statusMovesUsed));
+    window.localStorage.setItem('damageDealt', JSON.stringify(damageDealt));
+    window.localStorage.setItem('blockedHits', JSON.stringify(blockedHits));
+    window.localStorage.setItem('earnedMoney', JSON.stringify(earnedMoney));
+    window.localStorage.setItem('drawnCards', JSON.stringify(drawnCards));
+    window.localStorage.setItem('fastBoss', JSON.stringify(fastBoss));
+    window.localStorage.setItem('cardsPerTurn', JSON.stringify(cardsPerTurn));
+    window.localStorage.setItem('helixQuest', JSON.stringify(helixQuest));
+    window.localStorage.setItem('sandstormDamage', JSON.stringify(sandstormDamage));
+    window.localStorage.setItem('survive1hp', JSON.stringify(survive1hp));
+    window.localStorage.setItem('unlockedPokemon', JSON.stringify(unlockedPokemon));
+    window.localStorage.setItem('transforms', JSON.stringify(transforms));
+    window.localStorage.setItem('flawlessKO', JSON.stringify(flawlessKO));
+    window.localStorage.setItem('area1loss', JSON.stringify(area1loss));
+    window.localStorage.setItem('maxRound', JSON.stringify(maxRound));
+    window.localStorage.setItem('pikachuVictory', JSON.stringify(pikachuVictory));
+    window.localStorage.setItem('rockIceKO', JSON.stringify(rockIceKO));
+}
+
 function drawTeamSelection() {
     document.body.innerHTML = "";
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
+
+    ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
+    loadProgress();
 
     cSelected = 0;
     pSelected = ["", "", ""];
@@ -132,36 +280,52 @@ function drawTeamSelection() {
 
 function pokemonSelector(name) {
     this.cell = document.createElement('div');
+    this.cell.p = createPokemon(name);
     this.name = name;
     image = new Image();
     image.src = 'resources/sprites/pokemon_icons/' + name + '.png';
     image.className = 'pixel-sprite';
+    if (!this.cell.p.unlocked)
+        image.className += " not-unlocked";
     title = document.createElement('div');
-    title.innerHTML = name;
+    title.innerHTML = this.cell.p.unlocked ? name : "?????";
     this.cell.appendChild(title);
     this.cell.appendChild(image);
     this.cell.className = "team-selector-element";
     this.cell.onclick = function () {
-        tsc = document.getElementById("teamSelectorCount");
-        if (pSelected.findIndex(element => element === name) == -1 && cSelected < 3) {
-            pSelected[pSelected.findIndex(element => element === "")] = name;
-            cSelected += 1;
-            if (cSelected < 3) {
+        if (this.p.unlocked) {
+            tsc = document.getElementById("teamSelectorCount");
+            if (pSelected.findIndex(element => element === name) == -1 && cSelected < 3) {
+                pSelected[pSelected.findIndex(element => element === "")] = name;
+                cSelected += 1;
+                if (cSelected < 3) {
+                    tsc.innerText = "(" + cSelected + "/3)";
+                } else {
+                    tsc.innerText = "start";
+                    tsc.className = "selector-count-start";
+                    tsc.onclick = launchGame;
+                }
+                this.className = "selected-cell";
+            } else if (pSelected.findIndex(element => element === name) != -1) {
+                pSelected[pSelected.findIndex(element => element === name)] = "";
+                cSelected -= 1;
                 tsc.innerText = "(" + cSelected + "/3)";
-            } else {
-                tsc.innerText = "start";
-                tsc.className = "selector-count-start";
-                tsc.onclick = launchGame;
+                tsc.className = "selector-count";
+                tsc.onclick = () => { };
+                this.className = "team-selector-element";
             }
-            this.className = "selected-cell";
-        } else if (pSelected.findIndex(element => element === name) != -1) {
-            pSelected[pSelected.findIndex(element => element === name)] = "";
-            cSelected -= 1;
-            tsc.innerText = "(" + cSelected + "/3)";
-            tsc.className = "selector-count";
-            tsc.onclick = () => { };
-            this.className = "team-selector-element";
         }
+    }
+
+    if (this.cell.p.unlocked) {
+        this.cell.title = this.cell.p.name + "\n" + this.cell.p.description + "\nTypes: ";
+        for (let type of this.cell.p.types) {
+            var t = type.charAt(0).toUpperCase() + type.slice(1)
+            this.cell.title += t + " ";
+        }
+        this.cell.title += "\nTalent: " + this.cell.p.talent + "\n" + this.cell.p.talentDesc;
+    } else {
+        this.cell.title = this.cell.p.hint;
     }
 }
 
@@ -321,10 +485,11 @@ function effectiveMultiplier(move, pD) {
 
 function launchGame() {
     world = 1;
-    area = 10;
+    area = 1;
     money = 0;
     removePrice = 500;
     extraLoot = 0;
+    flawless = true;
     for (let i = 0; i < pSelected.length; i++) {
         pokemon = createPokemon(pSelected[i]);
         adjustBST(pokemon, 600, false);
@@ -348,6 +513,10 @@ function mapSelection() {
     document.body.innerHTML = "";
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
+
+    ambientMusic = "resources/sounds/musics/crossroads.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
 
     selector = document.createElement('div');
     selector.id = "selector";
@@ -467,7 +636,6 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
-bossList = ["diancie"]
 
 energy = 5;
 maxEnergy = 5;
@@ -501,6 +669,8 @@ function battleEncounter(encounter) {
     gameOverTimeout = -1;
     rewardTimeout = -1;
     encounterType = encounter;
+    turn = 1;
+    flawlessBattle = true;
 
     if (team[0].currenthp > 0) {
         activePokemon = 0;
@@ -516,6 +686,13 @@ function battleEncounter(encounter) {
     document.body.innerHTML = "";
     gArea = new gameArea('resources/sprites/battle_backgrounds/plains.png', () => { });
     gArea.start();
+
+    if (area < 10)
+        ambientMusic = "resources/sounds/musics/battle.mp3";
+    else
+        ambientMusic = "resources/sounds/musics/boss.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
 
     pLeftView = document.createElement('div');
     pLeftView.className = "pokemon-displayer-left";
@@ -784,6 +961,7 @@ function battleEncounter(encounter) {
 
 function startTurn() {
     energy = maxEnergy;
+    cardsPlayed = 0;
     if (player) {
         switchesLeft = 1;
         for (let p of team) {
@@ -1209,6 +1387,12 @@ function useMove(move) {
     if (energy >= move.cost && opponent.currenthp > 0) {
         energy -= move.cost;
 
+        if (player && move.cat === "status")
+            statusMovesUsed += 1;
+        cardsPlayed++;
+        if (player)
+            cardsPerTurn = Math.max(cardsPerTurn, cardsPlayed);
+
         var pDummy;
         if ((player && team[activePokemon].talent !== "Unseen Fist") || (!player && opponent.talent !== "Unseen Fist"))
             pDummy = new MissingNo();
@@ -1296,6 +1480,7 @@ function useMove(move) {
             desc.innerHTML += opponent.name + " protected itself!<br />";
         } else if (!player && move.cat !== "status" && doesBlock(team[activePokemon]) && pDummy != undefined) {
             desc.innerHTML += team[activePokemon].name + " protected itself!<br />";
+            blockedHits += 1;
         }
 
         if (move.fails && message === "") {
@@ -1382,6 +1567,19 @@ function dealDamage(damage, p, move) {
                 j.effectR(move, p, pD);
         }
     }
+
+    if (damage > 0 && move != undefined && p === team[activePokemon]) {
+        if (move.cat === "physical")
+            physicalDamageTaken += damage;
+        else if (move.cat === "special")
+            specialDamageTaken += damage;
+    } else if (damage > 0 && p === opponent) {
+        damageDealt += damage;
+        if (move != undefined && move.type === "rock" && p.currenthp == 0)
+            rockIceKO++;
+    }
+    if (p === team[activePokemon])
+        flawlessBattle = false;
 }
 
 function checkKO() {
@@ -1396,6 +1594,7 @@ function checkKO() {
             if (document.body.contains(battleFilter))
                 document.body.removeChild(battleFilter);
         }
+        flawless = false;
     }
     if (opponent.currenthp == 0) {
         rightSprite.className += " fainted";
@@ -1404,6 +1603,14 @@ function checkKO() {
                 p.endBattle();
         }
         if (rewardTimeout == -1) {
+            defeatedPokemon++;
+            if (area == 10 && turn <= 3)
+                fastBoss++;
+            for (let p of team) {
+                if (p.currenthp == 1)
+                    survive1hp++;
+            }
+
             if (document.body.contains(battleFilter))
                 document.body.removeChild(battleFilter);
             if (area < 10 || world < 3)
@@ -1497,6 +1704,10 @@ function endTurn() {
         if (opponent.endTurn != undefined)
             opponent.endTurn(team[activePokemon]);
         player = !player;
+        if (player) {
+            turn++;
+            maxRound = Math.max(turn, maxRound);
+        }
         startTurn();
     }
 }
@@ -1600,6 +1811,7 @@ function createOpponent(encounter) {
 }
 
 function nextEncounter() {
+    saveProgress();
     if (area == 10) {
         if (world == 3) {
             victoryScreen();
@@ -1645,6 +1857,16 @@ function victoryScreen() {
     grid.appendChild(title);
     grid.appendChild(replay);
     document.body.appendChild(grid);
+
+    victories += 1;
+    if (flawless)
+        flawlessVictories += 1;
+    if (contains(pSelected, "venusaur") && contains(pSelected, "charizard") && contains(pSelected, "blastoise"))
+        starterVictories += 1;
+    var i = team.findIndex(e => e.name === "Pikachu");
+    if (i >= 0 && team[i].currenthp == 0)
+        pikachuVictory += 1;
+    saveProgress();
 }
 
 
@@ -1657,7 +1879,17 @@ function victoryScreen() {
 /* ------------------------------------------------------ */
 
 function rewardScreen() {
+    var audios = document.getElementsByTagName('audio');
+    for (let a of audios) {
+        a.pause();
+        a = null;
+    }
+    ambientMusic = "resources/sounds/musics/victory.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
     money += 10 * Math.round(Math.sqrt(75 * (10 * world + area)));
+    earnedMoney += 10 * Math.round(Math.sqrt(75 * (10 * world + area)));
 
     var filter = document.createElement('div');
     filter.className = "filter";
@@ -1744,7 +1976,8 @@ function rewardScreen() {
     skip.innerHTML = "skip (" + String.fromCharCode(08381) + "100)";
     skip.onclick = () => {
         money += 100;
-        if (Math.random() < extraLoot || tuto) {
+        earnedMoney += 100;
+        if (Math.random() < extraLoot || tuto || area == 10) {
             extraLoot = 0;
             extraReward();
         } else {
@@ -1832,6 +2065,7 @@ function extraReward() {
     skip.innerHTML = "skip (" + String.fromCharCode(08381) + "150)";
     skip.onclick = () => {
         money += 150;
+        earnedMoney += 150;
         extraLoot += .35;
         nextEncounter();
     };
@@ -1884,6 +2118,10 @@ function pokemonCenterEncounter() {
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
+    ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
     var title = document.createElement('div');
     title.className = "centered-title";
     title.innerHTML = "Pokémon Center";
@@ -1926,6 +2164,10 @@ function pokemartEncounter() {
     document.body.innerHTML = "";
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
+
+    ambientMusic = "resources/sounds/musics/pokemart.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
 
     var moneyT = document.createElement('div');
     moneyT.className = "money-text";
@@ -2257,6 +2499,8 @@ function gameOver() {
     grid.appendChild(progress);
     grid.appendChild(replay);
     document.body.appendChild(grid);
+
+    saveProgress();
 }
 
 
@@ -2384,6 +2628,7 @@ function MissingNo() {
 
 function Venusaur() {
     this.name = "Venusaur";
+    this.description = "A specially oriented attacker with decent bulk, capable of spreading poison and benefitting from the sun."
     this.hp = 80;
     this.attack = 82;
     this.defense = 83;
@@ -2409,10 +2654,12 @@ function Venusaur() {
     this.talent = "Overgrow";
     this.talentDesc = "Increases the power of grass type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "grass"); };
+    this.unlocked = true;
 }
 
 function Charizard() {
     this.name = "Charizard";
+    this.description = "A mixed attacker with good coverage, capable of spreading burns and benefitting from the sun."
     this.hp = 78;
     this.attack = 84;
     this.defense = 78;
@@ -2438,10 +2685,12 @@ function Charizard() {
     this.talent = "Blaze";
     this.talentDesc = "Increases the power of fire type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "fire"); };
+    this.unlocked = true;
 }
 
 function Blastoise() {
     this.name = "Blastoise";
+    this.description = "A mixed attacker with good bulk, benefitting from the rain."
     this.hp = 79;
     this.attack = 83;
     this.defense = 100;
@@ -2467,10 +2716,12 @@ function Blastoise() {
     this.talent = "Torrent";
     this.talentDesc = "Increases the power of water type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "water"); }
+    this.unlocked = true;
 }
 
 function Pikachu() {
     this.name = "Pikachu";
+    this.description = "A fast powerful mixed attacker, capable of spreading paralysis."
     this.hp = 35;
     this.attack = 110;
     this.defense = 40;
@@ -2496,10 +2747,13 @@ function Pikachu() {
     this.talent = "Static";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are paralyzed."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
+    this.unlocked = defeatedPokemon >= 5;
+    this.hint = "Defeat 5 Pokémon\n" + defeatedPokemon + "/5";
 }
 
 function Garchomp() {
     this.name = "Garchomp";
+    this.description = "A well-rounded physical attacker with decent bulk, with powerful dragon type moves."
     this.hp = 108;
     this.attack = 130;
     this.defense = 95;
@@ -2525,10 +2779,13 @@ function Garchomp() {
     this.talent = "Rough skin"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
+    this.unlocked = defeatedPokemon >= 20;
+    this.hint = "Defeat 20 Pokémon\n" + defeatedPokemon + "/20";
 }
 
 function Cinderace() {
     this.name = "Cinderace";
+    this.description = "An all-purpose fast physical attacker with great coverage, capable of hitting hard any foe."
     this.hp = 80;
     this.attack = 116;
     this.defense = 75;
@@ -2560,10 +2817,13 @@ function Cinderace() {
         applyEffect("type_changed", 1, this, move.type);
         return .9;
     }
+    this.unlocked = defeatedPokemon >= 50;
+    this.hint = "Defeat 50 Pokémon\n" + defeatedPokemon + "/50";
 }
 
 function Lucario() {
     this.name = "Lucario";
+    this.description = "A powerful mixed attacker, capable of buffing itself to deal heavy damage."
     this.hp = 70;
     this.attack = 110;
     this.defense = 70;
@@ -2589,10 +2849,13 @@ function Lucario() {
     this.talent = "Inner focus"
     this.talentDesc = "This Pokémon cannot be made to flinch."
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
+    this.unlocked = defeatedPokemon >= 100;
+    this.hint = "Defeat 100 Pokémon\n" + defeatedPokemon + "/100";
 }
 
 function Volcarona() {
     this.name = "Volcarona";
+    this.description = "A powerful special attacker, capable of buffing itself to deal heavy damage and benefitting from the sun."
     this.hp = 85;
     this.attack = 60;
     this.defense = 65;
@@ -2618,10 +2881,13 @@ function Volcarona() {
     this.talent = "Flame body";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are burned."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
+    this.unlocked = defeatedPokemon >= 150;
+    this.hint = "Defeat 150 Pokémon\n" + defeatedPokemon + "/150";
 }
 
 function Eevee() {
     this.name = "Eevee";
+    this.description = "A well-rounded Pokémon, capable of dealing decent normal type damage and helping its teammates."
     this.hp = 55;
     this.attack = 55;
     this.defense = 50;
@@ -2647,10 +2913,13 @@ function Eevee() {
     this.talent = "Adaptability";
     this.talentDesc = "Increased STAB damage bonus."
     this.boost = function (move) { return 1 + .3 * (contains(this.types, move.type)); }
+    this.unlocked = victories >= 1;
+    this.hint = "Beat the game"
 }
 
 function Gardevoir() {
     this.name = "Gardevoir";
+    this.description = "A powerful special attacker with good coverage, capable of spreading various status conditions."
     this.hp = 68;
     this.attack = 65;
     this.defense = 65;
@@ -2682,10 +2951,13 @@ function Gardevoir() {
         if (isFrozen(this)) applyEffect("freeze", 1, pD);
         if (isAsleep(this)) applyEffect("sleep", 1, pD);
     }
+    this.unlocked = flawlessVictories >= 1;
+    this.hint = "Beat the game without any Pokémon fainting"
 }
 
 function Dragonite() {
     this.name = "Dragonite";
+    this.description = "A strong physical attacker with decent bulk, with powerful dragon type moves."
     this.hp = 91;
     this.attack = 134;
     this.defense = 95;
@@ -2711,10 +2983,13 @@ function Dragonite() {
     this.talent = "Inner focus"
     this.talentDesc = "This Pokémon cannot be made to flinch."
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
+    this.unlocked = starterVictories >= 1;
+    this.hint = "Beat the game with the starters"
 }
 
 function Ferrothorn() {
     this.name = "Ferrothorn";
+    this.description = "A utility Pokémon boasting great bulk, capable of buffing itself, spreading status conditions and setting traps."
     this.hp = 74;
     this.attack = 94;
     this.defense = 131;
@@ -2740,10 +3015,13 @@ function Ferrothorn() {
     this.talent = "Iron barbs"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
+    this.unlocked = physicalDamageTaken >= 15000;
+    this.hint = "Take 15,000 physical damage\n" + physicalDamageTaken + "/15000";
 }
 
 function Blissey() {
     this.name = "Blissey";
+    this.description = "A cleric with specially offensive options, boasting stellar special bulk despite a dangerously low defense."
     this.hp = 255;
     this.attack = 10;
     this.defense = 10;
@@ -2774,10 +3052,13 @@ function Blissey() {
         if (isFrozen(this)) removeEffect(this, "Freeze");
         if (isAsleep(this)) removeEffect(this, "Sleep");
     }
+    this.unlocked = specialDamageTaken >= 15000;
+    this.hint = "Take 15,000 special damage\n" + specialDamageTaken + "/15000";
 }
 
 function Sableye() {
     this.name = "Sableye";
+    this.description = "A utility Pokémon with a large array of options, capable of using countless status moves and hitting hard occasionally."
     this.hp = 50;
     this.attack = 75;
     this.defense = 75;
@@ -2807,10 +3088,13 @@ function Sableye() {
             drawMove(this, false);
         return 1;
     }
+    this.unlocked = statusMovesUsed >= 150;
+    this.hint = "Use 150 status moves\n" + statusMovesUsed + "/150";
 }
 
 function Scizor() {
     this.name = "Scizor";
+    this.description = "A powerful physical attacker with decent bulk, capable of buffing itself to deal heavy damage."
     this.hp = 70;
     this.attack = 130;
     this.defense = 100;
@@ -2836,10 +3120,13 @@ function Scizor() {
     this.talent = "Technician";
     this.talentDesc = "Damaging moves with a cost of 1 or less deal 20% extra damage."
     this.boost = function (move) { return 1 + .2 * (move.bp > 0 && move.cost <= 1); }
+    this.unlocked = damageDealt >= 50000;
+    this.hint = "Deal 50,000 damage\n" + damageDealt + "/50000";
 }
 
 function Aegislash() {
     this.name = "Aegislash";
+    this.description = "A mighty mixed attacker and impenetrable wall at the same time, provided it can switch stance accordingly."
     this.hp = 60;
     this.attack = 50;
     this.defense = 140;
@@ -2873,6 +3160,8 @@ function Aegislash() {
             switchAegislash(this, true);
         return 1;
     }
+    this.unlocked = blockedHits >= 30;
+    this.hint = "Block 30 attacks\n" + blockedHits + "/30";
 }
 
 function switchAegislash(p, shield) {
@@ -2915,6 +3204,7 @@ function switchAegislash(p, shield) {
 
 function Meowth() {
     this.name = "Meowth";
+    this.description = "A weaker mixed attacker with great speed, capable of increasing battle loot."
     this.hp = 40;
     this.attack = 45;
     this.defense = 35;
@@ -2940,10 +3230,13 @@ function Meowth() {
     this.talent = "Pickup";
     this.talentDesc = "Increased chance to find held items after a battle.";
     this.endBattle = function () { extraLoot += .1; }
+    this.unlocked = earnedMoney >= 10000;
+    this.hint = "Earn " + String.fromCharCode(08381) + "10,000\n" + earnedMoney + "/10000";
 }
 
 function Metagross() {
     this.name = "Metagross";
+    this.description = "A powerful physical attacker, capable of buffing itself to deal heavy damage."
     this.hp = 80;
     this.attack = 135;
     this.defense = 130;
@@ -2976,10 +3269,13 @@ function Metagross() {
         this.statchanges.speed = Math.max(0, this.statchanges.speed);
         drawStats(contains(team, this));
     }
+    this.unlocked = drawnCards >= 1000;
+    this.hint = "Draw 1,000 cards\n" + drawnCards + "/1000";
 }
 
 function Weavile() {
     this.name = "Weavile";
+    this.description = "A fast powerful physical attacker, capable of using many moves to deal heavy damage and benefitting from the hail."
     this.hp = 70;
     this.attack = 120;
     this.defense = 65;
@@ -3005,10 +3301,13 @@ function Weavile() {
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.unlocked = fastBoss >= 1;
+    this.hint = "Defeat a boss in 3 turns or less";
 }
 
 function Zeraora() {
     this.name = "Zeraora";
+    this.description = "A fast powerful mixed attacker, capable of buffing itself to power up its electric and fighting type moves."
     this.hp = 88;
     this.attack = 112;
     this.defense = 75;
@@ -3034,10 +3333,13 @@ function Zeraora() {
     this.talent = "Volt absorb"
     this.talentDesc = "Electric immunity."
     this.init = function () { applyEffect("immunity", 1, this, "electric"); }
+    this.unlocked = cardsPerTurn >= 8;
+    this.hint = "Use 8 cards in a single turn\n" + cardsPerTurn + "/8";
 }
 
 function Omanyte() {
     this.name = "Omanyte";
+    this.description = "A physically bulky wall with good specially offensive presence despite a low speed, benefitting greatly from the rain and sometimes from the hail or the sandstorm."
     this.hp = 35;
     this.attack = 40;
     this.defense = 100;
@@ -3066,11 +3368,13 @@ function Omanyte() {
         if (drawsExtra(this)) removeEffect(this, "Extra Draw");
         if (weather != undefined && weather.name === "Rain") applyEffect("extra_draw", 2, this);
     }
-
+    this.unlocked = helixQuest >= 1;
+    this.hint = "???";
 }
 
 function Tyranitar() {
     this.name = "Tyranitar";
+    this.description = "A slow powerful physical attacker with great bulk, capable of setting and benefitting greatly from the sandstorm."
     this.hp = 100;
     this.attack = 134;
     this.defense = 110;
@@ -3096,10 +3400,13 @@ function Tyranitar() {
     this.talent = "Sand stream"
     this.talentDesc = "Whips up a sandstorm at the beginning of the battle."
     this.init = function () { setWeather("sandstorm", 10); }
+    this.unlocked = sandstormDamage >= 300;
+    this.hint = "???";
 }
 
 function Gyarados() {
     this.name = "Gyarados";
+    this.description = "A powerful physical attacker with limited options offset by its ever increasing attack."
     this.hp = 95;
     this.attack = 125;
     this.defense = 79;
@@ -3125,10 +3432,13 @@ function Gyarados() {
     this.talent = "Moxie"
     this.talentDesc = "Slightly increases this Pokémon's attack at the end of each battle."
     this.endBattle = function () { this.attack *= 1.01; }
+    this.unlocked = survive1hp >= 1;
+    this.hint = "???";
 }
 
 function Ditto() {
     this.name = "Ditto";
+    this.description = "An all-purpose Pokémon, capable of copying whatever its foe can do."
     this.hp = 48;
     this.attack = 48;
     this.defense = 48;
@@ -3161,15 +3471,19 @@ function Ditto() {
         this.moves = [].concat(opponent.moves);
         if (this === team[activePokemon])
             document.getElementById("leftSprite").src = this.imgb;
+        transformed++;
     }
     this.endBattle = function () {
         this.moves = [createMove("struggle")];
         this.imgb = 'resources/sprites/pokemon_battle_icons/back/ditto.gif';
     }
+    this.unlocked = unlockedPokemon >= 10;
+    this.hint = "???";
 }
 
 function Mew() {
     this.name = "Mew";
+    this.description = "An all-purpose Pokémon with well-rounded stats, capable of learning any move."
     this.hp = 100;
     this.attack = 100;
     this.defense = 100;
@@ -3199,10 +3513,13 @@ function Mew() {
         if (isFrozen(this)) applyEffect("freeze", 1, pD);
         if (isAsleep(this)) applyEffect("sleep", 1, pD);
     }
+    this.unlocked = transforms >= 50;
+    this.hint = "???";
 }
 
 function Urshifu() {
     this.name = "Urshifu";
+    this.description = "A powerful physical attacker, capable of breaking through walls with its signature moves."
     this.hp = 100;
     this.attack = 130;
     this.defense = 100;
@@ -3227,10 +3544,13 @@ function Urshifu() {
     this.items = [];
     this.talent = "Unseen Fist";
     this.talentDesc = "This Pokémon's attacks ignore protections."
+    this.unlocked = flawlessKO >= 5;
+    this.hint = "???";
 }
 
 function Gengar() {
     this.name = "Gengar";
+    this.description = "A fast powerful special attacker with great coverage, capable of spreading poison."
     this.hp = 60;
     this.attack = 65;
     this.defense = 60;
@@ -3256,10 +3576,13 @@ function Gengar() {
     this.talent = "Levitation"
     this.talentDesc = "Levitates above the ground, granting ground type immunity."
     this.init = function () { applyEffect("levitation", 99, this); }
+    this.unlocked = area1loss >= 1;
+    this.hint = "???";
 }
 
 function Shuckle() {
     this.name = "Shuckle";
+    this.description = "A slow and incredibly weak Pokémon with stellar defenses, capable of taking hits while setting traps and dealing chip damage."
     this.hp = 40; //adjusted
     this.attack = 10;
     this.defense = 230;
@@ -3283,10 +3606,13 @@ function Shuckle() {
     this.items = [];
     this.talent = "Sturdy"
     this.talentDesc = "This Pokémon cannot be knocked out unless at 1HP already."
+    this.unlocked = maxRound >= 20;
+    this.hint = "???";
 }
 
 function Mimikyu() {
     this.name = "Mimikyu";
+    this.description = "A physical attacker with good defensive utility, capable of taking some hits before striking back hard."
     this.hp = 55;
     this.attack = 90;
     this.defense = 80;
@@ -3316,6 +3642,8 @@ function Mimikyu() {
         switchMimikyu(this, true);
         applyEffect("disguise", 2, this);
     }
+    this.unlocked = pikachuVictory >= 1;
+    this.hint = "???";
 }
 
 function switchMimikyu(p, disguise) {
@@ -3346,6 +3674,7 @@ function switchMimikyu(p, disguise) {
 
 function Mamoswine() {
     this.name = "Mamoswine";
+    this.description = "A powerful physical attacker with high damage, expensive moves, benefitting from the hail."
     this.hp = 110;
     this.attack = 130;
     this.defense = 80;
@@ -3371,6 +3700,8 @@ function Mamoswine() {
     this.talent = "Thick fat";
     this.talentDesc = "Lowers the damage of incoming ice and fire type moves.";
     this.init = function () { applyEffect("thick_fat", 1, this); }
+    this.unlocked = rockIceKO >= 1;
+    this.hint = "???";
 }
 
 function Arceus() {
@@ -6152,7 +6483,12 @@ function HappyHour() {
     this.bp = 0;
     this.cost = 3;
     this.exhaust = true;
-    this.effect = function (move, pA, pD) { if (player) money += 100; };
+    this.effect = function (move, pA, pD) {
+        if (player) {
+            money += 100;
+            earnedMoney += 100;
+        }
+    };
     this.description = "Gain " + String.fromCharCode(08381) + "100. Exhaust.";
 }
 
@@ -7084,7 +7420,12 @@ function PayDay() {
     this.bp = 25;
     this.cost = 1;
     this.exhaust = true;
-    this.effect = function (move, pA, pD) { if (player) money += 25; };
+    this.effect = function (move, pA, pD) {
+        if (player) {
+            money += 25;
+            earnedMoney += 25;
+        }
+    };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Gain " + String.fromCharCode(08381) + "25. Exhaust.";
 }
 
@@ -9345,8 +9686,10 @@ function SandstormW(turns) {
     this.effect = () => {
         if (!contains(team[activePokemon].types, "rock") && !contains(team[activePokemon].types, "ground") && !contains(team[activePokemon].types, "steel"))
             dealDamage(10, team[activePokemon]);
-        if (!contains(opponent.types, "rock") && !contains(opponent.types, "ground") && !contains(opponent.types, "steel"))
+        if (!contains(opponent.types, "rock") && !contains(opponent.types, "ground") && !contains(opponent.types, "steel")) {
             dealDamage(10, opponent);
+            sandstormDamage += 10;
+        }
         this.turns--;
     };
 }
