@@ -15,7 +15,7 @@ function drawStartingMenu() {
     var tutoButton = document.createElement('button');
     tutoButton.className = "launch-tuto";
     tutoButton.innerText = "how to play?";
-    tutoButton.addEventListener('click', () => { startTuto() });
+    tutoButton.addEventListener('click', () => { tuto = true; drawTeamSelection(); });
     document.body.appendChild(tutoButton);
     var soundButton = document.createElement('div');
     soundButton.className = "sound-button";
@@ -113,16 +113,17 @@ function resizeSprites(both) {
 }
 
 function playMusic(src, repeat) {
-    music = document.createElement("audio");
+    var music = document.createElement("audio");
     music.autoplay = true;
     music.loop = repeat;
-    music.onended = function () {
-        music.pause();
-        music = null;
-    }
+    music.volume = 1 - .6 * repeat;
     music.src = src;
     document.body.appendChild(music);
-    music.play();
+    music.onended = function () {
+        music.pause();
+        if (document.body.contains(music))
+            document.body.removeChild(music);
+    }
 }
 
 function toggleEscapeScreen() {
@@ -132,6 +133,7 @@ function toggleEscapeScreen() {
         var filter = document.createElement('div');
         filter.className = "filter";
         filter.id = "escapeScreen";
+        filter.style.zIndex = "1";
         document.body.appendChild(filter);
         var grid = document.createElement('div');
         grid.className = "gameover_grid";
@@ -242,8 +244,10 @@ function drawTeamSelection() {
     gArea.start();
 
     ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
-    if (music)
+    if (music) {
+        playMusic("resources/sounds/sfx/pc.mp3", false);
         playMusic(ambientMusic, true);
+    }
 
     loadProgress();
 
@@ -276,6 +280,38 @@ function drawTeamSelection() {
     }
 
     teamSelectorScreen.appendChild(teamSelector);
+
+    if (tuto) {
+        var filter = document.createElement('div');
+        filter.className = "filter";
+        teamSelectorScreen.appendChild(filter);
+
+        var title = document.createElement('div');
+        title.className = "centered-title";
+        title.innerHTML = "Welcome trainer!";
+
+        var message = document.createElement('div');
+        message.className = "centered-subtitle";
+        message.innerHTML = "Every adventure begins with a choice! Before venturing into the world of Pokémon you will need to assemble a powerful party. Here you can select which Pokémon to travel with.";
+
+        var replay = document.createElement('div');
+        replay.className = "centered-subtitle replay";
+        replay.innerHTML = "Continue";
+        replay.onclick = () => {
+            teamSelectorScreen.removeChild(filter);
+            var instruct = document.createElement('div');
+            instruct.className = "overlay-text";
+            instruct.innerHTML = "Select Venusaur, Charizard and Blastoise, then hit start.";
+            teamSelectorScreen.appendChild(instruct);
+        };
+
+        var grid = document.createElement('div');
+        grid.className = "gameover-grid";
+        grid.appendChild(title);
+        grid.appendChild(message);
+        grid.appendChild(replay);
+        filter.appendChild(grid);
+    }
 }
 
 function pokemonSelector(name) {
@@ -303,7 +339,7 @@ function pokemonSelector(name) {
                 } else {
                     tsc.innerText = "start";
                     tsc.className = "selector-count-start";
-                    tsc.onclick = launchGame;
+                    tsc.onclick = () => { if (!tuto || (contains(pSelected, "venusaur") && contains(pSelected, "charizard")) && contains(pSelected, "blastoise")) launchGame(); };
                 }
                 this.className = "selected-cell";
             } else if (pSelected.findIndex(element => element === name) != -1) {
@@ -373,23 +409,6 @@ const typetable =
 function contains(array, element) {
     return array.findIndex(e => e === element) != -1;
 }
-
-Function.prototype.clone = function () {
-    var cloneObj = this;
-    if (this.__isClone) {
-        cloneObj = this.__clonedFrom;
-    }
-
-    var temp = function () { return cloneObj.apply(this, arguments); };
-    for (var key in this) {
-        temp[key] = this[key];
-    }
-
-    temp.__isClone = true;
-    temp.__clonedFrom = cloneObj;
-
-    return temp;
-};
 
 function typemultiplier(move, attacker, defender) {
     i = types.findIndex(e => e === move.type);
@@ -1294,7 +1313,8 @@ function initDeck(p) {
 
 function copyMove(m) {
     var move = JSON.parse(JSON.stringify(m));
-    move.effect = m.effect.bind(move);
+    if (m.effect != undefined)
+        move.effect = m.effect.bind(move);
     if (m.postEffect != undefined)
         move.postEffect = m.postEffect.bind(move);
     return move;
@@ -1338,6 +1358,8 @@ function drawMove(p, newHand) {
                 } else {
                     p.hand.push(new Struggle());
                 }
+                if (contains(team, p))
+                    drawnCards++;
             }
         }
         if (p === team[switchInd[0]])
@@ -1442,10 +1464,10 @@ function useMove(move) {
         //taunt
         if (player && isTaunted(team[activePokemon]) && move.cat === "status") {
             cancelled = true;
-            desc.innerHTML += team[activePokemon].name + "can't use " + move.name + " after the taunt!<br />";
+            desc.innerHTML += team[activePokemon].name + " can't use " + move.name + " after the taunt!<br />";
         } else if (!player && isTaunted(opponent) && move.cat === "status") {
             cancelled = true;
-            desc.innerHTML += opponent.name + "can't use " + move.name + " after the taunt!<br />";
+            desc.innerHTML += opponent.name + " can't use " + move.name + " after the taunt!<br />";
         }
 
         //protection break
@@ -1556,7 +1578,14 @@ function dealDamage(damage, p, move) {
     refreshHealthBar(true);
     refreshHealthBar(false);
     checkKO();
+
     moveAnimation(move, damage, p);
+    if (music && move != undefined && damage > 0) {
+        if (effectiveMultiplier(move, p) > 1)
+            playMusic("resources/sounds/sfx/super_effective_hit.mp3", false);
+        else
+            playMusic("resources/sounds/sfx/hit.mp3", false);
+    }
 
     if (damage != 0) {
         var pD = contains(team, p) ? opponent : team[activePokemon];
@@ -1607,8 +1636,10 @@ function checkKO() {
             if (area == 10 && turn <= 3)
                 fastBoss++;
             for (let p of team) {
-                if (p.currenthp == 1)
+                if (p.currenthp == 1) {
                     survive1hp++;
+                    alert(survive1hp)
+                }
             }
 
             if (document.body.contains(battleFilter))
@@ -2119,8 +2150,10 @@ function pokemonCenterEncounter() {
     gArea.start();
 
     ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
-    if (music)
+    if (music) {
         playMusic(ambientMusic, true);
+        playMusic("resources/sounds/sfx/healer.mp3", false);
+    }
 
     var title = document.createElement('div');
     title.className = "centered-title";
@@ -2499,6 +2532,9 @@ function gameOver() {
     grid.appendChild(progress);
     grid.appendChild(replay);
     document.body.appendChild(grid);
+
+    if (area == 1 && world == 1)
+        area1loss++;
 
     saveProgress();
 }
@@ -3471,7 +3507,7 @@ function Ditto() {
         this.moves = [].concat(opponent.moves);
         if (this === team[activePokemon])
             document.getElementById("leftSprite").src = this.imgb;
-        transformed++;
+        transforms++;
     }
     this.endBattle = function () {
         this.moves = [createMove("struggle")];
@@ -3544,7 +3580,7 @@ function Urshifu() {
     this.items = [];
     this.talent = "Unseen Fist";
     this.talentDesc = "This Pokémon's attacks ignore protections."
-    this.unlocked = flawlessKO >= 5;
+    this.unlocked = flawlessKO >= 1;
     this.hint = "???";
 }
 
@@ -6080,8 +6116,9 @@ function Feint() {
     this.name = "Feint";
     this.type = "normal";
     this.cat = "physical";
-    this.bp = 15;
+    this.bp = 20;
     this.cost = 0;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { drawMove(pA, false); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
@@ -6355,7 +6392,7 @@ function FurySwipes() {
 }
 
 function FutureSight() {
-    this.name = "FutureSight";
+    this.name = "Future Sight";
     this.type = "psychic";
     this.cat = "status";
     this.bp = 0;
@@ -10336,7 +10373,7 @@ function ChoiceScarf() {
 
 function RockyHelmet() {
     this.name = "Rocky Helmet";
-    this.description = "Attackers making contact with the user lose 10HP.";
+    this.description = "Attackers making contact with the holder lose 10HP.";
     this.img = 'resources/sprites/held_items/rocky_helmet.webp';
     this.area = "";
     this.revenge = true;
@@ -10406,113 +10443,6 @@ function LifeOrb() {
 /* ------------------------------------------------------ */
 /* ---------------------- Tutorial ---------------------- */
 /* ------------------------------------------------------ */
-
-function startTuto() {
-    tuto = true;
-    drawTeamSelectionTuto();
-}
-
-function drawTeamSelectionTuto() {
-    document.body.innerHTML = "";
-    var gArea = new gameArea('resources/teamscreen.webp', () => { });
-    gArea.start();
-
-    cSelected = 0;
-    pSelected = ["", "", ""];
-
-    var teamSelectorScreen = document.createElement('div');
-    teamSelectorScreen.className = "team-selector-screen";
-    document.body.appendChild(teamSelectorScreen);
-
-    var teamSelectorTitle = document.createElement('div');
-    teamSelectorTitle.className = "selector-title";
-    var teamTitle = document.createElement('div');
-    teamTitle.className = "title";
-    teamTitle.innerHTML = "Select your team";
-    teamSelectorTitle.appendChild(teamTitle);
-    var teamSelectorCount = document.createElement('button');
-    teamSelectorCount.className = "selector-count";
-    teamSelectorCount.innerText = "(0/3)";
-    teamSelectorCount.id = "teamSelectorCount";
-    teamSelectorTitle.appendChild(teamSelectorCount);
-    teamSelectorScreen.appendChild(teamSelectorTitle);
-
-    var teamSelector = document.createElement('div');
-    teamSelector.className = "team-selector";
-
-    for (const pokemon of pokemonList) {
-        var cell = (new pokemonSelectorTuto(pokemon)).cell;
-        teamSelector.appendChild(cell);
-    }
-
-    teamSelectorScreen.appendChild(teamSelector);
-
-    var filter = document.createElement('div');
-    filter.className = "filter";
-    filter.id = "filter";
-    teamSelectorScreen.appendChild(filter);
-
-    var title = document.createElement('div');
-    title.className = "centered-title";
-    title.innerHTML = "Welcome trainer!";
-
-    var message = document.createElement('div');
-    message.className = "centered-subtitle";
-    message.innerHTML = "Every adventure begins with a choice! Before venturing into the world of Pokémon you will need to assemble a powerful party. Here you can select which Pokémon to travel with.";
-
-    var replay = document.createElement('div');
-    replay.className = "centered-subtitle replay";
-    replay.innerHTML = "Continue";
-    replay.onclick = () => {
-        teamSelectorScreen.removeChild(filter);
-        var instruct = document.createElement('div');
-        instruct.className = "overlay-text";
-        instruct.innerHTML = "Select Venusaur, Charizard and Blastoise, then hit start.";
-        teamSelectorScreen.appendChild(instruct);
-    };
-
-    var grid = document.createElement('div');
-    grid.className = "gameover-grid";
-    grid.appendChild(title);
-    grid.appendChild(message);
-    grid.appendChild(replay);
-    filter.appendChild(grid);
-}
-
-function pokemonSelectorTuto(name) {
-    this.cell = document.createElement('div');
-    this.name = name;
-    image = new Image();
-    image.src = 'resources/sprites/pokemon_icons/' + name + '.png';
-    image.className = 'pixel-sprite';
-    title = document.createElement('div');
-    title.innerHTML = name;
-    this.cell.appendChild(title);
-    this.cell.appendChild(image);
-    this.cell.className = "team-selector-element";
-    this.cell.onclick = function () {
-        tsc = document.getElementById("teamSelectorCount");
-        if (pSelected.findIndex(element => element === name) == -1 && cSelected < 3) {
-            pSelected[pSelected.findIndex(element => element === "")] = name;
-            cSelected += 1;
-            if (cSelected < 3) {
-                tsc.innerText = "(" + cSelected + "/3)";
-            } else {
-                tsc.innerText = "start";
-                tsc.className = "selector-count-start";
-                tsc.onclick = () => { if (contains(pSelected, "venusaur") && contains(pSelected, "charizard") && contains(pSelected, "blastoise")) launchGame(); };
-            }
-            this.className = "selected-cell";
-        } else if (pSelected.findIndex(element => element === name) != -1) {
-            pSelected[pSelected.findIndex(element => element === name)] = "";
-            cSelected -= 1;
-            tsc.innerText = "(" + cSelected + "/3)";
-            tsc.className = "selector-count";
-            tsc.onclick = () => { };
-            this.className = "team-selector-element";
-        }
-    }
-}
 
 function drawBattleExplanations() {
     var filter = document.createElement('div');
