@@ -5,8 +5,12 @@
 music = false;
 
 function drawStartingMenu() {
-    ambientMusic = "resources/sounds/musics/title_screen.mp3";
     document.body.innerHTML = "";
+
+    ambientMusic = "resources/sounds/musics/title_screen.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
     var startButton = document.createElement('button');
     startButton.className = "start";
     startButton.innerText = "start";
@@ -135,8 +139,13 @@ function toggleEscapeScreen() {
         filter.style.zIndex = "1";
         document.body.appendChild(filter);
         var grid = document.createElement('div');
-        grid.className = "gameover_grid";
+        grid.className = "gameover-grid";
         filter.appendChild(grid);
+        var exitButton = document.createElement('div');
+        exitButton.className = "centered-subtitle replay";
+        exitButton.innerHTML = "Exit to title screen";
+        exitButton.onclick = drawStartingMenu;
+        grid.appendChild(exitButton);
 
         var soundButton = document.createElement('div');
         soundButton.className = "sound-button";
@@ -509,6 +518,8 @@ function launchGame() {
     money = 0;
     removePrice = 500;
     extraLoot = 0;
+    pokemonCenterChance = 0;
+    pokemartChance = 0;
     flawless = true;
     for (let i = 0; i < pSelected.length; i++) {
         pokemon = createPokemon(pSelected[i]);
@@ -596,33 +607,27 @@ function pathSelector() {
         grid.appendChild(cell);
     } else {
         grid.className = "encounter-selector";
-        for (let i = 0; i < 2; i++) {
-            cell = document.createElement('div');
-            image = new Image();
-            image.className = 'pixel-sprite';
-            title = document.createElement('div');
+        while (grid.childNodes.length < 2 || grid.childNodes[0].encounter === grid.childNodes[1].encounter) {
+            var cell = document.createElement('div');
+            var image = new Image();
+            image.className = 'path-icon';
+            var title = document.createElement('div');
             cell.appendChild(image);
             cell.appendChild(title);
             cell.className = "team-selector-element";
-            rd = 0;
-            if (area > 2) {
-                rd = Math.floor(Math.random() * 24);
-            } else {
-                rd = Math.floor(Math.random() * 18);
-            }
-            if (rd < 18) {
-                type = types[rd];
-                image.src = 'resources/sprites/map_icons/' + type + '.png';
-                title.innerHTML = type + " type battle";
-                encounter = type;
-            } else if (rd < 21) {
+            if (Math.random() < pokemonCenterChance && pokemonCenterChance > .15) {
+                image.src = 'resources/sprites/map_icons/pokemon_center.png';
+                title.innerHTML = "pokémon center";
+                encounter = "pokemon_center";
+            } else if (Math.random() < pokemartChance && pokemartChance > .15) {
                 image.src = 'resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
             } else {
-                image.src = 'resources/sprites/map_icons/pokemon_center.png';
-                title.innerHTML = "pokémon center";
-                encounter = "pokemon_center";
+                type = types[Math.floor(Math.random() * 18)];
+                image.src = 'resources/sprites/map_icons/' + type + '.png';
+                title.innerHTML = type + " type battle";
+                encounter = type;
             }
             cell.encounter = encounter;
             cell.onclick = function () {
@@ -681,6 +686,9 @@ function startEncounter(encounter) {
 }
 
 function battleEncounter(encounter) {
+    pokemonCenterChance += .05;
+    pokemartChance += .05;
+
     opponent = createOpponent(encounter);
     player = true;
     weather = undefined;
@@ -1474,8 +1482,12 @@ function useMove(move) {
         }
 
         //move pre effects
-        if (move.preEffect != undefined)
-            move.preEffect();
+        if (move.preEffect != undefined) {
+            if (player)
+                move.preEffect(move, team[activePokemon], opponent);
+            else
+                move.preEffect(move, opponent, team[activePokemon]);
+        }
 
         //protection break
         if (move.noBlock != undefined) {
@@ -1579,7 +1591,6 @@ function dealDamage(damage, p, move) {
         p.currenthp = Math.min(Math.max(1, Math.floor(p.currenthp - damage)), p.maxhp);
     refreshHealthBar(true);
     refreshHealthBar(false);
-    checkKO();
 
     moveAnimation(move, damage, p);
     if (music && move != undefined && damage > 0) {
@@ -1611,6 +1622,8 @@ function dealDamage(damage, p, move) {
     }
     if (p === team[activePokemon])
         flawlessBattle = false;
+
+    checkKO();
 }
 
 function checkKO() {
@@ -1829,8 +1842,7 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
-    //adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
-    adjustBST(opponent, 250, false);
+    adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
     if (area < 10) {
@@ -2001,7 +2013,7 @@ function rewardScreen() {
             this.reward1.move = move1;
             this.reward1.onclick = function () {
                 team[this.p].moves.push(this.move);
-                if (true || Math.random() < extraLoot || tuto || area == 10) {
+                if (Math.random() < extraLoot || tuto || area == 10) {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -2019,7 +2031,7 @@ function rewardScreen() {
     skip.onclick = () => {
         money += 100;
         earnedMoney += 100;
-        if (true || Math.random() < extraLoot || tuto || area == 10) {
+        if (Math.random() < extraLoot || tuto || area == 10) {
             extraLoot = 0;
             extraReward();
         } else {
@@ -2096,6 +2108,8 @@ function extraReward() {
             this.reward1.item = item;
             this.reward1.onclick = function () {
                 team[this.p].items.push(this.item);
+                if (this.item.pickup != undefined)
+                    this.item.effect(this.p);
                 nextEncounter();
             };
         }
@@ -2156,6 +2170,9 @@ function getFromItemPool(t) {
 /* ------------------------------------------------------ */
 
 function pokemonCenterEncounter() {
+    pokemonCenterChance = 0;
+    pokemartChance += .05;
+
     document.body.innerHTML = "";
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
@@ -2205,6 +2222,9 @@ itemPrice = 2000;
 removePrice = 500;
 
 function pokemartEncounter() {
+    pokemonCenterChance += .05;
+    pokemartChance = 0;
+
     document.body.innerHTML = "";
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
@@ -4011,11 +4031,11 @@ function switchGiratina(p) {
         temp = p.spattack;
         p.spattack = p.spdefense;
         p.spdefense = temp;
-        dealDamage(-.1 * p.maxhp, p);
         this.revenge = function (move, pD) { };
         applyEffect("levitation", 99, p);
         p.talent = "Levitation"
         p.talentDesc = "Levitates above the ground, granting ground type immunity."
+        dealDamage(-.1 * p.maxhp, p);
     }
 }
 
@@ -6806,7 +6826,10 @@ function HyperVoice() {
     this.bp = 100;
     this.cost = 2;
     this.effect = function (move, pA, pD) { };
-    this.postEffect = function (move, pA, pD) { removeEffect("Sleep", pD); };
+    this.postEffect = function (move, pA, pD) {
+        if (isAsleep(pD))
+            removeEffect("Sleep", pD);
+    };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Wakes up the target if it is alseep.";
 }
 
@@ -8868,7 +8891,10 @@ function Uproar() {
     this.effect = function (move, pA, pD) {
         pA.hand.push(copyMove(this));
     };
-    this.postEffect = function (move, pA, pD) { removeEffect("Sleep", pD); };
+    this.postEffect = function (move, pA, pD) {
+        if (isAsleep(pD))
+            removeEffect("Sleep", pD);
+    };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Remains in hand. Wakes up sleeping Pokémon.";
 }
 
@@ -9027,7 +9053,7 @@ function WeatherBall() {
     this.cat = "special";
     this.bp = 70;
     this.cost = 2;
-    this.preEffect = function () {
+    this.preEffect = function (move, pA, pD) {
         if (weather != undefined) {
             if (weather.name === "Rain") this.type = "water";
             else if (weather.name === "Sun") this.type = "fire";
@@ -9776,8 +9802,9 @@ function AirLock(turns) {
 
 heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_stone", "magnet", "metal_coat", "miracle_seed", "mystic_water", "never_melt_ice", "poison_barb", "sharp_beak", "silk_scarf", "silver_powder", "soft_sand", "spell_tag", "twisted_spoon",
     "draco_plate", "dread_plate", "earth_plate", "fist_plate", "flame_plate", "icicle_plate", "insect_plate", "iron_plate", "meadow_plate", "mind_plate", "pixie_plate", "sky_plate", "splash_plate", "spooky_plate", "stone_plate", "toxic_plate", "zap_plate",
-    "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root",
-    "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock"];
+    "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
+    "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
+    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -9917,6 +9944,20 @@ function createHeldItem(item) {
             return new KingsRock();
         case "big_root":
             return new BigRoot();
+        case "blunder_policy":
+            return new BlunderPolicy();
+        case "destiny_knot":
+            return new DestinyKnot();
+        case "revive":
+            return new Revive();
+        case "pearl":
+            return new Pearl();
+        case "potion":
+            return new Potion();
+        case "amulet_coin":
+            return new AmuletCoin();
+        case "odd_keystone":
+            return new OddKeystone();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -10804,6 +10845,102 @@ function BigRoot() {
     this.area = "grass";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .25 * (move.recoil != undefined && move.recoil < 0); }
+}
+
+function BlunderPolicy() {
+    this.name = "Blunder Policy";
+    this.description = "Whenever the holder is hit by an attack with the possibility to fail, raises its speed by 2 stages.";
+    this.img = 'resources/sprites/held_items/weakness_policy.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (move != undefined && move.fails != undefined)
+            boostStat(pA, "speed", 2);
+    }
+}
+
+function DestinyKnot() {
+    this.name = "Destiny Knot";
+    this.description = "At the end of each turn, copies all of the holder's status conditions onto its opponent in limited amounts.";
+    this.img = 'resources/sprites/held_items/destiny_knot.webp';
+    this.area = "";
+    this.turn_end = true;
+    this.effect = (p) => {
+        var pD = p === team[activePokemon] ? opponent : team[activePokemon];
+        if (isPoisoned(p)) applyEffect("poison", 4, pD);
+        if (isBurned(p)) applyEffect("burn", 1, pD);
+        if (isParalyzed(p)) applyEffect("paralysis", 1, pD);
+        if (isFrozen(p)) applyEffect("freeze", 1, pD);
+        if (isAsleep(p)) applyEffect("sleep", 1, pD);
+    }
+}
+
+function Revive() {
+    this.name = "Revive";
+    this.description = "The first time the holder faints, revives it with 30% HP. Single use.";
+    this.img = 'resources/sprites/held_items/revive.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { if (pA.currenthp == 0) dealDamage(.3 * pA.maxhp, pA); }
+}
+
+function Pearl() {
+    this.name = "Pearl";
+    this.description = "Grants " + String.fromCharCode(08381) + "600 on pickup.";
+    this.img = 'resources/sprites/held_items/pearl.webp';
+    this.area = "";
+    this.pickup = true;
+    this.effect = (p) => {
+        money += 600;
+        earnedMoney += 600;
+    }
+}
+
+function Potion() {
+    this.name = "Potion";
+    this.description = "Restores 50% of the holder's HP on pickup.";
+    this.img = 'resources/sprites/held_items/potion.webp';
+    this.area = "";
+    this.pickup = true;
+    this.effect = (p) => { dealDamage(.5 * p.maxhp, p); }
+}
+
+function AmuletCoin() {
+    this.name = "Amulet Coin";
+    this.description = "Gain " + String.fromCharCode(08381) + "75 each battle.";
+    this.img = 'resources/sprites/held_items/amulet_coin.webp';
+    this.area = "";
+    this.init = true;
+    this.effect = (p) => {
+        money += 75;
+        earnedMoney += 75;
+    }
+}
+
+function OddKeystone() {
+    this.name = "Odd Keystone";
+    this.description = "An old stone holding a mysterious power. Voices can be heard from it.";
+    this.img = 'resources/sprites/held_items/odd_keystone.webp';
+    this.area = "ghost";
+    this.energy = 0;
+    this.boost = true;
+    this.effect = (move, p) => {
+        this.energy += 1 + contains(p.types, move.type) + (move.cat === "status");
+        if (this.energy >= 65) {
+            dealDamage(108, contains(team, p) ? opponent : team[activePokemon]);
+            this.energy -= 65;
+        }
+        return 1;
+    }
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        this.energy += 2 * move != undefined;
+        if (this.energy >= 65) {
+            dealDamage(108, pD);
+            this.energy -= 65;
+        }
+        if (pA.currenthp == 0) dealDamage(.3 * pA.maxhp, pA);
+    }
 }
 
 

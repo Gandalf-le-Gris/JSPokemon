@@ -156,6 +156,11 @@ button.start:hover {
     grid-template-columns: 15vw;
 }
 
+.path-icon {
+    width: 100%;
+    height: auto;
+}
+
 .pokemon-displayer-left {
     display: grid;
     grid-template-rows: auto auto auto;
