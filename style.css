@@ -105,7 +105,7 @@ button.start:hover {
 
 .team-selector {
     display: grid;
-    grid-gap: 4vw 1vw;
+    grid-gap: 6vh 1vw;
     grid-template-columns: 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw;
 }
 
@@ -530,16 +530,18 @@ button.start:hover {
     right: 0;
     top: 0;
     height: 8vh;
-    max-width: 70vw;
+    max-width: 75vw;
     background: rgba(255, 255, 255, .25);
     display: grid;
     grid-auto-flow: column;
+    column-gap: .4vw;
 }
 
 .held-items-pokemon {
     display: grid;
     grid-auto-flow: column;
     border-left: 2px solid black;
+    column-gap: .2vw;
 }
 
 .item-pokemon-sprite {

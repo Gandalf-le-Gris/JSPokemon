@@ -116,7 +116,6 @@ function playMusic(src, repeat) {
     var music = document.createElement("audio");
     music.autoplay = true;
     music.loop = repeat;
-    music.volume = 1 - .6 * repeat;
     music.src = src;
     document.body.appendChild(music);
     music.onended = function () {
@@ -459,6 +458,8 @@ function damageCalculator(move, pA, pD) {
     }
     if (crit)
         baseDam *= 1.5
+    if (move.cat !== "status")
+        baseDam = Math.max(1, baseDam);
 
     var other = 1;
     if (move.cat === "physical" && isBurned(pA))
@@ -942,7 +943,7 @@ function battleEncounter(encounter) {
             itemSubsection.appendChild(wrapper);
 
             var pImage = new Image();
-            pImage.src = 'resources/sprites/held_items/' + i.name.replace(" ", "_").toLowerCase() + '.webp';
+            pImage.src = i.img;
             pImage.className = "item-sprite";
             pImage.title = i.description;
             wrapper.appendChild(pImage);
@@ -1486,11 +1487,13 @@ function useMove(move) {
             target = doesBlock(team[activePokemon]) && pDummy != undefined ? pDummy : team[activePokemon];
         if (!cancelled) {
             if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0)) {
-                move.effect(move, team[activePokemon], target);
+                if (move.effect != undefined)
+                    move.effect(move, team[activePokemon], target);
                 if (team[activePokemon].boost != undefined)
                     boostMul *= team[activePokemon].boost(move);
             } else if (!player && (move.cat === "status" || effectiveMultiplier(move, team[activePokemon]) > 0)) {
-                move.effect(move, opponent, target);
+                if (move.effect != undefined)
+                    move.effect(move, opponent, target);
                 if (opponent.boost != undefined)
                     boostMul *= opponent.boost(move);
             }
@@ -1539,12 +1542,6 @@ function useMove(move) {
                     dealDamage(damage, team[activePokemon], move);
                     if (move.recoil != undefined)
                         dealDamage(Math.floor(move.recoil * damage), opponent);
-                    if (damage > 0) {
-                        for (let j of team[activePokemon].items) {
-                            if (j.revenge != undefined)
-                                j.effectR(move, team[activePokemon], opponent);
-                        }
-                    }
                 }
             }
         }
@@ -1566,7 +1563,6 @@ function useMove(move) {
             team[activePokemon].effects[i].bEffect(move, team[activePokemon], opponent);
             drawEffects(true);
         }
-
     }
 }
 
@@ -1641,6 +1637,8 @@ function checkKO() {
                     alert(survive1hp)
                 }
             }
+            if (flawlessBattle)
+                flawlessKO++;
 
             if (document.body.contains(battleFilter))
                 document.body.removeChild(battleFilter);
@@ -1825,7 +1823,8 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
-    adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
+    //adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
+    adjustBST(opponent, 250, false);
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
     if (area < 10) {
@@ -1897,6 +1896,12 @@ function victoryScreen() {
     var i = team.findIndex(e => e.name === "Pikachu");
     if (i >= 0 && team[i].currenthp == 0)
         pikachuVictory += 1;
+    for (let p of team) {
+        for (let i of p.items) {
+            if (i.name === "Helix Fossil")
+                helixQuest++;
+        }
+    }
     saveProgress();
 }
 
@@ -1990,7 +1995,7 @@ function rewardScreen() {
             this.reward1.move = move1;
             this.reward1.onclick = function () {
                 team[this.p].moves.push(this.move);
-                if (Math.random() < extraLoot || tuto) {
+                if (true || Math.random() < extraLoot || tuto || area == 10) {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -2008,7 +2013,7 @@ function rewardScreen() {
     skip.onclick = () => {
         money += 100;
         earnedMoney += 100;
-        if (Math.random() < extraLoot || tuto || area == 10) {
+        if (true || Math.random() < extraLoot || tuto || area == 10) {
             extraLoot = 0;
             extraReward();
         } else {
@@ -6037,6 +6042,7 @@ function Explosion() {
     this.cat = "physical";
     this.bp = 250;
     this.cost = 0;
+    this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { dealDamage(9999, pA); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. User faints.";
 }
@@ -9764,7 +9770,8 @@ function AirLock(turns) {
 
 heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_stone", "magnet", "metal_coat", "miracle_seed", "mystic_water", "never_melt_ice", "poison_barb", "sharp_beak", "silk_scarf", "silver_powder", "soft_sand", "spell_tag", "twisted_spoon",
     "draco_plate", "dread_plate", "earth_plate", "fist_plate", "flame_plate", "icicle_plate", "insect_plate", "iron_plate", "meadow_plate", "mind_plate", "pixie_plate", "sky_plate", "splash_plate", "spooky_plate", "stone_plate", "toxic_plate", "zap_plate",
-    "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "blunder_policy", "sitrus_berry", "life_orb"];
+    "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root",
+    "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -9821,6 +9828,8 @@ function createHeldItem(item) {
         case "meadow_plate":
             return new MeadowPlate();
         case "mind_plate":
+            return new MindPlate();
+        case "pixie_plate":
             return new PixiePlate();
         case "sky_plate":
             return new SkyPlate();
@@ -9850,162 +9859,215 @@ function createHeldItem(item) {
             return new SitrusBerry();
         case "life_orb":
             return new LifeOrb();
+        case "helix_fossil":
+            return new HelixFossil();
+        case "air_balloon":
+            return new AirBalloon();
+        case "cheri_berry":
+            return new CheriBerry();
+        case "chesto_berry":
+            return new ChestoBerry();
+        case "rawst_berry":
+            return new RawstBerry();
+        case "pecha_berry":
+            return new PechaBerry();
+        case "persim_berry":
+            return new PersimBerry();
+        case "muscle_band":
+            return new MuscleBand();
+        case "wise_glasses":
+            return new WiseGlasses();
+        case "mental_herb":
+            return new MentalHerb();
+        case "white_herb":
+            return new WhiteHerb();
+        case "scope_lens":
+            return new ScopeLens();
+        case "wide_lens":
+            return new WideLens();
+        case "damp_rock":
+            return new DampRock();
+        case "heat_rock":
+            return new HeatRock();
+        case "icy_rock":
+            return new IcyRock();
+        case "smooth_rock":
+            return new SmoothRock();
+        case "bottle_cap":
+            return new BottleCap();
+        case "gold_bottle_cap":
+            return new GoldBottleCap();
+        case "tm_xx":
+            return new TMXX();
+        case "shed_shell":
+            return new ShedShell();
+        case "enigma_berry":
+            return new EnigmaBerry();
+        case "iron_ball":
+            return new IronBall();
+        case "quick_claw":
+            return new QuickClaw();
+        case "kings_rock":
+            return new KingsRock();
+        case "big_root":
+            return new BigRoot();
         default:
-            return new BlackBelt();
+            alert("Unkown item: " + item);
+            return new Leftovers();
     }
 }
 
 function BlackBelt() {
     this.name = "Black Belt";
-    this.description = "Raises the power of fighting type moves by 10%";
+    this.description = "Raises the power of fighting type moves by 20%";
     this.img = 'resources/sprites/held_items/black_belt.webp';
     this.area = "fighting";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "fighting"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "fighting"); };
 }
 
 function BlackGlasses() {
     this.name = "Black Glasses";
-    this.description = "Raises the power of dark type moves by 10%";
+    this.description = "Raises the power of dark type moves by 20%";
     this.img = 'resources/sprites/held_items/black_glasses.webp';
     this.area = "dark";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "dark"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "dark"); };
 }
 
 function Charcoal() {
     this.name = "Charcoal";
-    this.description = "Raises the power of fire type moves by 10%";
+    this.description = "Raises the power of fire type moves by 20%";
     this.img = 'resources/sprites/held_items/charcoal.webp';
     this.area = "fire";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "fire"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "fire"); };
 }
 
 function DragonFang() {
     this.name = "Dragon Fang";
-    this.description = "Raises the power of dragon type moves by 10%";
+    this.description = "Raises the power of dragon type moves by 20%";
     this.img = 'resources/sprites/held_items/dragon_fang.webp';
     this.area = "dragon";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "dragon"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "dragon"); };
 }
 
 function HardStone() {
     this.name = "Hard Stone";
-    this.description = "Raises the power of rock type moves by 10%";
+    this.description = "Raises the power of rock type moves by 20%";
     this.img = 'resources/sprites/held_items/hard_stone.webp';
     this.area = "rock";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "rock"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "rock"); };
 }
 
 function Magnet() {
     this.name = "Magnet";
-    this.description = "Raises the power of electric type moves by 10%";
+    this.description = "Raises the power of electric type moves by 20%";
     this.img = 'resources/sprites/held_items/magnet.webp';
     this.area = "electric";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "electric"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "electric"); };
 }
 
 function MetalCoat() {
     this.name = "Metal Coat";
-    this.description = "Raises the power of steel type moves by 10%";
+    this.description = "Raises the power of steel type moves by 20%";
     this.img = 'resources/sprites/held_items/metal_coat.webp';
     this.area = "steel";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "steel"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "steel"); };
 }
 
 function MiracleSeed() {
     this.name = "Miracle Seed";
-    this.description = "Raises the power of grass type moves by 10%";
+    this.description = "Raises the power of grass type moves by 20%";
     this.img = 'resources/sprites/held_items/miracle_seed.webp';
     this.area = "grass";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "grass"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "grass"); };
 }
 
 function MysticWater() {
     this.name = "Mystic Water";
-    this.description = "Raises the power of water type moves by 10%";
+    this.description = "Raises the power of water type moves by 20%";
     this.img = 'resources/sprites/held_items/mystic_water.webp';
     this.area = "water";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "water"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "water"); };
 }
 
 function NeverMeltIce() {
-    this.name = "Never Melt Ice";
-    this.description = "Raises the power of ice type moves by 10%";
+    this.name = "Never-Melt Ice";
+    this.description = "Raises the power of ice type moves by 20%";
     this.img = 'resources/sprites/held_items/never_melt_ice.webp';
     this.area = "ice";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "ice"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "ice"); };
 }
 
 function PoisonBarb() {
     this.name = "Poison Barb";
-    this.description = "Raises the power of poison type moves by 10%";
+    this.description = "Raises the power of poison type moves by 20%";
     this.img = 'resources/sprites/held_items/poison_barb.webp';
     this.area = "poison";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "poison"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "poison"); };
 }
 
 function SharpBeak() {
     this.name = "Sharp Beak";
-    this.description = "Raises the power of flying type moves by 10%";
+    this.description = "Raises the power of flying type moves by 20%";
     this.img = 'resources/sprites/held_items/sharp_beak.webp';
     this.area = "flying";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "flying"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "flying"); };
 }
 
 function SilkScarf() {
     this.name = "Silk Scarf";
-    this.description = "Raises the power of normal type moves by 10%";
+    this.description = "Raises the power of normal type moves by 20%";
     this.img = 'resources/sprites/held_items/silk_scarf.webp';
     this.area = "normal";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "normal"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "normal"); };
 }
 
 function SilverPowder() {
     this.name = "Silver Powder";
-    this.description = "Raises the power of bug type moves by 10%";
+    this.description = "Raises the power of bug type moves by 20%";
     this.img = 'resources/sprites/held_items/silver_powder.webp';
     this.area = "bug";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "bug"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "bug"); };
 }
 
 function SoftSand() {
     this.name = "Soft Sand";
-    this.description = "Raises the power of ground type moves by 10%";
+    this.description = "Raises the power of ground type moves by 20%";
     this.img = 'resources/sprites/held_items/soft_sand.webp';
     this.area = "ground";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "ground"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "ground"); };
 }
 
 function SpellTag() {
     this.name = "Spell Tag";
-    this.description = "Raises the power of ghost type moves by 10%";
+    this.description = "Raises the power of ghost type moves by 20%";
     this.img = 'resources/sprites/held_items/spell_tag.webp';
     this.area = "ghost";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "ghost"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "ghost"); };
 }
 
 function TwistedSpoon() {
     this.name = "Twisted Spoon";
-    this.description = "Raises the power of psychic type moves by 10%";
+    this.description = "Raises the power of psychic type moves by 20%";
     this.img = 'resources/sprites/held_items/twisted_spoon.webp';
     this.area = "psychic";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .1 * (move.type === "psychic"); };
+    this.effect = (move, p) => { return 1 + .2 * (move.type === "psychic"); };
 }
 
 function DracoPlate() {
@@ -10405,13 +10467,13 @@ function WeaknessPolicy() {
 
 function SitrusBerry() {
     this.name = "Sitrus Berry";
-    this.description = "Restores 25% of maximum HP the first time an attack brings the holder below 50% of maximum HP.";
+    this.description = "Restores 15% of maximum HP the first time an attack brings the holder below 50% of maximum HP.";
     this.img = 'resources/sprites/held_items/sitrus_berry.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
-            dealDamage(-pA.maxhp * .25, pA);
+            dealDamage(-pA.maxhp * .15, pA);
             this.consumed = true;
         }
     };
@@ -10433,6 +10495,309 @@ function LifeOrb() {
             dealDamage(25, p);
         return 1.3;
     };
+}
+
+function HelixFossil() {
+    this.name = "Helix Fossil";
+    this.description = "The fossil of a forgotten Pokémon.";
+    this.img = 'resources/sprites/held_items/helix_fossil.webp';
+    this.area = "rock";
+    this.effect = (move, p) => { };
+}
+
+function AirBalloon() {
+    this.name = "Air Balloon";
+    this.description = "Holder begins the battle with 3 stacks of levitation.";
+    this.img = 'resources/sprites/held_items/air_balloon.webp';
+    this.area = "flying";
+    this.init = true;
+    this.effect = (p) => { applyEffect("levitation", 3, p); };
+}
+
+function CheriBerry() {
+    this.name = "Cheri Berry";
+    this.description = "Holder is immune to paralysis.";
+    this.img = 'resources/sprites/held_items/cheri_berry.webp';
+    this.area = "electric";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Paralysis"); };
+}
+
+function ChestoBerry() {
+    this.name = "Chesto Berry";
+    this.description = "Holder is immune to sleep.";
+    this.img = 'resources/sprites/held_items/chesto_berry.webp';
+    this.area = "normal";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Sleep"); };
+}
+
+function MentalHerb() {
+    this.name = "Mental Herb";
+    this.description = "Holder is immune to taunt. Raises holder's attack and special attack by 1 stage when a Pokémon attempts to taunt it.";
+    this.img = 'resources/sprites/held_items/mental_herb.webp';
+    this.area = "dark";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (isTaunted(pA)) {
+            removeEffect(pA, "Taunt");
+            boostStat(pA, "attack", 1);
+            boostStat(pA, "spattack", 1);
+        }
+    };
+}
+
+function MuscleBand() {
+    this.name = "Muscle Band";
+    this.description = "Increases physical damage by 5%.";
+    this.img = 'resources/sprites/held_items/muscle_band.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .05 * (move.cat === "physical"); };
+}
+
+function WiseGlasses() {
+    this.name = "Wise Glasses";
+    this.description = "Increases special damage by 5%.";
+    this.img = 'resources/sprites/held_items/wise_glasses.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .05 * (move.cat === "special"); };
+}
+
+function PechaBerry() {
+    this.name = "Pecha Berry";
+    this.description = "Holder is immune to poison.";
+    this.img = 'resources/sprites/held_items/pecha_berry.webp';
+    this.area = "poison";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Poison"); };
+}
+
+function PersimBerry() {
+    this.name = "Persim Berry";
+    this.description = "Holder is immune to confusion.";
+    this.img = 'resources/sprites/held_items/persim_berry.webp';
+    this.area = "psychic";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Confusion"); };
+}
+
+function RawstBerry() {
+    this.name = "Rawst Berry";
+    this.description = "Holder is immune to burn.";
+    this.img = 'resources/sprites/held_items/rawst_berry.webp';
+    this.area = "fire";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Burn"); };
+}
+
+function ShedShell() {
+    this.name = "Shed Shell";
+    this.description = "Holder is immune to trapping effects.";
+    this.img = 'resources/sprites/held_items/shed_shell.webp';
+    this.area = "ground";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        removeEffect(pA, "Trap");
+        removeEffect(pA, "Trap Damage");
+    };
+}
+
+function WhiteHerb() {
+    this.name = "White Herb";
+    this.description = "Holder's lowered stats are slowly restored at the end of each round.";
+    this.img = 'resources/sprites/held_items/white_herb.webp';
+    this.area = "boss";
+    this.turn_end = true;
+    this.effect = (p) => {
+        if (p.statchanges.attack < 0)
+            p.statchanges.attack++;
+        if (p.statchanges.defense < 0)
+            p.statchanges.defense++;
+        if (p.statchanges.spattack < 0)
+            p.statchanges.spattack++;
+        if (p.statchanges.spdefense < 0)
+            p.statchanges.spdefense++;
+        if (p.statchanges.speed < 0)
+            p.statchanges.speed++;
+    }
+}
+
+function DampRock() {
+    this.name = "Damp Rock";
+    this.description = "Causes the rain to fall for 3 turns at the beginning of a battle.";
+    this.img = 'resources/sprites/held_items/damp_rock.webp';
+    this.area = "water";
+    this.init = true;
+    this.effect = (p) => { setWeather("rain", 3); }
+}
+
+function HeatRock() {
+    this.name = "Heat Rock";
+    this.description = "Causes the sun to shine for 3 turns at the beginning of a battle.";
+    this.img = 'resources/sprites/held_items/heat_rock.webp';
+    this.area = "fire";
+    this.init = true;
+    this.effect = (p) => { setWeather("sun", 3); }
+}
+
+function IcyRock() {
+    this.name = "Icy Rock";
+    this.description = "Causes the hail to fall for 3 turns at the beginning of a battle.";
+    this.img = 'resources/sprites/held_items/icy_rock.webp';
+    this.area = "ice";
+    this.init = true;
+    this.effect = (p) => { setWeather("hail", 3); }
+}
+
+function SmoothRock() {
+    this.name = "Smooth Rock";
+    this.description = "Whips up a sandstorm for 3 turns at the beginning of a battle.";
+    this.img = 'resources/sprites/held_items/smooth_rock.webp';
+    this.area = "rock";
+    this.init = true;
+    this.effect = (p) => { setWeather("sandstorm", 3); }
+}
+
+function EnigmaBerry() {
+    this.name = "Enigma Berry";
+    this.description = "Restores 15% of maximum HP the first time the holder is hit by a super effective move.";
+    this.img = 'resources/sprites/held_items/enigma_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.consumed = false;
+    this.effectR = (move, pA, pD) => {
+        if (move != undefined && effectiveMultiplier(move, pA) > 1 && !this.consumed) {
+            dealDamage(-pA.maxhp * .15, pA);
+            this.consumed = true;
+        }
+    };
+    this.init = true;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function BottleCap() {
+    this.name = "Bottle Cap";
+    this.description = "Permanently grants a slight boost to a random holder's stat at the beginning of each battle.";
+    this.img = 'resources/sprites/held_items/bottle_cap.webp';
+    this.area = "";
+    this.init = true;
+    this.effect = (p) => {
+        switch (Math.floor(Math.random() * 6)) {
+            case 0:
+                p.maxhp = Math.floor(p.maxhp * 1.01);
+                break;
+            case 1:
+                p.attack *= 1.01;
+                break;
+            case 2:
+                p.defense *= 1.01;
+                break;
+            case 3:
+                p.spattack *= 1.01;
+                break;
+            case 4:
+                p.spdefense *= 1.01;
+                break;
+            case 5:
+                p.speed *= 1.01;
+                break;
+            default:
+        }
+        refreshHealthBar(contains(team, p));
+    }
+}
+
+function GoldBottleCap() {
+    this.name = "Gold Bottle Cap";
+    this.description = "Permanently grants a slight boost to all of the holder's stat at the beginning of each battle.";
+    this.img = 'resources/sprites/held_items/gold_bottle_cap.webp';
+    this.area = "boss";
+    this.init = true;
+    this.effect = (p) => {
+        p.maxhp = Math.floor(p.maxhp * 1.008);
+        p.attack *= 1.008;
+        p.defense *= 1.008;
+        p.spattack *= 1.008;
+        p.spdefense *= 1.008;
+        p.speed *= 1.008;
+        refreshHealthBar(contains(team, p));
+    }
+}
+
+function IronBall() {
+    this.name = "Iron Ball";
+    this.description = "Grounds holder, lowers its speed by 1 stage and raises its defense by 1 stage.";
+    this.img = 'resources/sprites/held_items/iron_ball.webp';
+    this.area = "steel";
+    this.init = true;
+    this.effect = (p) => {
+        applyEffect("grounded", 1, p);
+        boostStat(p, "speed", -1);
+        boostStat(p, "defense", 1);
+    }
+}
+
+function KingsRock() {
+    this.name = "King's Rock";
+    this.description = "Holder's attacks hitting multiple times apply 1 stack of fear to the target if it's not scared already.";
+    this.img = 'resources/sprites/held_items/kings_rock.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => {
+        var pD = contains(team, p) ? opponent : team[activePokemon];
+        if (move.multihit != undefined && move.multihit > 1 && !isScared(pD))
+            applyEffect("fear", 1, pD);
+        return 1;
+    }
+}
+
+function QuickClaw() {
+    this.name = "Quick Claw";
+    this.description = "Holder draws an extra card at the beginning of the turn.";
+    this.img = 'resources/sprites/held_items/quick_claw.webp';
+    this.area = "";
+    this.init = true;
+    this.effect = (p) => { applyEffect("extra_draw", 1, p); }
+}
+
+function TMXX() {
+    this.name = "TM??";
+    this.description = "Shuffles a Judgment move into the holder's draw pile at the beginning of the battle.";
+    this.img = 'resources/sprites/held_items/normal_tm.webp';
+    this.area = "boss";
+    this.init = true;
+    this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new Judgment()); }
+}
+
+function WideLens() {
+    this.name = "Wide Lens";
+    this.description = "Holder's attacks with a possibility to miss deal 25% extra damage.";
+    this.img = 'resources/sprites/held_items/wide_lens.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .25 * (move.fails != undefined); }
+}
+
+function ScopeLens() {
+    this.name = "Scope Lens";
+    this.description = "Holder's critical hits deal 25% extra damage.";
+    this.img = 'resources/sprites/held_items/scope_lens.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .25 * (move.crit != undefined && move.crit); }
+}
+
+function BigRoot() {
+    this.name = "Big Root";
+    this.description = "Holder's draining attacks deal 25% extra damage.";
+    this.img = 'resources/sprites/held_items/big_root.webp';
+    this.area = "grass";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .25 * (move.recoil != undefined && move.recoil < 0); }
 }
 
 
