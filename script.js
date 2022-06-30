@@ -1318,6 +1318,8 @@ function copyMove(m) {
         move.effect = m.effect.bind(move);
     if (m.postEffect != undefined)
         move.postEffect = m.postEffect.bind(move);
+    if (m.preEffect != undefined)
+        move.preEffect = m.preEffect.bind(move);
     return move;
 }
 
@@ -1470,6 +1472,10 @@ function useMove(move) {
             cancelled = true;
             desc.innerHTML += opponent.name + " can't use " + move.name + " after the taunt!<br />";
         }
+
+        //move pre effects
+        if (move.preEffect != undefined)
+            move.preEffect();
 
         //protection break
         if (move.noBlock != undefined) {
@@ -6968,7 +6974,7 @@ function Judgment() {
     this.cat = "special";
     this.bp = 100;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { this.type = pA.types[0]; };
+    this.preEffect = function (move, pA, pD) { this.type = pA.types[0]; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Changes type on use to match that of the user.";
 }
 
@@ -9021,7 +9027,7 @@ function WeatherBall() {
     this.cat = "special";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.preEffect = function () {
         if (weather != undefined) {
             if (weather.name === "Rain") this.type = "water";
             else if (weather.name === "Sun") this.type = "fire";
