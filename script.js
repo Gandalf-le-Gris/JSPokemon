@@ -261,6 +261,7 @@ function loadProgress() {
     rockIceKO = window.localStorage.getItem('rockIceKO') != null ? parseInt(JSON.parse(window.localStorage.getItem('rockIceKO'))) : 0;
     recoilMoves = window.localStorage.getItem('recoilMoves') != null ? parseInt(JSON.parse(window.localStorage.getItem('recoilMoves'))) : 0;
     bossesDefeated = window.localStorage.getItem('bossesDefeated') != null ? parseInt(JSON.parse(window.localStorage.getItem('bossesDefeated'))) : 0;
+    weatherChanged = window.localStorage.getItem('weatherChanged') != null ? parseInt(JSON.parse(window.localStorage.getItem('weatherChanged'))) : 0;
     unlockedPokemon = -3;
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
@@ -293,6 +294,7 @@ function saveProgress() {
     window.localStorage.setItem('rockIceKO', JSON.stringify(rockIceKO));
     window.localStorage.setItem('recoilMoves', JSON.stringify(recoilMoves));
     window.localStorage.setItem('bossesDefeated', JSON.stringify(bossesDefeated));
+    window.localStorage.setItem('weatherChanged', JSON.stringify(weatherChanged));
 }
 
 function drawTeamSelection() {
@@ -1349,6 +1351,7 @@ function switchPokemon(ind) {
         if (pS.currenthp > 0)
             switchesLeft--;
 
+        switchCastform(team[activePokemon]);
         resizeSprites();
         if (music)
             setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 250);
@@ -1879,6 +1882,8 @@ function runEffects() {
         weather.effect();
         if (weather.turns == 0)
             weather = undefined;
+        switchCastform(team[activePokemon]);
+        switchCastform(opponent);
     }
     if (terrain != undefined) {
         terrain.effect();
@@ -4086,6 +4091,78 @@ function switchRotom(p, move) {
                 p.types = ["electric", "fire"];
                 break;
             default:
+        }
+    }
+}
+
+function Castform() {
+    this.name = "Castform";
+    this.description = "A special attacker that can adapt to the weather to benefit from it to the fullest."
+    this.hp = 70;
+    this.attack = 70;
+    this.defense = 70;
+    this.spattack = 70;
+    this.spdefense = 70;
+    this.speed = 70;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["normal"];
+    this.moves = [createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("sunny_day"), createMove("hail"), createMove("hydro_pump"), createMove("fire_blast"), createMove("blizzard")];
+    this.movepool = ["amnesia", "blizzard", "avalanche", "body_slam", "clear_smog", "defog", "headbutt", "ember", "energy_ball", "facade", "fire_blast", "flamethrower", "future_sight", "hex", "hidden_power", "hurricane", "hydro_pump", "ice_beam", "icy_wind", "ominous_wind", "mimic", "scald", "shadow_ball", "toxic", "shock_wave", "solar_beam", "thunder", "thunderbolt", "water_gun", "water_pulse", "weather_ball", "hail", "rain_dance", "sunny_day", "sandstorm"];
+    this.opponentMoves =
+        [[createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("rain_dance"), createMove("hydro_pump"), createMove("thunder"), createMove("thunderbolt"), createMove("water_pulse"), createMove("hurricane"), createMove("scald")],
+        [createMove("weather_ball"), createMove("weather_ball"), createMove("sunny_day"), createMove("sunny_day"), createMove("fire_blast"), createMove("ember"), createMove("flamethrower"), createMove("solar_beam"), createMove("energy_ball"), createMove("defog")],
+        [createMove("weather_ball"), createMove("weather_ball"), createMove("hail"), createMove("hail"), createMove("blizzard"), createMove("ice_beam"), createMove("icy_wind"), createMove("avalanche"), createMove("blizzard"), createMove("defog")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Forecast"
+    this.talentDesc = "Changes form depending on the current weather."
+    this.unlocked = weatherChanged >= 50;
+    this.hint = "Change the weather 50 times\n" + weatherChanged + "/50";
+    this.cry = "resources/sounds/sfx/cries/castform.ogg"
+}
+
+function switchCastform(p) {
+    if (p.name === "Castform") {
+        if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
+            resizeSprites(true);
+            p.types = ["normal"];
+        } else if (weather != undefined) {
+            switch (weather.name) {
+                case "Sun":
+                    if (!contains(p.types, "fire")) {
+                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
+                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
+                        resizeSprites(true);
+                        p.types = ["fire"];
+                    }
+                    break;
+                case "Rain":
+                    if (!contains(p.types, "water")) {
+                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
+                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
+                        resizeSprites(true);
+                        p.types = ["water"];
+                    }
+                    break;
+                case "Hail":
+                    if (!contains(p.types, "ice")) {
+                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
+                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
+                        resizeSprites(true);
+                        p.types = ["ice"];
+                    }
+                    break;
+                default:
+            }
         }
     }
 }
@@ -10153,7 +10230,12 @@ function setWeather(w, turns) {
             default:
         }
     }
+    switchCastform(team[activePokemon]);
+    switchCastform(opponent);
     drawEnvironment();
+
+    if (player)
+        weatherChanged++;
 }
 
 function Rain(turns) {
@@ -10162,6 +10244,8 @@ function Rain(turns) {
     this.description = "Powers up water type moves and weakens fire type moves.";
     this.effect = () => {
         this.turns--;
+        switchCastform(team[activePokemon]);
+        switchCastform(opponent);
     };
 }
 
@@ -10171,6 +10255,8 @@ function Sun(turns) {
     this.description = "Powers up fire type moves and weakens water type moves.";
     this.effect = () => {
         this.turns--;
+        switchCastform(team[activePokemon]);
+        switchCastform(opponent);
     };
 }
 
