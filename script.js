@@ -608,6 +608,9 @@ function pathSelector() {
     } else {
         grid.className = "encounter-selector";
         while (grid.childNodes.length < 2 || grid.childNodes[0].encounter === grid.childNodes[1].encounter) {
+            if (grid.childNodes.length == 2)
+                grid.removeChild(grid.children[1]);
+
             var cell = document.createElement('div');
             var image = new Image();
             image.className = 'path-icon';
