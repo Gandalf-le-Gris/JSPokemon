@@ -1039,6 +1039,11 @@ function battleEncounter(encounter) {
     switch1.title = getMoveDescription(team[switchInd[0]]);
     switch2.title = getMoveDescription(team[switchInd[1]]);
 
+    if (music) {
+        setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 1000);
+        setTimeout(() => { playMusic(opponent.cry, false) }, 3000);
+    }
+
     if (tuto) {
         drawBattleExplanations()
     }
@@ -1339,6 +1344,8 @@ function switchPokemon(ind) {
             switchesLeft--;
 
         resizeSprites();
+        if (music)
+            setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 250);
     } else if (switchesLeft == 0) {
         var preview = document.getElementById("movePreview");
         preview.className = "preview-on";
@@ -1686,6 +1693,8 @@ function dealDamage(damage, p, move) {
 function checkKO() {
     if (team[activePokemon].currenthp == 0) {
         leftSprite.className += " fainted";
+        if (music)
+            setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 750);
         var gameO = true;
         for (let p of team) {
             gameO = gameO && p.currenthp == 0;
@@ -1699,6 +1708,8 @@ function checkKO() {
     }
     if (opponent.currenthp == 0) {
         rightSprite.className += " fainted";
+        if (music)
+            setTimeout(() => { playMusic(opponent.cry, false); }, 750);
         for (let p of team) {
             if (p.endBattle != undefined)
                 p.endBattle();
@@ -2789,6 +2800,7 @@ function Venusaur() {
     this.talentDesc = "Increases the power of grass type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "grass"); };
     this.unlocked = true;
+    this.cry = "resources/sounds/sfx/cries/venusaur.ogg"
 }
 
 function Charizard() {
@@ -2820,6 +2832,7 @@ function Charizard() {
     this.talentDesc = "Increases the power of fire type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "fire"); };
     this.unlocked = true;
+    this.cry = "resources/sounds/sfx/cries/charizard.ogg"
 }
 
 function Blastoise() {
@@ -2851,6 +2864,7 @@ function Blastoise() {
     this.talentDesc = "Increases the power of water type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "water"); }
     this.unlocked = true;
+    this.cry = "resources/sounds/sfx/cries/blastoise.ogg"
 }
 
 function Pikachu() {
@@ -2883,6 +2897,7 @@ function Pikachu() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
     this.unlocked = defeatedPokemon >= 5;
     this.hint = "Defeat 5 Pokémon\n" + defeatedPokemon + "/5";
+    this.cry = "resources/sounds/sfx/cries/pikachu.ogg"
 }
 
 function Garchomp() {
@@ -2915,6 +2930,7 @@ function Garchomp() {
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
     this.unlocked = defeatedPokemon >= 20;
     this.hint = "Defeat 20 Pokémon\n" + defeatedPokemon + "/20";
+    this.cry = "resources/sounds/sfx/cries/garchomp.ogg"
 }
 
 function Cinderace() {
@@ -2953,6 +2969,7 @@ function Cinderace() {
     }
     this.unlocked = defeatedPokemon >= 50;
     this.hint = "Defeat 50 Pokémon\n" + defeatedPokemon + "/50";
+    this.cry = "resources/sounds/sfx/cries/cinderace.ogg"
 }
 
 function Lucario() {
@@ -2985,6 +3002,7 @@ function Lucario() {
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = defeatedPokemon >= 100;
     this.hint = "Defeat 100 Pokémon\n" + defeatedPokemon + "/100";
+    this.cry = "resources/sounds/sfx/cries/lucario.ogg"
 }
 
 function Volcarona() {
@@ -3017,6 +3035,7 @@ function Volcarona() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
     this.unlocked = defeatedPokemon >= 150;
     this.hint = "Defeat 150 Pokémon\n" + defeatedPokemon + "/150";
+    this.cry = "resources/sounds/sfx/cries/volcarona.ogg"
 }
 
 function Eevee() {
@@ -3049,6 +3068,7 @@ function Eevee() {
     this.boost = function (move) { return 1 + .3 * (contains(this.types, move.type)); }
     this.unlocked = victories >= 1;
     this.hint = "Beat the game"
+    this.cry = "resources/sounds/sfx/cries/eevee.ogg"
 }
 
 function Gardevoir() {
@@ -3087,6 +3107,7 @@ function Gardevoir() {
     }
     this.unlocked = flawlessVictories >= 1;
     this.hint = "Beat the game without any Pokémon fainting"
+    this.cry = "resources/sounds/sfx/cries/gardevoir.ogg"
 }
 
 function Dragonite() {
@@ -3119,6 +3140,7 @@ function Dragonite() {
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = starterVictories >= 1;
     this.hint = "Beat the game with the starters"
+    this.cry = "resources/sounds/sfx/cries/dragonite.ogg"
 }
 
 function Ferrothorn() {
@@ -3151,6 +3173,7 @@ function Ferrothorn() {
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
     this.unlocked = physicalDamageTaken >= 15000;
     this.hint = "Take 15,000 physical damage\n" + physicalDamageTaken + "/15000";
+    this.cry = "resources/sounds/sfx/cries/ferrothorn.ogg"
 }
 
 function Blissey() {
@@ -3188,6 +3211,7 @@ function Blissey() {
     }
     this.unlocked = specialDamageTaken >= 15000;
     this.hint = "Take 15,000 special damage\n" + specialDamageTaken + "/15000";
+    this.cry = "resources/sounds/sfx/cries/blissey.ogg"
 }
 
 function Sableye() {
@@ -3224,6 +3248,7 @@ function Sableye() {
     }
     this.unlocked = statusMovesUsed >= 150;
     this.hint = "Use 150 status moves\n" + statusMovesUsed + "/150";
+    this.cry = "resources/sounds/sfx/cries/sableye.ogg"
 }
 
 function Scizor() {
@@ -3256,6 +3281,7 @@ function Scizor() {
     this.boost = function (move) { return 1 + .2 * (move.bp > 0 && move.cost <= 1); }
     this.unlocked = damageDealt >= 50000;
     this.hint = "Deal 50,000 damage\n" + damageDealt + "/50000";
+    this.cry = "resources/sounds/sfx/cries/scizor.ogg"
 }
 
 function Aegislash() {
@@ -3296,6 +3322,7 @@ function Aegislash() {
     }
     this.unlocked = blockedHits >= 30;
     this.hint = "Block 30 attacks\n" + blockedHits + "/30";
+    this.cry = "resources/sounds/sfx/cries/aegislash.ogg"
 }
 
 function switchAegislash(p, shield) {
@@ -3366,6 +3393,7 @@ function Meowth() {
     this.endBattle = function () { extraLoot += .1; }
     this.unlocked = earnedMoney >= 10000;
     this.hint = "Earn " + String.fromCharCode(08381) + "10,000\n" + earnedMoney + "/10000";
+    this.cry = "resources/sounds/sfx/cries/meowth.ogg"
 }
 
 function Metagross() {
@@ -3405,6 +3433,7 @@ function Metagross() {
     }
     this.unlocked = drawnCards >= 1000;
     this.hint = "Draw 1,000 cards\n" + drawnCards + "/1000";
+    this.cry = "resources/sounds/sfx/cries/metagross.ogg"
 }
 
 function Weavile() {
@@ -3437,6 +3466,7 @@ function Weavile() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
     this.unlocked = fastBoss >= 1;
     this.hint = "Defeat a boss in 3 turns or less";
+    this.cry = "resources/sounds/sfx/cries/weavile.ogg"
 }
 
 function Zeraora() {
@@ -3469,6 +3499,7 @@ function Zeraora() {
     this.init = function () { applyEffect("immunity", 1, this, "electric"); }
     this.unlocked = cardsPerTurn >= 8;
     this.hint = "Use 8 cards in a single turn\n" + cardsPerTurn + "/8";
+    this.cry = "resources/sounds/sfx/cries/zeraora.ogg"
 }
 
 function Omanyte() {
@@ -3504,6 +3535,7 @@ function Omanyte() {
     }
     this.unlocked = helixQuest >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/omanyte.ogg"
 }
 
 function Tyranitar() {
@@ -3536,6 +3568,7 @@ function Tyranitar() {
     this.init = function () { setWeather("sandstorm", 10); }
     this.unlocked = sandstormDamage >= 300;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/tyranitar.ogg"
 }
 
 function Gyarados() {
@@ -3568,6 +3601,7 @@ function Gyarados() {
     this.endBattle = function () { this.attack *= 1.01; }
     this.unlocked = survive1hp >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/gyarados.ogg"
 }
 
 function Ditto() {
@@ -3613,6 +3647,7 @@ function Ditto() {
     }
     this.unlocked = unlockedPokemon >= 10;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/ditto.ogg"
 }
 
 function Mew() {
@@ -3649,6 +3684,7 @@ function Mew() {
     }
     this.unlocked = transforms >= 50;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/mew.ogg"
 }
 
 function Urshifu() {
@@ -3680,6 +3716,7 @@ function Urshifu() {
     this.talentDesc = "This Pokémon's attacks ignore protections."
     this.unlocked = flawlessKO >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/urshifu.ogg"
 }
 
 function Gengar() {
@@ -3712,6 +3749,7 @@ function Gengar() {
     this.init = function () { applyEffect("levitation", 99, this); }
     this.unlocked = area1loss >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/gengar.ogg"
 }
 
 function Shuckle() {
@@ -3742,6 +3780,7 @@ function Shuckle() {
     this.talentDesc = "This Pokémon cannot be knocked out unless at 1HP already."
     this.unlocked = maxRound >= 20;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/shuckle.ogg"
 }
 
 function Mimikyu() {
@@ -3778,6 +3817,7 @@ function Mimikyu() {
     }
     this.unlocked = pikachuVictory >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/mimikyu.ogg"
 }
 
 function switchMimikyu(p, disguise) {
@@ -3836,6 +3876,7 @@ function Mamoswine() {
     this.init = function () { applyEffect("thick_fat", 1, this); }
     this.unlocked = rockIceKO >= 1;
     this.hint = "???";
+    this.cry = "resources/sounds/sfx/cries/mamoswine.ogg"
 }
 
 function Arceus() {
@@ -3868,6 +3909,7 @@ function Arceus() {
         removeEffect(this, "Type changed");
         applyEffect("type_changed", 1, this, this.types[0]);
     }
+    this.cry = "resources/sounds/sfx/cries/arceus.ogg"
 }
 
 function Heatran() {
@@ -3895,6 +3937,7 @@ function Heatran() {
     this.talent = "Flash fire";
     this.talentDesc = "Immunity to fire type moves.";
     this.init = function () { applyEffect("immunity", 1, this, "fire"); }
+    this.cry = "resources/sounds/sfx/cries/heatran.ogg"
 }
 
 function Mewtwo() {
@@ -3922,6 +3965,7 @@ function Mewtwo() {
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.cry = "resources/sounds/sfx/cries/mewtwo.ogg"
 }
 
 function Hoopa() {
@@ -3949,6 +3993,7 @@ function Hoopa() {
     this.talent = "Confined"
     this.talentDesc = "Breaks free after 3 turns."
     this.init = function () { applyEffect("confined", 3, this); }
+    this.cry = "resources/sounds/sfx/cries/hoopa.ogg"
 }
 
 function switchHoopa(p) {
@@ -3996,6 +4041,7 @@ function Groudon() {
     this.talent = "Drought"
     this.talentDesc = "Changes the weather to sun at the beginning of the battle."
     this.init = function () { setWeather("sun", 99); }
+    this.cry = "resources/sounds/sfx/cries/groudon.ogg"
 }
 
 function Kyogre() {
@@ -4023,6 +4069,7 @@ function Kyogre() {
     this.talent = "Drizzle"
     this.talentDesc = "Changes the weather to rain at the beginning of the battle."
     this.init = function () { setWeather("rain", 99); }
+    this.cry = "resources/sounds/sfx/cries/kyogre.ogg"
 }
 
 function Rayquaza() {
@@ -4050,6 +4097,7 @@ function Rayquaza() {
     this.talent = "Air lock"
     this.talentDesc = "Prevents weather changes."
     this.init = function () { setWeather("air_lock", 99); }
+    this.cry = "resources/sounds/sfx/cries/rayquaza.ogg"
 }
 
 function Giratina() {
@@ -4081,6 +4129,7 @@ function Giratina() {
         if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1);
         if (this.currenthp < .5 * this.maxhp && !this.origin) switchGiratina(this);
     }
+    this.cry = "resources/sounds/sfx/cries/giratina.ogg"
 }
 
 function switchGiratina(p) {
@@ -4133,6 +4182,7 @@ function Eternatus() {
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.cry = "resources/sounds/sfx/cries/eternatus.ogg"
 }
 
 function Regigigas() {
@@ -4162,6 +4212,7 @@ function Regigigas() {
     this.talentDesc = "Reduced attack at the beginning of the battle."
     this.boost = function (move) { return 1 - .4 * (this.slowStart && move.cat === "physical"); }
     this.init = function (move, pD) { applyEffect("slow_start", 3, this); }
+    this.cry = "resources/sounds/sfx/cries/regigigas.ogg"
 }
 
 function Diancie() {
@@ -4196,6 +4247,7 @@ function Diancie() {
         this.statchanges.speed = Math.max(0, this.statchanges.speed);
         drawStats(contains(team, this));
     }
+    this.cry = "resources/sounds/sfx/cries/diancie.ogg"
 }
 
 function StatChanges() {
