@@ -1710,7 +1710,6 @@ function checkKO() {
             for (let p of team) {
                 if (p.currenthp == 1) {
                     survive1hp++;
-                    alert(survive1hp)
                 }
             }
             if (flawlessBattle)
@@ -1788,7 +1787,7 @@ function discardCard(move) {
     if (player)
         p = team[activePokemon];
     var i = p.hand.findIndex(e => e == move);
-    if (move.exhaust == undefined)
+    if (move.exhaust == undefined && i >= 0)
         p.discard.push(p.hand[i]);
     p.hand.splice(i, 1);
     if (player)
@@ -7779,7 +7778,10 @@ function PsychUp() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { (player ? team[activePokemon] : opponent).statchanges = JSON.parse(JSON.stringify((player ? opponent : team[activePokemon]).statchanges)); };
+    this.effect = function (move, pA, pD) {
+        (player ? team[activePokemon] : opponent).statchanges = JSON.parse(JSON.stringify((player ? opponent : team[activePokemon]).statchanges));
+        drawStats(contains(team, pA));
+    };
     this.description = "User copies target's stat changes.";
 }
 
@@ -10593,8 +10595,8 @@ function SitrusBerry() {
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
-            dealDamage(-pA.maxhp * .15, pA);
             this.consumed = true;
+            dealDamage(-pA.maxhp * .15, pA);
         }
     };
     this.init = true;
@@ -10789,8 +10791,8 @@ function EnigmaBerry() {
     this.consumed = false;
     this.effectR = (move, pA, pD) => {
         if (move != undefined && effectiveMultiplier(move, pA) > 1 && !this.consumed) {
-            dealDamage(-pA.maxhp * .15, pA);
             this.consumed = true;
+            dealDamage(-pA.maxhp * .15, pA);
         }
     };
     this.init = true;
