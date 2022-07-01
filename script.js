@@ -259,6 +259,7 @@ function loadProgress() {
     maxRound = window.localStorage.getItem('maxRound') != null ? parseInt(JSON.parse(window.localStorage.getItem('maxRound'))) : 0;
     pikachuVictory = window.localStorage.getItem('pikachuVictory') != null ? parseInt(JSON.parse(window.localStorage.getItem('pikachuVictory'))) : 0;
     rockIceKO = window.localStorage.getItem('rockIceKO') != null ? parseInt(JSON.parse(window.localStorage.getItem('rockIceKO'))) : 0;
+    recoilMoves = window.localStorage.getItem('recoilMoves') != null ? parseInt(JSON.parse(window.localStorage.getItem('recoilMoves'))) : 0;
     unlockedPokemon = -3;
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
@@ -289,6 +290,7 @@ function saveProgress() {
     window.localStorage.setItem('maxRound', JSON.stringify(maxRound));
     window.localStorage.setItem('pikachuVictory', JSON.stringify(pikachuVictory));
     window.localStorage.setItem('rockIceKO', JSON.stringify(rockIceKO));
+    window.localStorage.setItem('recoilMoves', JSON.stringify(recoilMoves));
 }
 
 function drawTeamSelection() {
@@ -574,6 +576,8 @@ function launchGame() {
     flawless = true;
     for (let i = 0; i < pSelected.length; i++) {
         pokemon = createPokemon(pSelected[i]);
+        if (i == 0)
+            pokemon = new Darmanitan();
         adjustBST(pokemon, 600, false);
         team[i] = pokemon;
     }
@@ -715,7 +719,7 @@ function pathSelector() {
 /* ------------------ Battle encounter ------------------ */
 /* ------------------------------------------------------ */
 
-opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"];
+opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
 
 energy = 5;
@@ -1031,8 +1035,10 @@ function battleEncounter(encounter) {
 
     for (let p of team) {
         initDeck(p);
+        initItems(p);
     }
     initDeck(opponent);
+    initItems(opponent);
 
     startTurn();
 
@@ -1041,7 +1047,7 @@ function battleEncounter(encounter) {
 
     if (music) {
         setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 1000);
-        setTimeout(() => { playMusic(opponent.cry, false) }, 3000);
+        setTimeout(() => { playMusic(opponent.cry, false) }, 2500);
     }
 
     if (tuto) {
@@ -1377,6 +1383,9 @@ function initDeck(p) {
     p.hand = [];
     p.discard = [];
     shuffle(p.draw);
+}
+
+function initItems(p) {
     for (let i of p.items) {
         if (i.init != undefined) {
             i.effect(p);
@@ -1489,6 +1498,8 @@ function useMove(move) {
         cardsPlayed++;
         if (player)
             cardsPerTurn = Math.max(cardsPerTurn, cardsPlayed);
+        if (player && move.recoil != undefined && move.recoil > 0)
+            recoilMoves++;
 
         var pDummy;
         if ((player && team[activePokemon].talent !== "Unseen Fist") || (!player && opponent.talent !== "Unseen Fist"))
@@ -2527,7 +2538,8 @@ function drawRemoveCard() {
     grid.appendChild(title);
 
     for (let p of team) {
-        for (let move of p.moves) {
+        var moves = p.moves2 == undefined ? p.moves : p.moves2.concat(p.moves);
+        for (let move of moves) {
             function makeReward(p, move1) {
                 this.reward1 = document.createElement('div');
                 this.reward1.className = "reward";
@@ -2743,6 +2755,8 @@ function createPokemon(pokemon) {
             return new Regigigas();
         case "diancie":
             return new Diancie();
+        case "darmanitan":
+            return new Darmanitan();
         default:
             return new MissingNo();
     }
@@ -3879,6 +3893,110 @@ function Mamoswine() {
     this.cry = "resources/sounds/sfx/cries/mamoswine.ogg"
 }
 
+function Darmanitan() {
+    this.name = "Darmanitan";
+    this.description = "A frail yet mighty attacker that can switch between physical and special sets."
+    this.hp = 105;
+    this.attack = 140;
+    this.defense = 55;
+    this.spattack = 30;
+    this.spdefense = 55;
+    this.speed = 95;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["fire"];
+    this.moves = [createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("belly_drum"), createMove("bite"), createMove("rock_tomb")];
+    this.moves2 = [createMove("ember"), createMove("fire_blast"), createMove("fire_spin"), createMove("future_sight"), createMove("psychic"), createMove("grass_knot")];
+    this.movepool = ["bite", "body_press", "body_slam", "earthquake", "fire_fang", "fire_punch", "flame_charge", "flare_blitz", "focus_punch", "giga_impact", "hammer_arm", "lash_out", "payback", "rock_tomb", "stone_edge", "superpower", "thrash", "zen_headbutt", "u_turn", "belly_drum"];
+    this.movepool2 = ["ember", "fire_blast", "fire_spin", "flamethrower", "focus_blast", "future_sight", "grass_knot", "heat_wave", "mystical_fire", "overheat", "psychic", "rest", "solar_beam", "uproar", "hidden_power", "hyper_beam", "burning_jealousy", "extrasensory"];
+    this.opponentMoves = [[createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("bite"), createMove("rock_tomb"), createMove("hammer_arm"), createMove("earthquake"), createMove("stone_edge"), createMove("zen_headbutt"), createMove("body_slam")]];
+    this.opponentMoves2 = [[createMove("ember"), createMove("fire_blast"), createMove("future_sight"), createMove("psychic"), createMove("extrasensory"), createMove("rest"), createMove("solar_beam"), createMove("burning_jealousy"), createMove("hidden_power"), createMove("focus_blast")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Zen mode";
+    this.talentDesc = "Switches to zen mode when under 50% HP.";
+    this.zen = false;
+    this.init = function () {
+        if (this === opponent) {
+            for (let i = 0; i <= Math.floor(Math.random() * 3); i++) {
+                this.opponentMoves2.splice(Math.floor(Math.random() * this.moves.length), 1);
+            }
+            while (this.opponentMoves2.length < 10) {
+                this.opponentMoves2.push(createMove(this.movepool2[Math.floor(Math.random() * this.movepool2.length)]));
+            }
+            this.moves2 = this.opponentMoves2;
+        }
+        if (this.currenthp <= .5 * this.maxhp && !this.zen)
+            switchDarmanitan(this, true);
+        else if (this.currenthp > .5 * this.maxhp && this.zen)
+            switchDarmanitan(this, false);
+    }
+    this.revenge = function (move, pD) {
+        if (this.currenthp <= .5 * this.maxhp && !this.zen)
+            switchDarmanitan(this, true);
+        else if (this.currenthp > .5 * this.maxhp && this.zen)
+            switchDarmanitan(this, false);
+    }
+    this.unlocked = recoilMoves >= 30;
+    this.hint = "Use 30 moves with recoil\n" + recoilMoves + "/30";
+    this.cry = "resources/sounds/sfx/cries/darmanitan.ogg"
+}
+
+function switchDarmanitan(p, zen) {
+    if (p.name === "Darmanitan") {
+        if (zen && !p.zen) {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
+            resizeSprites(true);
+            p.types = ["fire", "psychic"];
+            if (team[activePokemon] === p) {
+                document.getElementById("leftSprite").src = p.imgb;
+            } else if (opponent === p) {
+                document.getElementById("rightSprite").src = p.imgf;
+            }
+            p.attack *= 3 / 14;
+            p.defense *= 21 / 11;
+            p.spattack *= 14 / 3;
+            p.spdefense *= 21 / 11;
+            p.speed *= 11 / 19;
+            p.zen = true;
+        } else {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+            resizeSprites(true);
+            p.types = ["fire"];
+            if (team[activePokemon] === p) {
+                document.getElementById("leftSprite").src = p.imgb;
+            } else if (opponent === p) {
+                document.getElementById("rightSprite").src = p.imgf;
+            }
+            p.attack *= 14 / 3;
+            p.defense *= 11 / 21;
+            p.spattack *= 3 / 14;
+            p.spdefense *= 11 / 21;
+            p.speed *= 19 / 11;
+            p.zen = false;
+        }
+        var temp = [].concat(p.moves);
+        p.moves = [].concat(p.moves2);
+        p.moves2 = temp;
+        var temp = [].concat(p.movepool);
+        p.movepool = [].concat(p.movepool2);
+        p.movepool2 = temp;
+
+        initDeck(p);
+        drawMove(p, true);
+    }
+}
+
+
+
 function Arceus() {
     this.name = "Arceus";
     this.hp = 120;
@@ -4012,7 +4130,9 @@ function switchHoopa(p) {
         p.speed = Math.floor(p.speed * 8 / 7);
         dealDamage(-.3 * p.maxhp, p);
         p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
+
         initDeck(p);
+        drawMove(p, true);
     }
 }
 
@@ -4334,7 +4454,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
     "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume", "psystrike", "hyperspace_fury", "hyperspace_hole",
     "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create", "shadow_force", "eternabeam", "dynamax_cannon", "crush_grip",
-    "diamond_storm"];
+    "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum"];
 
 function createMove(move) {
     switch (move) {
@@ -4376,6 +4496,8 @@ function createMove(move) {
             return new BatonPass();
         case "beat_up":
             return new BeatUp();
+        case "belly_drum":
+            return new BellyDrum();
         case "bind":
             return new Bind();
         case "bite":
@@ -4416,6 +4538,8 @@ function createMove(move) {
             return new BulletPunch();
         case "bullet_seed":
             return new BulletSeed();
+        case "burning_jealousy":
+            return new BurningJealousy();
         case "calm_mind":
             return new CalmMind();
         case "charge":
@@ -4516,6 +4640,8 @@ function createMove(move) {
             return new Eternabeam();
         case "explosion":
             return new Explosion();
+        case "extrasensory":
+            return new Extrasensory();
         case "extreme_evoboost":
             return new ExtremeEvoboost();
         case "extreme_speed":
@@ -5279,6 +5405,20 @@ function BeatUp() {
     this.description = "Deals " + this.bp + " base power damage to the opponent for each non-fainted party member.";
 }
 
+function BellyDrum() {
+    this.name = "Belly Drum";
+    this.type = "normal";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) {
+        dealDamage(.25 * pA.maxhp, pA);
+        boostStat(pA, "attack", 12);
+    };
+    this.description = "User sacrifices 25% of its maximum HP to maximize its attack. Exhaust.";
+}
+
 function Bind() {
     this.name = "Bind";
     this.type = "normal";
@@ -5538,6 +5678,16 @@ function BulletSeed() {
     this.multihit = 3;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
+}
+
+function BurningJealousy() {
+    this.name = "Burning Jealousy";
+    this.type = "fire";
+    this.cat = "special";
+    this.bp = 20;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = 20 * (1 + Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); };
+    this.description = "Deals 20 base power damage to the opponent, plus 20 additional base power for each stat raise on the opponent.";
 }
 
 function CalmMind() {
@@ -6195,6 +6345,17 @@ function Explosion() {
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { dealDamage(9999, pA); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. User faints.";
+}
+
+function Extrasensory() {
+    this.name = "Extrasensory";
+    this.type = "psychic";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) { if (pA.draw.length > pD.draw.length) applyEffect("confusion", 1, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target if the user's draw pile is bigger than its.";
 }
 
 function ExtremeEvoboost() {
