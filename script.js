@@ -260,6 +260,7 @@ function loadProgress() {
     pikachuVictory = window.localStorage.getItem('pikachuVictory') != null ? parseInt(JSON.parse(window.localStorage.getItem('pikachuVictory'))) : 0;
     rockIceKO = window.localStorage.getItem('rockIceKO') != null ? parseInt(JSON.parse(window.localStorage.getItem('rockIceKO'))) : 0;
     recoilMoves = window.localStorage.getItem('recoilMoves') != null ? parseInt(JSON.parse(window.localStorage.getItem('recoilMoves'))) : 0;
+    bossesDefeated = window.localStorage.getItem('bossesDefeated') != null ? parseInt(JSON.parse(window.localStorage.getItem('bossesDefeated'))) : 0;
     unlockedPokemon = -3;
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
@@ -291,6 +292,7 @@ function saveProgress() {
     window.localStorage.setItem('pikachuVictory', JSON.stringify(pikachuVictory));
     window.localStorage.setItem('rockIceKO', JSON.stringify(rockIceKO));
     window.localStorage.setItem('recoilMoves', JSON.stringify(recoilMoves));
+    window.localStorage.setItem('bossesDefeated', JSON.stringify(bossesDefeated));
 }
 
 function drawTeamSelection() {
@@ -576,8 +578,6 @@ function launchGame() {
     flawless = true;
     for (let i = 0; i < pSelected.length; i++) {
         pokemon = createPokemon(pSelected[i]);
-        if (i == 0)
-            pokemon = new Darmanitan();
         adjustBST(pokemon, 600, false);
         team[i] = pokemon;
     }
@@ -719,7 +719,7 @@ function pathSelector() {
 /* ------------------ Battle encounter ------------------ */
 /* ------------------------------------------------------ */
 
-opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan"];
+opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
 
 energy = 5;
@@ -1729,6 +1729,8 @@ function checkKO() {
             defeatedPokemon++;
             if (area == 10 && turn <= 3)
                 fastBoss++;
+            if (area == 10)
+                bossesDefeated++;
             for (let p of team) {
                 if (p.currenthp == 1) {
                     survive1hp++;
@@ -1819,16 +1821,23 @@ function discardCard(move) {
 function endTurn() {
     if ((!player || team[activePokemon].currenthp > 0) && opponent.currenthp > 0) {
         runEffects();
-        for (let p of team) {
-            for (let i of p.items) {
-                if (i.turn_end != undefined)
-                    i.effect(p);
+        if (player) {
+            for (let p of team) {
+                for (let i of p.items) {
+                    if (i.turn_end != undefined)
+                        i.effect(p);
+                }
             }
+            if (team[activePokemon].endTurn != undefined)
+                team[activePokemon].endTurn(opponent);
+        } else {
+            for (let i of opponent.items) {
+                if (i.turn_end != undefined)
+                    i.effect(opponent);
+            }
+            if (opponent.endTurn != undefined)
+                opponent.endTurn(team[activePokemon]);
         }
-        if (team[activePokemon].endTurn != undefined)
-            team[activePokemon].endTurn(opponent);
-        if (opponent.endTurn != undefined)
-            opponent.endTurn(team[activePokemon]);
         player = !player;
         if (player) {
             turn++;
@@ -2757,6 +2766,8 @@ function createPokemon(pokemon) {
             return new Diancie();
         case "darmanitan":
             return new Darmanitan();
+        case "rotom":
+            return new Rotom();
         default:
             return new MissingNo();
     }
@@ -3995,6 +4006,90 @@ function switchDarmanitan(p, zen) {
     }
 }
 
+function Rotom() {
+    this.name = "Rotom";
+    this.description = "A special attacker that can exploit its adaptative typing do deal significant damage and take some hits."
+    this.hp = 50;
+    this.attack = 65;
+    this.defense = 107;
+    this.spattack = 105;
+    this.spdefense = 107;
+    this.speed = 86;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["electric", "ghost"];
+    this.moves = [createMove("shadow_ball"), createMove("hurricane"), createMove("blizzard"), createMove("overheat"), createMove("leaf_storm"), createMove("hydro_pump"), createMove("thunderbolt"), createMove("nasty_plot")];
+    this.movepool = ["hurricane", "blizzard", "overheat", "leaf_storm", "hydro_pump", "charge", "charge_beam", "confuse_ray", "defog", "dark_pulse", "disarming_voice", "discharge", "electroweb", "hex", "hidden_power", "nasty_plot", "shadow_ball", "shock_wave", "swagger", "thunder", "thunder_shock", "thunderbolt", "thunder_wave", "toxic", "volt_switch", "will_o_wisp", "electro_ball", "hyper_voice", "spite", "eerie_impulse", "ominous_wind", "signal_beam"];
+    this.opponentMoves =
+        [[createMove("hurricane"), createMove("hurricane"), createMove("hurricane"), createMove("thunderbolt"), createMove("thunder"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("shock_wave")],
+        [createMove("blizzard"), createMove("blizzard"), createMove("blizzard"), createMove("thunderbolt"), createMove("thunder"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("shock_wave")],
+        [createMove("overheat"), createMove("overheat"), createMove("overheat"), createMove("thunderbolt"), createMove("nasty_plot"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("nasty_plot")],
+        [createMove("leaf_storm"), createMove("leaf_storm"), createMove("leaf_storm"), createMove("thunderbolt"), createMove("nasty_plot"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("nasty_plot")],
+        [createMove("hydro_pump"), createMove("hydro_pump"), createMove("hydro_pump"), createMove("thunderbolt"), createMove("thunder"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("shock_wave")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Levitation"
+    this.talentDesc = "Levitates above the ground, granting ground type immunity.\nSpecial: Switches to an alternate form when using certain moves."
+    this.init = function () { applyEffect("levitation", 99, this); }
+    this.boost = function (move) {
+        switchRotom(this, move);
+        return 1;
+    }
+    this.unlocked = bossesDefeated >= 10;
+    this.hint = "Defeat 10 bosses\n" + bossesDefeated + "/10";
+    this.cry = "resources/sounds/sfx/cries/rotom.ogg"
+}
+
+function switchRotom(p, move) {
+    if (p.name === "Rotom" && !contains(p.types, move.type)) {
+        switch (move.type) {
+            case "ghost":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+                resizeSprites(true);
+                p.types = ["electric", "ghost"];
+                break;
+            case "flying":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
+                resizeSprites(true);
+                p.types = ["electric", "flying"];
+                break;
+            case "ice":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
+                resizeSprites(true);
+                p.types = ["electric", "ice"];
+                break;
+            case "fire":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
+                resizeSprites(true);
+                p.types = ["electric", "fire"];
+                break;
+            case "grass":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
+                resizeSprites(true);
+                p.types = ["electric", "grass"];
+                break;
+            case "water":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
+                resizeSprites(true);
+                p.types = ["electric", "fire"];
+                break;
+            default:
+        }
+    }
+}
+
 
 
 function Arceus() {
@@ -4454,7 +4549,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
     "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume", "psystrike", "hyperspace_fury", "hyperspace_hole",
     "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create", "shadow_force", "eternabeam", "dynamax_cannon", "crush_grip",
-    "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum"];
+    "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum", "eerie_impulse", "ominous_wind"];
 
 function createMove(move) {
     switch (move) {
@@ -4628,6 +4723,8 @@ function createMove(move) {
             return new Earthquake();
         case "echoed_voice":
             return new EchoedVoice();
+        case "eerie_impulse":
+            return new EerieImpulse();
         case "electro_ball":
             return new ElectroBall();
         case "electroweb":
@@ -4860,6 +4957,8 @@ function createMove(move) {
             return new NightSlash();
         case "nuzzle":
             return new Nuzzle();
+        case "ominous_wind":
+            return new OminousWind();
         case "origin_pulse":
             return new OriginPulse();
         case "outrage":
@@ -5665,7 +5764,7 @@ function BulletPunch() {
     this.bp = 40;
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
-    this.posEffect = function (move, pA, pD) { drawMove(pA, false); };
+    this.postEffect = function (move, pA, pD) { drawMove(pA, false); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
 }
 
@@ -5992,9 +6091,11 @@ function Discharge() {
     this.cat = "special";
     this.bp = 0;
     this.cost = 0;
+    this.fails = false;
     this.effect = function (move, pA, pD) {
         if (energy >= 3)
             applyEffect("paralysis", 1, pD);
+        this.fails = energy == 0;
         this.bp = 50 * energy;
         energy = 0;
     };
@@ -6279,6 +6380,16 @@ function EchoedVoice() {
         this.bp += 20;
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
+}
+
+function EerieImpulse() {
+    this.name = "Eerie Impulse";
+    this.type = "electric";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { boostStat(pD, "spattack", -2); };
+    this.description = "Lowers target's special attack by 2 stages.";
 }
 
 function ElectroBall() {
@@ -7075,7 +7186,9 @@ function HyperBeam() {
     this.cat = "special";
     this.bp = 0;
     this.cost = 0;
+    this.fails = false;
     this.effect = function (move, pA, pD) {
+        this.fails = energy == 0;
         this.bp = 50 * energy;
         energy = 0;
     };
@@ -7719,6 +7832,25 @@ function Nuzzle() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the opponent.";
+}
+
+function OminousWind() {
+    this.name = "Ominous Wind";
+    this.type = "ghost";
+    this.cat = "special";
+    this.bp = 70;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) {
+        if (pA.currenthp % 10 == 6) {
+            if (pA.statchanges.attack <= 0) boostStat(pA, "attack", 1);
+            if (pA.statchanges.defense <= 0) boostStat(pA, "defense", 1);
+            if (pA.statchanges.spattack <= 0) boostStat(pA, "spattack", 1);
+            if (pA.statchanges.spdefense <= 0) boostStat(pA, "spdefense", 1);
+            if (pA.statchanges.speed <= 0) boostStat(pA, "speed", 1);
+        }
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. If the user's HP ends with 6, raises all non-enhanced stats by one stage.";
 }
 
 function OriginPulse() {
@@ -9342,7 +9474,7 @@ function WeatherBall() {
     this.bp = 70;
     this.cost = 2;
     this.preEffect = function (move, pA, pD) {
-        if (weather != undefined) {
+        if (weather != undefined && weather.name != "Air Lock") {
             if (weather.name === "Rain") this.type = "water";
             else if (weather.name === "Sun") this.type = "fire";
             else if (weather.name === "Hail") this.type = "ice";
