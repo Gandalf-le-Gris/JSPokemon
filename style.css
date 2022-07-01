@@ -721,6 +721,54 @@ button.launch-tuto:hover {
     filter: invert()
 }
 
+.fade-dark1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 1);
+    animation: fadeDark 1s;
+    -webkit-animation: fadeDark 1s;
+    -moz-animation: fadeDark 1s;
+    -o-animation: fadeDark 1s;
+    animation-fill-mode: forwards;
+    z-index: 1;
+}
+
+.fade-dark2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 1);
+    animation: fadeDark 2s;
+    -webkit-animation: fadeDark 2s;
+    -moz-animation: fadeDark 2s;
+    -o-animation: fadeDark 2s;
+    animation-fill-mode: forwards;
+    z-index: 1;
+}
+
+.fade-in {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 1);
+    animation: fadeOut 1s;
+    -webkit-animation: fadeOut 1s;
+    -moz-animation: fadeOut 1s;
+    -o-animation: fadeOut 1s;
+    animation-fill-mode: forwards;
+    z-index: 1;
+}
+
 
 
 
@@ -769,6 +817,46 @@ button.launch-tuto:hover {
 
     100% {
         opacity: 0;
+    }
+}
+
+@keyframes fadeDark {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadeDark {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes fadeDark {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-o-keyframes fadeDark {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 

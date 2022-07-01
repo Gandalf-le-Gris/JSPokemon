@@ -14,12 +14,20 @@ function drawStartingMenu() {
     var startButton = document.createElement('button');
     startButton.className = "start";
     startButton.innerText = "start";
-    startButton.addEventListener('click', () => { tuto = false; drawTeamSelection(); });
+    startButton.addEventListener('click', () => {
+        tuto = false;
+        fadeOutTransition(2);
+        setTimeout(drawTeamSelection, 2000);
+    });
     document.body.appendChild(startButton);
     var tutoButton = document.createElement('button');
     tutoButton.className = "launch-tuto";
     tutoButton.innerText = "how to play?";
-    tutoButton.addEventListener('click', () => { tuto = true; drawTeamSelection(); });
+    tutoButton.addEventListener('click', () => {
+        tuto = true;
+        fadeOutTransition(2);
+        setTimeout(drawTeamSelection, 2000);
+    });
     document.body.appendChild(tutoButton);
     var soundButton = document.createElement('div');
     soundButton.className = "sound-button";
@@ -136,7 +144,7 @@ function toggleEscapeScreen() {
         var filter = document.createElement('div');
         filter.className = "filter";
         filter.id = "escapeScreen";
-        filter.style.zIndex = "1";
+        filter.style.zIndex = "10";
         document.body.appendChild(filter);
         var grid = document.createElement('div');
         grid.className = "gameover-grid";
@@ -174,6 +182,43 @@ function toggleEscapeScreen() {
             soundImage.src = "resources/sprites/ui_icons/sound.webp"
         soundButton.appendChild(soundImage);
     }
+}
+
+function fadeOutTransition(n) {
+    var fadeFilter = document.createElement('div');
+    fadeFilter.className = "fade-dark" + n;
+    document.body.appendChild(fadeFilter);
+
+    var m;
+    var audios = document.getElementsByTagName('audio');
+    for (let a of audios) {
+        if (a.loop)
+            m = a;
+    }
+    if (m != undefined)
+        interval = setInterval(fadeOutMusic, 15);
+    function fadeOutMusic() {
+        if (m == undefined)
+            clearInterval(interval);
+
+        var newVolume = m.volume - 0.02 / n;
+        if (newVolume >= 0) {
+            m.volume = newVolume;
+        }
+        else {
+            clearInterval(interval);
+            m.volume = 0;
+            m.pause();
+            m.currentTIme = 0;
+        }
+    }
+}
+
+function fadeInTransition() {
+    var fadeFilter = document.createElement('div');
+    fadeFilter.className = "fade-in";
+    document.body.appendChild(fadeFilter);
+    setTimeout(() => { document.body.removeChild(fadeFilter); }, 1000);
 }
 
 
@@ -248,6 +293,7 @@ function saveProgress() {
 
 function drawTeamSelection() {
     document.body.innerHTML = "";
+    fadeInTransition();
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -347,7 +393,12 @@ function pokemonSelector(name) {
                 } else {
                     tsc.innerText = "start";
                     tsc.className = "selector-count-start";
-                    tsc.onclick = () => { if (!tuto || (contains(pSelected, "venusaur") && contains(pSelected, "charizard")) && contains(pSelected, "blastoise")) launchGame(); };
+                    tsc.onclick = () => {
+                        if (!tuto || (contains(pSelected, "venusaur") && contains(pSelected, "charizard")) && contains(pSelected, "blastoise")) {
+                            fadeOutTransition(2);
+                            setTimeout(launchGame, 2000);
+                        }
+                    };
                 }
                 this.className = "selected-cell";
             } else if (pSelected.findIndex(element => element === name) != -1) {
@@ -542,6 +593,7 @@ var types = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "
 
 function mapSelection() {
     document.body.innerHTML = "";
+    fadeInTransition();
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -634,7 +686,8 @@ function pathSelector() {
             }
             cell.encounter = encounter;
             cell.onclick = function () {
-                startEncounter(this.encounter);
+                fadeOutTransition(1);
+                setTimeout(() => { startEncounter(this.encounter) }, 1000);
             }
             grid.appendChild(cell);
         }
@@ -715,6 +768,7 @@ function battleEncounter(encounter) {
     }
 
     document.body.innerHTML = "";
+    fadeInTransition();
     gArea = new gameArea('resources/sprites/battle_backgrounds/plains.png', () => { });
     gArea.start();
 
@@ -1877,7 +1931,8 @@ function nextEncounter() {
     } else {
         area += 1;
     }
-    mapSelection();
+    fadeOutTransition(1);
+    setTimeout(mapSelection, 1000);
 }
 
 
@@ -1891,6 +1946,7 @@ function nextEncounter() {
 
 function victoryScreen() {
     document.body.innerHTML = "";
+    fadeInTransition();
     var gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -1901,7 +1957,10 @@ function victoryScreen() {
     var replay = document.createElement('div');
     replay.className = "centered-subtitle replay";
     replay.innerHTML = "Play again";
-    replay.onclick = drawTeamSelection;
+    replay.onclick = () => {
+        fadeOutTransition(2);
+        setTimeout(drawTeamSelection, 2000);
+    }
 
     var grid = document.createElement('div');
     grid.className = "gameover-grid";
@@ -2177,6 +2236,7 @@ function pokemonCenterEncounter() {
     pokemartChance += .05;
 
     document.body.innerHTML = "";
+    fadeInTransition();
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -2229,6 +2289,7 @@ function pokemartEncounter() {
     pokemartChance = 0;
 
     document.body.innerHTML = "";
+    fadeInTransition();
     gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -2544,6 +2605,7 @@ function hideCardRemove() {
 
 function gameOver() {
     document.body.innerHTML = "";
+    fadeInTransition();
     var gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
@@ -2558,7 +2620,10 @@ function gameOver() {
     var replay = document.createElement('div');
     replay.className = "centered-subtitle replay";
     replay.innerHTML = "Try again";
-    replay.onclick = drawTeamSelection;
+    replay.onclick = () => {
+        fadeOutTransition(2);
+        setTimeout(drawTeamSelection, 2000);
+    }
 
     var grid = document.createElement('div');
     grid.className = "gameover-grid";
@@ -4010,11 +4075,12 @@ function Giratina() {
     this.hand = [];
     this.discard = [];
     this.items = [];
+    this.origin = false;
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) {
         if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1);
-        if (this.currenthp < .5 * this.maxhp) switchGiratina(this);
+        if (this.currenthp < .5 * this.maxhp && !this.origin) switchGiratina(this);
     }
 }
 
@@ -4039,6 +4105,7 @@ function switchGiratina(p) {
         p.talent = "Levitation"
         p.talentDesc = "Levitates above the ground, granting ground type immunity."
         dealDamage(-.1 * p.maxhp, p);
+        p.origin = true;
     }
 }
 
@@ -5481,7 +5548,10 @@ function ClearSmog() {
     this.bp = 30;
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
-    this.postEffect = function (move, pA, pD) { pD.statchanges = new StatChanges(); };
+    this.postEffect = function (move, pA, pD) {
+        pD.statchanges = new StatChanges();
+        drawStats(contains(team, pD));
+    };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Resets target's stat changes.";
 }
 
@@ -8264,7 +8334,7 @@ function SludgeBomb() {
     this.cost = 2;
     this.effect = function (move, pA, pD) {
         var i = pD.effects.findIndex(e => e.name === "Poison");
-        if (i == -1 || pD.effects[i].stacks > 0)
+        if (i != -1 && pD.effects[i].stacks > 0)
             applyEffect("poison", 6, pD);
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. If target is poisoned, applies 6 stacks of poison to it.";
@@ -10883,8 +10953,14 @@ function Revive() {
     this.description = "The first time the holder faints, revives it with 30% HP. Single use.";
     this.img = 'resources/sprites/held_items/revive.webp';
     this.area = "";
+    this.consumed = false;
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { if (pA.currenthp == 0) dealDamage(.3 * pA.maxhp, pA); }
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp == 0 && !this.consumed) {
+            this.consumed = true;
+            dealDamage(.3 * pA.maxhp, pA);
+        }
+    }
 }
 
 function Pearl() {
