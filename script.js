@@ -3,6 +3,7 @@
 /* ----------------------------------------------------- */
 
 music = false;
+fastBattle = false;
 
 function drawStartingMenu() {
     document.body.innerHTML = "";
@@ -18,6 +19,8 @@ function drawStartingMenu() {
         tuto = false;
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
     });
     document.body.appendChild(startButton);
     var tutoButton = document.createElement('button');
@@ -27,6 +30,8 @@ function drawStartingMenu() {
         tuto = true;
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
     });
     document.body.appendChild(tutoButton);
     var soundButton = document.createElement('div');
@@ -48,6 +53,7 @@ function drawStartingMenu() {
     });
     document.body.appendChild(soundButton);
     var soundImage = new Image();
+    soundImage.id = "soundImage";
     soundImage.className = "pixel-sprite";
     soundImage.src = "resources/sprites/ui_icons/mute.webp"
     soundButton.appendChild(soundImage);
@@ -124,8 +130,18 @@ function resizeSprites(both) {
     }
 }
 
+baseVolume = .2;
+masterVolume = 1;
+musicVolume = 1;
+sfxVolume = 1;
+
 function playMusic(src, repeat) {
     var music = document.createElement("audio");
+    music.volume = baseVolume * masterVolume;
+    if (repeat)
+        music.volume *= musicVolume;
+    else
+        music.volume *= sfxVolume;
     music.autoplay = true;
     music.loop = repeat;
     music.src = src;
@@ -147,19 +163,27 @@ function toggleEscapeScreen() {
         filter.style.zIndex = "10";
         document.body.appendChild(filter);
         var grid = document.createElement('div');
-        grid.className = "gameover-grid";
+        grid.className = "settings-grid";
         filter.appendChild(grid);
-        var exitButton = document.createElement('div');
-        exitButton.className = "centered-subtitle replay";
-        exitButton.innerHTML = "Exit to title screen";
-        exitButton.onclick = drawStartingMenu;
-        grid.appendChild(exitButton);
 
-        var soundButton = document.createElement('div');
-        soundButton.className = "sound-button";
-        soundButton.addEventListener('click', () => {
+        var title = document.createElement('div');
+        title.innerHTML = "settings";
+        grid.appendChild(title);
+
+        var settingsOptionsGrid = document.createElement('div');
+        settingsOptionsGrid.className = "dual-column-grid";
+        grid.appendChild(settingsOptionsGrid);
+
+        var soundSwitch = document.createElement('label');
+        soundSwitch.className = "switch";
+        settingsOptionsGrid.appendChild(soundSwitch);
+        var soundSwitchInput = document.createElement('input');
+        soundSwitchInput.type = "checkbox";
+        soundSwitchInput.checked = music;
+        soundSwitchInput.onclick = () => {
             if (music) {
-                soundImage.src = "resources/sprites/ui_icons/mute.webp"
+                if (soundImage != undefined)
+                    soundImage.src = "resources/sprites/ui_icons/mute.webp"
                 var audios = document.getElementsByTagName('audio');
                 for (let a of audios) {
                     a.pause();
@@ -167,20 +191,118 @@ function toggleEscapeScreen() {
                 }
                 music = false;
             } else {
-                soundImage.src = "resources/sprites/ui_icons/sound.webp"
+                if (soundImage != undefined)
+                    soundImage.src = "resources/sprites/ui_icons/sound.webp"
                 playMusic(ambientMusic, true);
                 music = true;
             }
-        });
-        soundButton.style.filter = "invert()";
-        filter.appendChild(soundButton);
-        var soundImage = new Image();
-        soundImage.className = "pixel-sprite";
-        if (!music)
-            soundImage.src = "resources/sprites/ui_icons/mute.webp"
-        else
-            soundImage.src = "resources/sprites/ui_icons/sound.webp"
-        soundButton.appendChild(soundImage);
+            soundSwitchInput.checked = music;
+        }
+        soundSwitch.appendChild(soundSwitchInput);
+        var soundSwitchSlider = document.createElement('span');
+        soundSwitchSlider.className = "slider round";
+        soundSwitch.appendChild(soundSwitchSlider);
+        var soundSwitchText = document.createElement('div');
+        soundSwitchText.innerHTML = "Activate music";
+        settingsOptionsGrid.appendChild(soundSwitchText);
+
+        var masterSoundSlider = document.createElement('div');
+        masterSoundSlider.className = "slidecontainer";
+        settingsOptionsGrid.appendChild(masterSoundSlider);
+        var masterSoundInput = document.createElement('input');
+        masterSoundInput.className = "sliderbar";
+        masterSoundInput.type = "range";
+        masterSoundInput.min = 0;
+        masterSoundInput.max = 100;
+        masterSoundInput.value = Math.floor(100 * masterVolume);
+        masterSoundInput.onchange = () => {
+            masterVolume = masterSoundInput.value / 100;
+            for (let a of document.getElementsByTagName('audio')) {
+                if (a.loop)
+                    a.volume = baseVolume * masterVolume * musicVolume;
+                else
+                    a.volume = baseVolume * masterVolume * sfxVolume;
+            }
+        }
+        masterSoundSlider.appendChild(masterSoundInput);
+        var masterSoundText = document.createElement('div');
+        masterSoundText.innerHTML = "Main volume";
+        settingsOptionsGrid.appendChild(masterSoundText);
+
+        var musicSoundSlider = document.createElement('div');
+        musicSoundSlider.className = "slidecontainer";
+        settingsOptionsGrid.appendChild(musicSoundSlider);
+        var musicSoundInput = document.createElement('input');
+        musicSoundInput.className = "sliderbar";
+        musicSoundInput.type = "range";
+        musicSoundInput.min = 0;
+        musicSoundInput.max = 100;
+        musicSoundInput.value = Math.floor(100 * musicVolume);
+        musicSoundInput.onchange = () => {
+            musicVolume = musicSoundInput.value / 100;
+            for (let a of document.getElementsByTagName('audio')) {
+                if (a.loop)
+                    a.volume = baseVolume * masterVolume * musicVolume;
+            }
+        }
+        musicSoundSlider.appendChild(musicSoundInput);
+        var musicSoundText = document.createElement('div');
+        musicSoundText.innerHTML = "Music volume";
+        settingsOptionsGrid.appendChild(musicSoundText);
+
+        var sfxSoundSlider = document.createElement('div');
+        sfxSoundSlider.className = "slidecontainer";
+        settingsOptionsGrid.appendChild(sfxSoundSlider);
+        var sfxSoundInput = document.createElement('input');
+        sfxSoundInput.className = "sliderbar";
+        sfxSoundInput.type = "range";
+        sfxSoundInput.min = 0;
+        sfxSoundInput.max = 100;
+        sfxSoundInput.value = Math.floor(100 * sfxVolume);
+        sfxSoundInput.onchange = () => {
+            sfxVolume = sfxSoundInput.value / 100;
+            for (let a of document.getElementsByTagName('audio')) {
+                if (!a.loop)
+                    a.volume = baseVolume * masterVolume * sfxVolume;
+            }
+        }
+        sfxSoundSlider.appendChild(sfxSoundInput);
+        var sfxSoundText = document.createElement('div');
+        sfxSoundText.innerHTML = "Sound effect volume";
+        settingsOptionsGrid.appendChild(sfxSoundText);
+
+        var sep1 = document.createElement('hr');
+        sep1.className = "separator";
+        settingsOptionsGrid.appendChild(sep1);
+
+        var fastBattleSwitch = document.createElement('label');
+        fastBattleSwitch.className = "switch";
+        settingsOptionsGrid.appendChild(fastBattleSwitch);
+        var fastBattleSwitchInput = document.createElement('input');
+        fastBattleSwitchInput.type = "checkbox";
+        fastBattleSwitchInput.id = "soundsSwitchInput";
+        fastBattleSwitchInput.checked = fastBattle;
+        fastBattleSwitchInput.onclick = () => {
+            fastBattle = !fastBattle;
+            fastBattleSwitchInput.checked = fastBattle;
+        }
+        fastBattleSwitch.appendChild(fastBattleSwitchInput);
+        var fastBattleSwitchSlider = document.createElement('span');
+        fastBattleSwitchSlider.className = "slider round";
+        fastBattleSwitch.appendChild(fastBattleSwitchSlider);
+        var fastBattleSwitchText = document.createElement('div');
+        fastBattleSwitchText.innerHTML = "Faster battles";
+        settingsOptionsGrid.appendChild(fastBattleSwitchText);
+
+        var sep2 = document.createElement('hr');
+        sep2.className = "separator";
+        settingsOptionsGrid.appendChild(sep2);
+
+        var exitButton = document.createElement('div');
+        exitButton.className = "settings-option";
+        exitButton.innerHTML = "Exit to title screen";
+        exitButton.onclick = drawStartingMenu;
+        settingsOptionsGrid.appendChild(exitButton);
     }
 }
 
@@ -195,13 +317,15 @@ function fadeOutTransition(n) {
         if (a.loop)
             m = a;
     }
-    if (m != undefined)
+    if (m != undefined) {
+        volume = m.volume;
         interval = setInterval(fadeOutMusic, 15);
+    }
     function fadeOutMusic() {
         if (m == undefined)
             clearInterval(interval);
 
-        var newVolume = m.volume - 0.02 / n;
+        var newVolume = m.volume - 0.02 * volume / n;
         if (newVolume >= 0) {
             m.volume = newVolume;
         }
@@ -229,7 +353,7 @@ function fadeInTransition() {
 /* ------------------- Team selection ------------------- */
 /* ------------------------------------------------------ */
 
-const pokemonList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "ditto", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"]
+const pokemonList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "darmanitan", "rotom", "castform", "whimsicott", "kommo-o", "nidoking", "ninetales_alola", "omanyte", "tyranitar", "gyarados", "ditto", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine"]
 
 var cSelected = 0;
 var pSelected = ["", "", ""];
@@ -262,6 +386,10 @@ function loadProgress() {
     recoilMoves = window.localStorage.getItem('recoilMoves') != null ? parseInt(JSON.parse(window.localStorage.getItem('recoilMoves'))) : 0;
     bossesDefeated = window.localStorage.getItem('bossesDefeated') != null ? parseInt(JSON.parse(window.localStorage.getItem('bossesDefeated'))) : 0;
     weatherChanged = window.localStorage.getItem('weatherChanged') != null ? parseInt(JSON.parse(window.localStorage.getItem('weatherChanged'))) : 0;
+    statRaised = window.localStorage.getItem('statRaised') != null ? parseInt(JSON.parse(window.localStorage.getItem('statRaised'))) : 0;
+    poisonApplied = window.localStorage.getItem('poisonApplied') != null ? parseInt(JSON.parse(window.localStorage.getItem('poisonApplied'))) : 0;
+    loweredStats = window.localStorage.getItem('loweredStats') != null ? parseInt(JSON.parse(window.localStorage.getItem('loweredStats'))) : 0;
+    hailStarted = window.localStorage.getItem('hailStarted') != null ? parseInt(JSON.parse(window.localStorage.getItem('hailStarted'))) : 0;
     unlockedPokemon = -3;
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
@@ -295,6 +423,43 @@ function saveProgress() {
     window.localStorage.setItem('recoilMoves', JSON.stringify(recoilMoves));
     window.localStorage.setItem('bossesDefeated', JSON.stringify(bossesDefeated));
     window.localStorage.setItem('weatherChanged', JSON.stringify(weatherChanged));
+    window.localStorage.setItem('statRaised', JSON.stringify(statRaised));
+    window.localStorage.setItem('poisonApplied', JSON.stringify(poisonApplied));
+    window.localStorage.setItem('loweredStats', JSON.stringify(loweredStats));
+    window.localStorage.setItem('hailStarted', JSON.stringify(hailStarted));
+}
+
+function unlockAll() {
+    window.localStorage.setItem('defeatedPokemon', JSON.stringify(150));
+    window.localStorage.setItem('victories', JSON.stringify(1));
+    window.localStorage.setItem('flawlessVictories', JSON.stringify(1));
+    window.localStorage.setItem('starterVictories', JSON.stringify(1));
+    window.localStorage.setItem('physicalDamageTaken', JSON.stringify(15000));
+    window.localStorage.setItem('specialDamageTaken', JSON.stringify(15000));
+    window.localStorage.setItem('statusMovesUsed', JSON.stringify(150));
+    window.localStorage.setItem('damageDealt', JSON.stringify(50000));
+    window.localStorage.setItem('blockedHits', JSON.stringify(30));
+    window.localStorage.setItem('earnedMoney', JSON.stringify(10000));
+    window.localStorage.setItem('drawnCards', JSON.stringify(1000));
+    window.localStorage.setItem('fastBoss', JSON.stringify(1));
+    window.localStorage.setItem('cardsPerTurn', JSON.stringify(8));
+    window.localStorage.setItem('helixQuest', JSON.stringify(1));
+    window.localStorage.setItem('sandstormDamage', JSON.stringify(300));
+    window.localStorage.setItem('survive1hp', JSON.stringify(1));
+    window.localStorage.setItem('unlockedPokemon', JSON.stringify(10));
+    window.localStorage.setItem('transforms', JSON.stringify(50));
+    window.localStorage.setItem('flawlessKO', JSON.stringify(1));
+    window.localStorage.setItem('area1loss', JSON.stringify(1));
+    window.localStorage.setItem('maxRound', JSON.stringify(20));
+    window.localStorage.setItem('pikachuVictory', JSON.stringify(1));
+    window.localStorage.setItem('rockIceKO', JSON.stringify(1));
+    window.localStorage.setItem('recoilMoves', JSON.stringify(30));
+    window.localStorage.setItem('bossesDefeated', JSON.stringify(10));
+    window.localStorage.setItem('weatherChanged', JSON.stringify(50));
+    window.localStorage.setItem('statRaised', JSON.stringify(100));
+    window.localStorage.setItem('poisonApplied', JSON.stringify(300));
+    window.localStorage.setItem('loweredStats', JSON.stringify(50));
+    window.localStorage.setItem('hailStarted', JSON.stringify(10));
 }
 
 function drawTeamSelection() {
@@ -338,6 +503,9 @@ function drawTeamSelection() {
         cell = (new pokemonSelector(pokemon)).cell;
         teamSelector.appendChild(cell);
     }
+    for (let i = 0; i < 3; i++) {
+        teamSelector.appendChild((new randomSelector(i)).cell);
+    }
 
     teamSelectorScreen.appendChild(teamSelector);
 
@@ -377,14 +545,15 @@ function drawTeamSelection() {
 function pokemonSelector(name) {
     this.cell = document.createElement('div');
     this.cell.p = createPokemon(name);
+    name = this.cell.p.id;
     this.name = name;
     image = new Image();
     image.src = 'resources/sprites/pokemon_icons/' + name + '.png';
-    image.className = 'pixel-sprite';
+    image.className = 'selector-pixel-sprite';
     if (!this.cell.p.unlocked)
         image.className += " not-unlocked";
     title = document.createElement('div');
-    title.innerHTML = this.cell.p.unlocked ? name : "?????";
+    title.innerHTML = this.cell.p.unlocked ? this.cell.p.name : "?????";
     this.cell.appendChild(title);
     this.cell.appendChild(image);
     this.cell.className = "team-selector-element";
@@ -403,6 +572,8 @@ function pokemonSelector(name) {
                         if (!tuto || (contains(pSelected, "venusaur") && contains(pSelected, "charizard")) && contains(pSelected, "blastoise")) {
                             fadeOutTransition(2);
                             setTimeout(launchGame, 2000);
+                            if (music)
+                                playMusic('resources/sounds/sfx/button_click.mp3', false);
                         }
                     };
                 }
@@ -427,6 +598,49 @@ function pokemonSelector(name) {
         this.cell.title += "\nTalent: " + this.cell.p.talent + "\n" + this.cell.p.talentDesc;
     } else {
         this.cell.title = this.cell.p.hint;
+    }
+}
+
+function randomSelector(n) {
+    var name = "random" + n;
+    this.cell = document.createElement('div');
+    image = new Image();
+    image.src = 'resources/sprites/ui_icons/random.webp';
+    image.className = 'random-selector-pixel-sprite';
+    image.style.filter = "invert()";
+    title = document.createElement('div');
+    title.innerHTML = "Random";
+    this.cell.appendChild(title);
+    this.cell.appendChild(image);
+    this.cell.className = "team-selector-element";
+    this.cell.onclick = function () {
+        tsc = document.getElementById("teamSelectorCount");
+        if (pSelected.findIndex(element => element === name) == -1 && cSelected < 3) {
+            pSelected[pSelected.findIndex(element => element === "")] = name;
+            cSelected += 1;
+            if (cSelected < 3) {
+                tsc.innerText = "(" + cSelected + "/3)";
+            } else {
+                tsc.innerText = "start";
+                tsc.className = "selector-count-start";
+                tsc.onclick = () => {
+                    if (!tuto || (contains(pSelected, "venusaur") && contains(pSelected, "charizard")) && contains(pSelected, "blastoise")) {
+                        fadeOutTransition(2);
+                        setTimeout(launchGame, 2000);
+                        if (music)
+                            playMusic('resources/sounds/sfx/button_click.mp3', false);
+                    }
+                };
+            }
+            this.className = "selected-cell";
+        } else if (pSelected.findIndex(element => element === name) != -1) {
+            pSelected[pSelected.findIndex(element => element === name)] = "";
+            cSelected -= 1;
+            tsc.innerText = "(" + cSelected + "/3)";
+            tsc.className = "selector-count";
+            tsc.onclick = () => { };
+            this.className = "team-selector-element";
+        }
     }
 }
 
@@ -578,11 +792,25 @@ function launchGame() {
     pokemonCenterChance = 0;
     pokemartChance = 0;
     flawless = true;
+
     for (let i = 0; i < pSelected.length; i++) {
-        pokemon = createPokemon(pSelected[i]);
-        adjustBST(pokemon, 600, false);
-        team[i] = pokemon;
+        if (!pSelected[i].includes("random")) {
+            pokemon = createPokemon(pSelected[i]);
+            adjustBST(pokemon, 600, false);
+            team[i] = pokemon;
+        }
     }
+    for (let i = 0; i < pSelected.length; i++) {
+        if (team[i] == undefined) {
+            var name = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+            while (contains(pSelected, name) || !(createPokemon(name)).unlocked)
+                name = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+            pokemon = createPokemon(name);
+            adjustBST(pokemon, 600, false);
+            team[i] = pokemon;
+        }
+    }
+
     mapSelection();
 }
 
@@ -643,7 +871,10 @@ function pathSelector() {
         encounter = "boss";
 
         cell.onclick = function () {
-            startEncounter(encounter);
+            fadeOutTransition(1);
+            setTimeout(() => { startEncounter(this.encounter) }, 1000);
+            if (music)
+                playMusic('resources/sounds/sfx/button_click.mp3', false);
         }
         grid.appendChild(cell);
     } else if (area == 9) {
@@ -660,7 +891,10 @@ function pathSelector() {
         encounter = "pokemon_center";
 
         cell.onclick = function () {
-            startEncounter(encounter);
+            fadeOutTransition(1);
+            setTimeout(() => { startEncounter(this.encounter) }, 1000);
+            if (music)
+                playMusic('resources/sounds/sfx/button_click.mp3', false);
         }
         grid.appendChild(cell);
     } else {
@@ -694,6 +928,8 @@ function pathSelector() {
             cell.onclick = function () {
                 fadeOutTransition(1);
                 setTimeout(() => { startEncounter(this.encounter) }, 1000);
+                if (music)
+                    playMusic('resources/sounds/sfx/button_click.mp3', false);
             }
             grid.appendChild(cell);
         }
@@ -721,7 +957,7 @@ function pathSelector() {
 /* ------------------ Battle encounter ------------------ */
 /* ------------------------------------------------------ */
 
-opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom"];
+opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
 
 energy = 5;
@@ -1004,7 +1240,7 @@ function battleEncounter(encounter) {
         itemSection.appendChild(itemSubsection);
 
         var pImage = new Image();
-        pImage.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+        pImage.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
         pImage.className = "item-pokemon-sprite";
         itemSubsection.appendChild(pImage);
 
@@ -1574,6 +1810,11 @@ function useMove(move) {
             drawEffects(!player);
         }
 
+        //bulletproof
+        var name = move.name.toLowerCase();
+        var bulletproof = (name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") ||(player && opponent.talent === "Bulletproof"));
+        cancelled = cancelled || bulletproof;
+
         var boostMul = 1;
         //move effects
         var target;
@@ -1604,7 +1845,7 @@ function useMove(move) {
             blockedHits += 1;
         }
 
-        if (move.fails && message === "") {
+        if ((bulletproof || move.fails) && message === "") {
             desc.innerHTML += "But it failed!<br />";
         }
 
@@ -1714,7 +1955,10 @@ function checkKO() {
             gameO = gameO && p.currenthp == 0;
         }
         if (gameO && gameOverTimeout == -1) {
-            gameOverTimeout = setTimeout(gameOver, 3000);
+            gameOverTimeout = setTimeout(() => {
+                setTimeout(gameOver, 1000);
+                fadeOutTransition(1);
+            }, 3000);
             if (document.body.contains(battleFilter))
                 document.body.removeChild(battleFilter);
         }
@@ -1903,7 +2147,7 @@ function aiActions() {
     var i = aiPlayable();
     if (i >= 0 && opponent.currenthp > 0 && team[activePokemon].currenthp > 0) {
         useMove(opponent.hand[i]);
-        setTimeout(aiActions, 1000);
+        setTimeout(aiActions, 2000 - 1200 * fastBattle);
     } else {
         if (team[activePokemon].currenthp == 0) {
             desc.innerHTML += team[activePokemon].name + ' fainted!<br />Choose a new Pokémon to send out.<br />';
@@ -1981,6 +2225,10 @@ function nextEncounter() {
 
 function victoryScreen() {
     document.body.innerHTML = "";
+
+    ambientMusic = "resources/sounds/musics/run_complete.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
     fadeInTransition();
     var gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
@@ -1995,6 +2243,8 @@ function victoryScreen() {
     replay.onclick = () => {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
     }
 
     var grid = document.createElement('div');
@@ -2062,7 +2312,7 @@ function rewardScreen() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2110,6 +2360,8 @@ function rewardScreen() {
             this.reward1.move = move1;
             this.reward1.onclick = function () {
                 team[this.p].moves.push(this.move);
+                if (music)
+                    playMusic('resources/sounds/sfx/button_click.mp3', false);
                 if (Math.random() < extraLoot || tuto || area == 10) {
                     extraLoot = 0;
                     extraReward();
@@ -2128,6 +2380,8 @@ function rewardScreen() {
     skip.onclick = () => {
         money += 100;
         earnedMoney += 100;
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
         if (Math.random() < extraLoot || tuto || area == 10) {
             extraLoot = 0;
             extraReward();
@@ -2173,7 +2427,7 @@ function extraReward() {
             this.reward1.className = "reward";
 
             var sprite = new Image();
-            sprite.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+            sprite.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite.className = "reward-sprite";
             this.reward1.appendChild(sprite);
 
@@ -2205,6 +2459,8 @@ function extraReward() {
             this.reward1.item = item;
             this.reward1.onclick = function () {
                 team[this.p].items.push(this.item);
+                if (music)
+                    playMusic('resources/sounds/sfx/button_click.mp3', false);
                 if (this.item.pickup != undefined)
                     this.item.effect(this.p);
                 nextEncounter();
@@ -2220,6 +2476,8 @@ function extraReward() {
         money += 150;
         earnedMoney += 150;
         extraLoot += .35;
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
         nextEncounter();
     };
     grid.appendChild(skip);
@@ -2292,7 +2550,11 @@ function pokemonCenterEncounter() {
     var replay = document.createElement('div');
     replay.className = "centered-subtitle replay";
     replay.innerHTML = "continue";
-    replay.onclick = nextEncounter;
+    replay.onclick = () => {
+        nextEncounter();
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
+    }
 
     var grid = document.createElement('div');
     grid.className = "gameover-grid";
@@ -2375,7 +2637,7 @@ function pokemartEncounter() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2427,6 +2689,8 @@ function pokemartEncounter() {
                 if (money >= movePrice && this.priceTag.innerHTML !== "sold") {
                     team[this.p].moves.push(this.move);
                     money -= movePrice;
+                    if (music)
+                        playMusic('resources/sounds/sfx/button_click.mp3', false);
                     document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
                     this.priceTag.innerHTML = "sold";
                     this.article.className += " sold";
@@ -2456,7 +2720,7 @@ function pokemartEncounter() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2492,6 +2756,8 @@ function pokemartEncounter() {
                 if (money >= itemPrice && this.priceTag.innerHTML !== "sold") {
                     team[this.p].items.push(this.item);
                     money -= itemPrice;
+                    if (music)
+                        playMusic('resources/sounds/sfx/button_click.mp3', false);
                     document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
                     this.priceTag.innerHTML = "sold";
                     this.article.className += " sold";
@@ -2505,7 +2771,11 @@ function pokemartEncounter() {
 
     var deleteB = document.createElement('div');
     deleteB.className = "remove-button";
-    deleteB.onclick = drawRemoveCard;
+    deleteB.onclick = () => {
+        drawRemoveCard();
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
+    }
     grid.appendChild(deleteB);
 
     var wrapper = document.createElement('div');
@@ -2532,7 +2802,11 @@ function pokemartEncounter() {
     var continueB = document.createElement('div');
     continueB.className = "centered-subtitle replay";
     continueB.innerHTML = "continue";
-    continueB.onclick = nextEncounter;
+    continueB.onclick = () => {
+        nextEncounter();
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
+    }
     grid.appendChild(continueB);
 }
 
@@ -2558,7 +2832,7 @@ function drawRemoveCard() {
                 this.reward1 = document.createElement('div');
                 this.reward1.className = "reward";
                 var sprite1 = new Image();
-                sprite1.src = 'resources/sprites/pokemon_icons/' + p.name.toLowerCase() + '.png';
+                sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
                 sprite1.className = "reward-sprite";
                 this.reward1.appendChild(sprite1);
 
@@ -2607,6 +2881,8 @@ function drawRemoveCard() {
                     if (money >= removePrice) {
                         var i = this.p.moves.findIndex(e => e === this.move);
                         this.p.moves.splice(i, 1);
+                        if (music)
+                            playMusic('resources/sounds/sfx/button_click.mp3', false);
                         hideCardRemove();
                         money -= removePrice;
                         removePrice += 250;
@@ -2622,7 +2898,11 @@ function drawRemoveCard() {
     var continueB = document.createElement('div');
     continueB.className = "centered-subtitle replay";
     continueB.innerHTML = "cancel";
-    continueB.onclick = hideCardRemove;
+    continueB.onclick = () => {
+        hideCardRemove();
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
+    }
     grid.appendChild(continueB);
 }
 
@@ -2645,6 +2925,10 @@ function gameOver() {
     var gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
 
+    ambientMusic = "resources/sounds/musics/game_over.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
     var title = document.createElement('div');
     title.className = "centered-title";
     title.innerHTML = "Game Over";
@@ -2659,6 +2943,8 @@ function gameOver() {
     replay.onclick = () => {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
     }
 
     var grid = document.createElement('div');
@@ -2773,6 +3059,16 @@ function createPokemon(pokemon) {
             return new Darmanitan();
         case "rotom":
             return new Rotom();
+        case "castform":
+            return new Castform();
+        case "kommo-o":
+            return new KommoO();
+        case "nidoking":
+            return new Nidoking();
+        case "whimsicott":
+            return new Whimsicott();
+        case "ninetales_alola":
+            return new AlolanNinetales();
         default:
             return new MissingNo();
     }
@@ -2780,6 +3076,7 @@ function createPokemon(pokemon) {
 
 function MissingNo() {
     this.name = "MissingNo.";
+    this.id = "missing_no"
     this.hp = 33;
     this.attack = 136;
     this.defense = 0;
@@ -2803,6 +3100,7 @@ function MissingNo() {
 
 function Venusaur() {
     this.name = "Venusaur";
+    this.id = "venusaur"
     this.description = "A specially oriented attacker with decent bulk, capable of spreading poison and benefitting from the sun."
     this.hp = 80;
     this.attack = 82;
@@ -2835,6 +3133,7 @@ function Venusaur() {
 
 function Charizard() {
     this.name = "Charizard";
+    this.id = "charizard"
     this.description = "A mixed attacker with good coverage, capable of spreading burns and benefitting from the sun."
     this.hp = 78;
     this.attack = 84;
@@ -2867,6 +3166,7 @@ function Charizard() {
 
 function Blastoise() {
     this.name = "Blastoise";
+    this.id = "blastoise"
     this.description = "A mixed attacker with good bulk, benefitting from the rain."
     this.hp = 79;
     this.attack = 83;
@@ -2899,6 +3199,7 @@ function Blastoise() {
 
 function Pikachu() {
     this.name = "Pikachu";
+    this.id = "pikachu"
     this.description = "A fast powerful mixed attacker, capable of spreading paralysis."
     this.hp = 35;
     this.attack = 110;
@@ -2932,6 +3233,7 @@ function Pikachu() {
 
 function Garchomp() {
     this.name = "Garchomp";
+    this.id = "garchomp"
     this.description = "A well-rounded physical attacker with decent bulk, with powerful dragon type moves."
     this.hp = 108;
     this.attack = 130;
@@ -2965,6 +3267,7 @@ function Garchomp() {
 
 function Cinderace() {
     this.name = "Cinderace";
+    this.id = "cinderace"
     this.description = "An all-purpose fast physical attacker with great coverage, capable of hitting hard any foe."
     this.hp = 80;
     this.attack = 116;
@@ -3004,6 +3307,7 @@ function Cinderace() {
 
 function Lucario() {
     this.name = "Lucario";
+    this.id = "lucario"
     this.description = "A powerful mixed attacker, capable of buffing itself to deal heavy damage."
     this.hp = 70;
     this.attack = 110;
@@ -3037,6 +3341,7 @@ function Lucario() {
 
 function Volcarona() {
     this.name = "Volcarona";
+    this.id = "volcarona"
     this.description = "A powerful special attacker, capable of buffing itself to deal heavy damage and benefitting from the sun."
     this.hp = 85;
     this.attack = 60;
@@ -3070,6 +3375,7 @@ function Volcarona() {
 
 function Eevee() {
     this.name = "Eevee";
+    this.id = "eevee"
     this.description = "A well-rounded Pokémon, capable of dealing decent normal type damage and helping its teammates."
     this.hp = 55;
     this.attack = 55;
@@ -3103,6 +3409,7 @@ function Eevee() {
 
 function Gardevoir() {
     this.name = "Gardevoir";
+    this.id = "gardevoir"
     this.description = "A powerful special attacker with good coverage, capable of spreading various status conditions."
     this.hp = 68;
     this.attack = 65;
@@ -3142,6 +3449,7 @@ function Gardevoir() {
 
 function Dragonite() {
     this.name = "Dragonite";
+    this.id = "dragonite"
     this.description = "A strong physical attacker with decent bulk, with powerful dragon type moves."
     this.hp = 91;
     this.attack = 134;
@@ -3175,6 +3483,7 @@ function Dragonite() {
 
 function Ferrothorn() {
     this.name = "Ferrothorn";
+    this.id = "ferrothorn"
     this.description = "A utility Pokémon boasting great bulk, capable of buffing itself, spreading status conditions and setting traps."
     this.hp = 74;
     this.attack = 94;
@@ -3208,6 +3517,7 @@ function Ferrothorn() {
 
 function Blissey() {
     this.name = "Blissey";
+    this.id = "blissey"
     this.description = "A cleric with specially offensive options, boasting stellar special bulk despite a dangerously low defense."
     this.hp = 255;
     this.attack = 10;
@@ -3246,6 +3556,7 @@ function Blissey() {
 
 function Sableye() {
     this.name = "Sableye";
+    this.id = "sableye"
     this.description = "A utility Pokémon with a large array of options, capable of using countless status moves and hitting hard occasionally."
     this.hp = 50;
     this.attack = 75;
@@ -3283,6 +3594,7 @@ function Sableye() {
 
 function Scizor() {
     this.name = "Scizor";
+    this.id = "scizor"
     this.description = "A powerful physical attacker with decent bulk, capable of buffing itself to deal heavy damage."
     this.hp = 70;
     this.attack = 130;
@@ -3316,6 +3628,7 @@ function Scizor() {
 
 function Aegislash() {
     this.name = "Aegislash";
+    this.id = "aegislash"
     this.description = "A mighty mixed attacker and impenetrable wall at the same time, provided it can switch stance accordingly."
     this.hp = 60;
     this.attack = 50;
@@ -3395,6 +3708,7 @@ function switchAegislash(p, shield) {
 
 function Meowth() {
     this.name = "Meowth";
+    this.id = "meowth"
     this.description = "A weaker mixed attacker with great speed, capable of increasing battle loot."
     this.hp = 40;
     this.attack = 45;
@@ -3428,6 +3742,7 @@ function Meowth() {
 
 function Metagross() {
     this.name = "Metagross";
+    this.id = "metagross"
     this.description = "A powerful physical attacker, capable of buffing itself to deal heavy damage."
     this.hp = 80;
     this.attack = 135;
@@ -3468,6 +3783,7 @@ function Metagross() {
 
 function Weavile() {
     this.name = "Weavile";
+    this.id = "weavile"
     this.description = "A fast powerful physical attacker, capable of using many moves to deal heavy damage and benefitting from the hail."
     this.hp = 70;
     this.attack = 120;
@@ -3501,6 +3817,7 @@ function Weavile() {
 
 function Zeraora() {
     this.name = "Zeraora";
+    this.id = "zeraora"
     this.description = "A fast powerful mixed attacker, capable of buffing itself to power up its electric and fighting type moves."
     this.hp = 88;
     this.attack = 112;
@@ -3534,6 +3851,7 @@ function Zeraora() {
 
 function Omanyte() {
     this.name = "Omanyte";
+    this.id = "omanyte"
     this.description = "A physically bulky wall with good specially offensive presence despite a low speed, benefitting greatly from the rain and sometimes from the hail or the sandstorm."
     this.hp = 35;
     this.attack = 40;
@@ -3570,6 +3888,7 @@ function Omanyte() {
 
 function Tyranitar() {
     this.name = "Tyranitar";
+    this.id = "tyranitar"
     this.description = "A slow powerful physical attacker with great bulk, capable of setting and benefitting greatly from the sandstorm."
     this.hp = 100;
     this.attack = 134;
@@ -3603,6 +3922,7 @@ function Tyranitar() {
 
 function Gyarados() {
     this.name = "Gyarados";
+    this.id = "gyarados"
     this.description = "A powerful physical attacker with limited options offset by its ever increasing attack."
     this.hp = 95;
     this.attack = 125;
@@ -3636,6 +3956,7 @@ function Gyarados() {
 
 function Ditto() {
     this.name = "Ditto";
+    this.id = "ditto"
     this.description = "An all-purpose Pokémon, capable of copying whatever its foe can do."
     this.hp = 48;
     this.attack = 48;
@@ -3682,6 +4003,7 @@ function Ditto() {
 
 function Mew() {
     this.name = "Mew";
+    this.id = "mew"
     this.description = "An all-purpose Pokémon with well-rounded stats, capable of learning any move."
     this.hp = 100;
     this.attack = 100;
@@ -3719,6 +4041,7 @@ function Mew() {
 
 function Urshifu() {
     this.name = "Urshifu";
+    this.id = "urshifu"
     this.description = "A powerful physical attacker, capable of breaking through walls with its signature moves."
     this.hp = 100;
     this.attack = 130;
@@ -3751,6 +4074,7 @@ function Urshifu() {
 
 function Gengar() {
     this.name = "Gengar";
+    this.id = "gengar"
     this.description = "A fast powerful special attacker with great coverage, capable of spreading poison."
     this.hp = 60;
     this.attack = 65;
@@ -3784,6 +4108,7 @@ function Gengar() {
 
 function Shuckle() {
     this.name = "Shuckle";
+    this.id = "shuckle"
     this.description = "A slow and incredibly weak Pokémon with stellar defenses, capable of taking hits while setting traps and dealing chip damage."
     this.hp = 40; //adjusted
     this.attack = 10;
@@ -3815,6 +4140,7 @@ function Shuckle() {
 
 function Mimikyu() {
     this.name = "Mimikyu";
+    this.id = "mimikyu"
     this.description = "A physical attacker with good defensive utility, capable of taking some hits before striking back hard."
     this.hp = 55;
     this.attack = 90;
@@ -3878,6 +4204,7 @@ function switchMimikyu(p, disguise) {
 
 function Mamoswine() {
     this.name = "Mamoswine";
+    this.id = "mamoswine"
     this.description = "A powerful physical attacker with high damage, expensive moves, benefitting from the hail."
     this.hp = 110;
     this.attack = 130;
@@ -3911,6 +4238,7 @@ function Mamoswine() {
 
 function Darmanitan() {
     this.name = "Darmanitan";
+    this.id = "darmanitan"
     this.description = "A frail yet mighty attacker that can switch between physical and special sets."
     this.hp = 105;
     this.attack = 140;
@@ -4013,6 +4341,7 @@ function switchDarmanitan(p, zen) {
 
 function Rotom() {
     this.name = "Rotom";
+    this.id = "rotom"
     this.description = "A special attacker that can exploit its adaptative typing do deal significant damage and take some hits."
     this.hp = 50;
     this.attack = 65;
@@ -4097,6 +4426,7 @@ function switchRotom(p, move) {
 
 function Castform() {
     this.name = "Castform";
+    this.id = "castform"
     this.description = "A special attacker that can adapt to the weather to benefit from it to the fullest."
     this.hp = 70;
     this.attack = 70;
@@ -4165,6 +4495,146 @@ function switchCastform(p) {
             }
         }
     }
+}
+
+function KommoO() {
+    this.name = "Kommo-o";
+    this.id = "kommo-o"
+    this.description = "A mixed attacker with good bulk that can sacrifice HP to grow stronger and play with its stat changes."
+    this.hp = 75;
+    this.attack = 110;
+    this.defense = 125;
+    this.spattack = 100;
+    this.spdefense = 105;
+    this.speed = 85;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["dragon", "fighting"];
+    this.moves = [createMove("clangorous_soul"), createMove("clanging_scales"), createMove("boomburst"), createMove("close_combat"), createMove("dragon_claw"), createMove("drain_punch")];
+    this.movepool = ["aqua_tail", "aura_sphere", "autotomize", "belly_drum", "body_press", "boomburst", "breaking_swipe", "brick_break", "bulk_up", "bulldoze", "clanging_scales", "clangorous_soul", "close_combat", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_pulse", "dragon_tail", "drain_punch", "dual_chop", "earthquake", "flamethrower", "flash_cannon", "focus_blast", "focus_punch", "hyper_voice", "iron_tail", "low_kick", "outrage", "payback", "poison_jab", "reversal", "rock_slide", "scale_shot", "shadow_claw", "superpower", "x_scissor", "fire_punch", "ice_punch", "thunder_punch", "uproar", "water_pulse", "swhock_wave", "echoed_voice"];
+    this.opponentMoves =
+        [[createMove("clangorous_soul"), createMove("clanging_scales"), createMove("clanging_scales"), createMove("boomburst"), createMove("focus_blast"), createMove("aura_sphere"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("dragon_pulse"), createMove("aura_sphere")],
+        [createMove("bulk_up"), createMove("dragon_dance"), createMove("close_combat"), createMove("drain_punch"), createMove("brick_break"), createMove("dragon_claw"), createMove("dragon_tail"), createMove("dual_chop"), createMove("rock_slide"), createMove("poison_jab")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/kommo-o.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/kommo-o.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Bulletproof"
+    this.talentDesc = "Immunity to ballistic moves."
+    this.unlocked = statRaised >= 100;
+    this.hint = "Raise any stat 100 times\n" + statRaised + "/100";
+    this.cry = "resources/sounds/sfx/cries/kommo-o.ogg"
+}
+
+function Nidoking() {
+    this.gender = Math.floor(Math.random() * 2) == 0 ? true : false;
+    this.name = this.gender ? "Nidoking" : "Nidoqueen";
+    this.id = this.gender ? "nidoking" : "nidoqueen";
+    this.description = "A mixed bulky attacker with the ability to spread poison."
+    this.hp = this.gender ? 81 : 90;
+    this.attack = this.gender ? 102 : 92;
+    this.defense = this.gender ? 77 : 87;
+    this.spattack = this.gender ? 85 : 75;
+    this.spdefense = this.gender ? 75 : 85;
+    this.speed = this.gender ? 85 : 76;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["poison", "ground"];
+    this.moves = [createMove("drill_run"), createMove("earth_power"), createMove("toxic_spikes"), createMove("poison_jab"), createMove("toxic"), createMove("megahorn")];
+    this.movepool = ["aqua_tail", "blizzard", "body_slam", "bulldoze", "curse", "dig", "double_edge", "double_kick", "drill_run", "earth_power", "earthquake", "flamethrower", "fire_punch", "giga_impact", "head_smash", "hex", "high_horsepower", "hone_claws", "ice_beam", "ice_punch", "iron_tail", "megahorn", "poison_jab", "poison_sting", "poison_tail", "rock_blast", "rock_slide", "sandstorm", "sand_tomb", "scorching_sands", "shadow_claw", "sludge_bomb", "sludge_wave", "stealth_rock", "stomping_tantrum", "stone_edge", "sucker_punch", "surf", "thunderbolt", "thunder_punch", "toxic", "toxic_spikes", "venom_drench", "venoshock"];
+    this.opponentMoves =
+        [[createMove("poison_jab"), createMove("toxic_spikes"), createMove("toxic"), createMove("poison_tail"), createMove("poison_sting"), createMove("venoshock"), createMove("venom_drench"), createMove("earthquake"), createMove("earth_power"), createMove("flamethrower")],
+        [createMove("earthquake"), createMove("drill_run"), createMove("earth_power"), createMove("stomping_tantrum"), createMove("scorching_sands"), createMove("stealth_rock"), createMove("sandstorm"), createMove("stone_edge"), createMove("rock_slide"), createMove("ice_beam")]];
+    this.imgf = this.gender ? 'resources/sprites/pokemon_battle_icons/front/nidoking.gif' : 'resources/sprites/pokemon_battle_icons/front/nidoqueen.gif';
+    this.imgb = this.gender ? 'resources/sprites/pokemon_battle_icons/back/nidoking.gif' : 'resources/sprites/pokemon_battle_icons/back/nidoqueen.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Poison point"
+    this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are poisoned."
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("poison", 6, pD); }
+    this.unlocked = statRaised >= 100;
+    this.hint = "Apply 300 poison stacks to foes\n" + poisonApplied + "/300";
+    this.cry = this.gender ? "resources/sounds/sfx/cries/nidoking.ogg" : "resources/sounds/sfx/cries/nidoqueen.ogg"
+}
+
+function Whimsicott() {
+    this.name = "Whimsicott";
+    this.id = "whimsicott"
+    this.description = "A fast utility Pokémon that can use status moves liberally to support its teammates while dealing decent damage."
+    this.hp = 60;
+    this.attack = 67;
+    this.defense = 85;
+    this.spattack = 77;
+    this.spdefense = 75;
+    this.speed = 116;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["grass", "fairy"];
+    this.moves = [createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("fairy_wind"), createMove("gust"), createMove("sunny_day"), createMove("leech_seed"), createMove("cotton_spore")];
+    this.movepool = ["absorb", "beat_up", "charm", "cotton_guard", "cotton_spore", "dazzling_gleam", "defog", "energy_ball", "fairy_wind", "fling", "giga_drain", "grass_knot", "growth", "gust", "hurricane", "leech_seed", "mega_drain", "memento", "moonblast", "play_rough", "poison_powder", "psychic", "rest", "razor_leaf", "seed_bomb", "solar_beam", "shadow_ball", "stun_spore", "sunny_day", "swagger", "taunt", "toxic", "tickle", "u_turn", "fake_tears", "grass_whistle", "hidden_power"];
+    this.opponentMoves =
+        [[createMove("absorb"), createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("solar_beam"), createMove("sunny_day"), createMove("growth"), createMove("leech_seed"), createMove("charm"), createMove("fake_tears")],
+        [createMove("mega_drain"), createMove("energy_ball"), createMove("sunny_day"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("fairy_wind"), createMove("grass_whistle"), createMove("stun_spore"), createMove("play_rough"), createMove("taunt")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/whimsicott.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/whimsicott.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Prankster";
+    this.talentDesc = "When using a status move, draw a card."
+    this.boost = function (move) {
+        if (move.cat === "status")
+            drawMove(this, false);
+        return 1;
+    }
+    this.unlocked = loweredStats >= 50;
+    this.hint = "Lower the stats of foes 50 times\n" + loweredStats + "/50";
+    this.cry = "resources/sounds/sfx/cries/whimsicott.ogg"
+}
+
+function AlolanNinetales() {
+    this.name = "Ninetales";
+    this.id = "ninetales_alola"
+    this.description = "A fast special attacker that can set and exploit the hail."
+    this.hp = 73;
+    this.attack = 67;
+    this.defense = 75;
+    this.spattack = 81;
+    this.spdefense = 100;
+    this.speed = 109;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["ice", "fairy"];
+    this.moves = [createMove("aurora_beam"), createMove("blizzard"), createMove("ice_beam"), createMove("hail"), createMove("moonblast"), createMove("dazzling_gleam"), createMove("extrasensory"), createMove("calm_mind")];
+    this.movepool = ["agility", "aurora_beam", "blizzard", "calm_mind", "charm", "confuse_ray", "dark_pulse", "dazzling_gleam", "extrasensory", "dream_eater", "freeze_dry", "frost_breath", "hail", "hex", "heal_bell", "hypnosis", "ice_beam", "ice_shard", "icy_wind", "moonblast", "nasty_plot", "psych_up", "rest", "stored_power", "swagger", "triple_axel", "weather_ball", "hidden_power", "hyper_beam", "spite"];
+    this.opponentMoves =
+        [[createMove("hail"), createMove("blizzard"), createMove("aurora_beam"), createMove("icy_wind"), createMove("ice_beam"), createMove("frost_breath"), createMove("freeze_dry"), createMove("moonblast"), createMove("extrasensory"), createMove("nasty_plot")],
+        [createMove("blizzard"), createMove("frost_breath"), createMove("weather_ball"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("hex"), createMove("dark_pulse")]];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/ninetales_alola.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/ninetales_alola.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Snow warning"
+    this.talentDesc = "Causes the hail to fall at the beginning of the battle."
+    this.init = function () { setWeather("hail", 10); }
+    this.unlocked = hailStarted >= 10;
+    this.hint = "Make the hail fall 10 times\n" + hailStarted + "/10";
+    this.cry = "resources/sounds/sfx/cries/ninetales_alola.ogg"
 }
 
 
@@ -4565,6 +5035,10 @@ function adjustBST(pokemon, target, boss) {
 
 var statsChangeMultiplier = 1.2;
 function boostStat(p, stat, stages) {
+    if (p === team[activePokemon] && stages > 0)
+        statRaised++;
+    if (p === opponent && stages < 0)
+        loweredStats++;
     switch (stat) {
         case "attack":
             p.statchanges.attack = Math.min(6, Math.max(-6, p.statchanges.attack + stages));
@@ -4626,7 +5100,9 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "skitter_smack", "ice_fang", "thunder_fang", "darkest_lariat", "clear_smog", "sludge_wave", "smog", "poison_gas", "lick", "phantom_force", "wood_hammer",
     "feint_attack", "high_horsepower", "leech_life", "aurora_beam", "magma_storm", "lava_plume", "psystrike", "hyperspace_fury", "hyperspace_hole",
     "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create", "shadow_force", "eternabeam", "dynamax_cannon", "crush_grip",
-    "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum", "eerie_impulse", "ominous_wind"];
+    "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum", "eerie_impulse", "ominous_wind", "boomburst", "clanging_scales", "clangorous_soul",
+    "drill_run", "megahorn", "poison_sting", "poison_tail", "cotton_guard", "cotton_spore", "fairy_wind", "stun_spore", "grass_whistle", "frost_breath",
+    "freeze_dry"];
 
 function createMove(move) {
     switch (move) {
@@ -4686,6 +5162,8 @@ function createMove(move) {
             return new BodySlam();
         case "bone_rush":
             return new BoneRush();
+        case "boomburst":
+            return new Boomburst();
         case "bounce":
             return new Bounce();
         case "breaking_swipe":
@@ -4720,6 +5198,10 @@ function createMove(move) {
             return new ChargeBeam();
         case "charm":
             return new Charm();
+        case "clanging_scales":
+            return new ClangingScales();
+        case "clangorous_soul":
+            return new ClangorousSoul();
         case "clear_smog":
             return new ClearSmog();
         case "close_combat":
@@ -4728,6 +5210,10 @@ function createMove(move) {
             return new ConfuseRay();
         case "confusion":
             return new Confusion();
+        case "cotton_guard":
+            return new CottonGuard();
+        case "cotton_spore":
+            return new CottonSpore();
         case "cross_chop":
             return new CrossChop();
         case "cross_poison":
@@ -4782,6 +5268,8 @@ function createMove(move) {
             return new DrainPunch();
         case "dragon_tail":
             return new DragonTail();
+        case "drill_run":
+            return new DrillRun();
         case "double_edge":
             return new DoubleEdge();
         case "dream_eater":
@@ -4822,6 +5310,8 @@ function createMove(move) {
             return new ExtremeSpeed();
         case "facade":
             return new Facade();
+        case "fairy_wind":
+            return new FairyWind();
         case "fake_out":
             return new FakeOut();
         case "fake_tears":
@@ -4866,8 +5356,12 @@ function createMove(move) {
             return new ForcePalm();
         case "foul_play":
             return new FoulPlay();
+        case "freeze_dry":
+            return new FreezeDry();
         case "frenzy_plant":
             return new FrenzyPlant();
+        case "frost_breath":
+            return new FrostBreath();
         case "fury_cutter":
             return new FuryCutter();
         case "fury_swipes":
@@ -4880,6 +5374,8 @@ function createMove(move) {
             return new GigaImpact();
         case "grass_knot":
             return new GrassKnot();
+        case "grass_whistle":
+            return new GrassWhistle();
         case "growth":
             return new Growth();
         case "gunk_shot":
@@ -5000,6 +5496,8 @@ function createMove(move) {
             return new MeanLook();
         case "mega_drain":
             return new MegaDrain();
+        case "megahorn":
+            return new Megahorn();
         case "mega_kick":
             return new MegaKick();
         case "memento":
@@ -5060,6 +5558,10 @@ function createMove(move) {
             return new PoisonJab();
         case "poison_powder":
             return new PoisonPowder();
+        case "poison_sting":
+            return new PoisonSting();
+        case "poison_tail":
+            return new PoisonTail();
         case "poltergeist":
             return new Poltergeist();
         case "pound":
@@ -5212,6 +5714,8 @@ function createMove(move) {
             return new StringShot();
         case "struggle_bug":
             return new StruggleBug();
+        case "stun_spore":
+            return new StunSpore();
         case "substitute":
             return new Substitute();
         case "sucker_punch":
@@ -5690,6 +6194,16 @@ function BoneRush() {
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times.";
 }
 
+function Boomburst() {
+    this.name = "Boomburst";
+    this.type = "normal";
+    this.cat = "special";
+    this.bp = 150;
+    this.cost = 3;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
 function Bounce() {
     this.name = "Bounce";
     this.type = "flying";
@@ -5918,6 +6432,35 @@ function Charm() {
     this.description = "Lowers target's attack by 2 stages.";
 }
 
+function ClangingScales() {
+    this.name = "Clanging Scales";
+    this.type = "dragon";
+    this.cat = "special";
+    this.bp = 110;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) { if (pA.statchanges.spattack <= 0) boostStat(pA, "defense", -1); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense by 1 stage unless its special attack has been raised.";
+}
+
+function ClangorousSoul() {
+    this.name = "Clangorous Soul";
+    this.type = "dragon";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 2;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) {
+        dealDamage(.2 * pA.maxhp, pA);
+        boostStat(pA, "attack", 1);
+        boostStat(pA, "defense", 1);
+        boostStat(pA, "spattack", 1);
+        boostStat(pA, "spdefense", 1);
+        boostStat(pA, "speed", 1);
+    };
+    this.description = "User sacrifices 20% of its maximum HP to raise all of its stats by 1 stage. Exhaust.";
+}
+
 function ClearSmog() {
     this.name = "Clear Smog";
     this.type = "poison";
@@ -5966,6 +6509,27 @@ function Confusion() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent.";
+}
+
+function CottonGuard() {
+    this.name = "Cotton Guard";
+    this.type = "grass";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { boostStat(pA, "defense", 3); };
+    this.description = "Raises user's defense by 3 stages. Exhaust.";
+}
+
+function CottonSpore() {
+    this.name = "Cotton Spore";
+    this.type = "grass";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { boostStat(pD, "speed", -2); };
+    this.description = "Lowers target's speed by 2 stages. Exhaust.";
 }
 
 function CrossChop() {
@@ -6335,6 +6899,17 @@ function DragonTail() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fetches the first dragon type move in the user's discard pile and places it into its hand.";
 }
 
+function DrillRun() {
+    this.name = "Drill Run";
+    this.type = "ground";
+    this.cat = "physical";
+    this.bp = 75;
+    this.cost = 2;
+    this.crit = false;
+    this.effect = function (move, pA, pD) { this.crit = (pA.speed < pD.speed); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's base speed is lower than its foe's.";
+}
+
 function DrainingKiss() {
     this.name = "Draining Kiss";
     this.type = "fairy";
@@ -6505,7 +7080,7 @@ function EnergyBall() {
     this.type = "grass";
     this.cat = "special";
     this.bp = 80;
-    this.cost = 1;
+    this.cost = 2;
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sun") boostStat(pD, "spdefense", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's special defense by 1 stage under the sun.";
@@ -6587,6 +7162,16 @@ function Facade() {
             this.bp = 70;
     };
     this.description = "Deals 70 base power damage to the opponent. Base power doubles if user is poisoned or burned.";
+}
+
+function FairyWind() {
+    this.name = "Fairy wind";
+    this.type = "fairy";
+    this.cat = "special";
+    this.bp = 40;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { this.bp = 40 + 20 * (effectiveMultiplier(move, pD) > 1); };
+    this.description = "Deals 40 base power damage to the opponent. Base power increases if this attack is super effective.";
 }
 
 function FakeOut() {
@@ -6860,6 +7445,16 @@ function FoulPlay() {
     this.description = "Deals 90 base power damage to the opponent. Base power varies with target's attack stat changes.";
 }
 
+function FreezeDry() {
+    this.name = "Freeze Dry";
+    this.type = "ice";
+    this.cat = "special";
+    this.bp = 85;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { this.bp = 85 + 85 * contains(pD.types, "water"); };
+    this.description = "Deals 85 base power damage to the opponent. Base power increases drastically against water type foes.";
+}
+
 function FrenzyPlant() {
     this.name = "Frenzy Plant";
     this.type = "grass";
@@ -6871,6 +7466,17 @@ function FrenzyPlant() {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Shuffles 2 Recharge into the user's draw pile.";
+}
+
+function FrostBreath() {
+    this.name = "Frost Breath";
+    this.type = "ice";
+    this.cat = "special";
+    this.bp = 35;
+    this.cost = 1;
+    this.crit = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals 35 base power damage to the opponent. Always results in a critical hit.";
 }
 
 function FuryCutter() {
@@ -6952,6 +7558,16 @@ function GrassKnot() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, Math.min(125, 25 * 180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
     this.description = "Deals up to 125 base power damage to the opponent depending on how slow it is.";
+}
+
+function GrassWhistle() {
+    this.name = "Grass Whistle";
+    this.type = "grass";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("sleep", 1, pD); };
+    this.description = "Applies 1 stack of sleep to the opponent.";
 }
 
 function Growth() {
@@ -7687,11 +8303,21 @@ function MegaKick() {
     this.name = "Mega Kick";
     this.type = "normal";
     this.cat = "physical";
-    this.bp = 150;
+    this.bp = 160;
     this.cost = 3;
     this.fails = false;
-    this.effect = function (move, pA, pD) { this.fails = (pA.statchanges.attack > 0 || pA.statchanges.defense > 0 || pA.statchanges.spattack > 0 || pA.statchanges.spdefense > 0 || pA.statchanges.speed > 0); };
+    this.effect = function (move, pA, pD) { this.fails = !(pA.statchanges.attack > 0 || pA.statchanges.defense > 0 || pA.statchanges.spattack > 0 || pA.statchanges.spdefense > 0 || pA.statchanges.speed > 0); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fails unless user has a raised stat.";
+}
+
+function Megahorn() {
+    this.name = "Megahorn";
+    this.type = "bug";
+    this.cat = "physical";
+    this.bp = 140;
+    this.cost = 3;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Deals " + this.bp + " base power damage to the opponent.";
 }
 
 function Memento() {
@@ -8098,6 +8724,30 @@ function PoisonPowder() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { applyEffect("poison", 6, pD); };
     this.description = "Applies 6 stacks of poison to the opponent.";
+}
+
+function PoisonSting() {
+    this.name = "Poison Sting";
+    this.type = "poison";
+    this.cat = "physical";
+    this.bp = 15;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) { applyEffect("poison", 4, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 4 stacks of poison to the target. Exhaust.";
+}
+
+function PoisonTail() {
+    this.name = "Poison Tail";
+    this.type = "poison";
+    this.cat = "physical";
+    this.bp = 35;
+    this.cost = 1;
+    this.crit = true;
+    this.effect = function (move, pA, pD) { this.crit = isPoisoned(pD); };
+    this.postEffect = function (move, pA, pD) { if (this.crit) applyEffect("poison", 4, pD); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and applies 4 stacks of poison to the target if it's poisoned already.";
 }
 
 function Poltergeist() {
@@ -9041,6 +9691,16 @@ function StringShot() {
     this.description = "Lowers target's speed by 2 stages.";
 }
 
+function StunSpore() {
+    this.name = "Stun Spore";
+    this.type = "grass";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
+    this.description = "Applies 1 stack of paralysis to the opponent.";
+}
+
 function Substitute() {
     this.name = "Substitute";
     this.type = "normal";
@@ -9734,6 +10394,9 @@ function applyEffect(type, stacks, p, extra) {
         }
     }
     if (!fails) {
+        if (type === "poison" && p === opponent)
+            poisonApplied += stacks;
+
         var i = p.effects.findIndex(e => e.name === effect.name);
         if (i >= 0) {
             p.effects[i].stacks += effect.stacks;
@@ -10234,8 +10897,10 @@ function setWeather(w, turns) {
     switchCastform(opponent);
     drawEnvironment();
 
-    if (player)
+    if (player && opponent.talent !== "Sand stream" && opponent.talent !== "Snow warning")
         weatherChanged++;
+    if (player && weather.name === "Hail" && opponent.talent != "Snow warning")
+        hailStarted++;
 }
 
 function Rain(turns) {
