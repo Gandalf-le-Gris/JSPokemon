@@ -971,7 +971,7 @@ function pathSelector() {
 
         cell.onclick = function () {
             fadeOutTransition(1);
-            setTimeout(() => { startEncounter(this.encounter) }, 1000);
+            setTimeout(() => { startEncounter(encounter) }, 1000);
             if (music)
                 playMusic('resources/sounds/sfx/button_click.mp3', false);
         }
@@ -991,7 +991,7 @@ function pathSelector() {
 
         cell.onclick = function () {
             fadeOutTransition(1);
-            setTimeout(() => { startEncounter(this.encounter) }, 1000);
+            setTimeout(() => { startEncounter(encounter) }, 1000);
             if (music)
                 playMusic('resources/sounds/sfx/button_click.mp3', false);
         }
@@ -4551,6 +4551,7 @@ function Castform() {
     this.discard = [];
     this.items = [];
     this.talent = "Forecast"
+    this.init = function () { switchCastform(this); };
     this.talentDesc = "Changes form depending on the current weather."
     this.unlocked = weatherChanged >= 50;
     this.hint = "Change the weather 50 times\n" + weatherChanged + "/50";
