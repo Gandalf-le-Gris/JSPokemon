@@ -485,7 +485,11 @@ function toggleEscapeScreen() {
         var exitButton = document.createElement('div');
         exitButton.className = "settings-option";
         exitButton.innerHTML = "Exit to title screen";
-        exitButton.onclick = drawStartingMenu;
+        exitButton.onclick = () => {
+            toggleEscapeScreen();
+            fadeOutTransition(2);
+            setTimeout(drawStartingMenu, 2000);
+        }
         settingsOptionsGrid.appendChild(exitButton);
     }
 }
@@ -7219,6 +7223,7 @@ function EchoedVoice() {
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) {
         this.bp += 20;
+        this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
 }
@@ -7676,6 +7681,7 @@ function FuryCutter() {
     this.cost = 1;
     this.effect = function (move, pA, pD) {
         this.bp += 20;
+        this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
 }
@@ -9252,6 +9258,7 @@ function Rollout() {
     this.exhaust = true;
     this.effect = function (move, pA, pD) {
         this.bp += 20;
+        this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
 }
