@@ -5,6 +5,100 @@
 music = false;
 fastBattle = false;
 
+function loadResources() {
+    var filter = document.createElement('div');
+    filter.className = "filter-black";
+    document.body.appendChild(filter);
+
+    loadProgress();
+
+    async function loadAssets(imageUrlArray, isImage) {
+        const promiseArray = [];
+        const imageArray = [];
+
+        for (let imageUrl of imageUrlArray) {
+            promiseArray.push(new Promise(resolve => {
+                const img = isImage ? new Image() : new Audio();
+                img.onload = resolve;
+                img.src = imageUrl;
+                imageArray.push(img);
+            }));
+        }
+
+        await Promise.all(promiseArray);
+        console.log("All images loaded");
+        return imageArray;
+    }
+
+    imgs = [];
+    sounds = [];
+
+    imgs.push("resources/homescreen.jfif");
+    imgs.push("resources/teamscreen.webp");
+    imgs.push("resources/sprites/battle_backgrounds/plains.png");
+    for (let e of effectList) {
+        imgs.push(createEffect(e, 0).icon);
+    }
+    for (let i of heldItems) {
+        imgs.push(createHeldItem(i).img);
+    }
+    for (let t of types) {
+        imgs.push("resources/sprites/map_icons/" + t + ".png");
+        imgs.push("resources/sprites/move_icons/types/" + t + ".webp");
+    }
+    imgs.push("resources/sprites/map_icons/boss.png");
+    imgs.push("resources/sprites/map_icons/boss.png");
+    imgs.push("resources/sprites/map_icons/pokemart.png");
+    imgs.push("resources/sprites/map_icons/pokemon_center.png");
+    imgs.push("resources/sprites/move_icons/category/physical.webp");
+    imgs.push("resources/sprites/move_icons/category/special.webp");
+    imgs.push("resources/sprites/move_icons/category/status.webp");
+    for (let poke of pokemonList) {
+        var p = createPokemon(poke);
+        imgs.push(p.imgb);
+        imgs.push(p.imgf);
+        imgs.push("resources/sprites/pokemon_icons/" + p.id + ".png");
+        sounds.push(p.cry);
+    }
+    for (let poke of bossList) {
+        var p = createPokemon(poke);
+        imgs.push(p.imgb);
+        imgs.push(p.imgf);
+        sounds.push(p.cry);
+    }
+    imgs.push("resources/sprites/ui_icons/buff.png");
+    imgs.push("resources/sprites/ui_icons/debuff.png");
+    imgs.push("resources/sprites/ui_icons/deck.png");
+    imgs.push("resources/sprites/ui_icons/discard.png");
+    imgs.push("resources/sprites/ui_icons/energy.png");
+    imgs.push("resources/sprites/ui_icons/mute.webp");
+    imgs.push("resources/sprites/ui_icons/random.webp");
+    imgs.push("resources/sprites/ui_icons/remove.png");
+    imgs.push("resources/sprites/ui_icons/sound.webp");
+
+    sounds.push("resources/sounds/musics/battle.mp3");
+    sounds.push("resources/sounds/musics/boss.mp3");
+    sounds.push("resources/sounds/musics/crossroads.mp3");
+    sounds.push("resources/sounds/musics/game_over.mp3");
+    sounds.push("resources/sounds/musics/pokemart.mp3");
+    sounds.push("resources/sounds/musics/pokemon_center.mp3");
+    sounds.push("resources/sounds/musics/run_complete.mp3");
+    sounds.push("resources/sounds/musics/title_screen.mp3");
+    sounds.push("resources/sounds/musics/victory.mp3");
+
+    sounds.push("resources/sounds/sfx/button_click.mp3");
+    sounds.push("resources/sounds/sfx/healer.mp3");
+    sounds.push("resources/sounds/sfx/hit.mp3");
+    sounds.push("resources/sounds/sfx/pc.mp3");
+    sounds.push("resources/sounds/sfx/super_effective_hit.mp3");
+
+    imgs = loadAssets(imgs, true);
+    sounds = loadAssets(sounds, false);
+
+    drawStartingMenu();
+}
+
+
 function drawStartingMenu() {
     document.body.innerHTML = "";
 
@@ -10384,6 +10478,10 @@ function Recharge() {
 /* ------------------------------------------------------ */
 /* ------------------ Effects creation ------------------ */
 /* ------------------------------------------------------ */
+
+effectList = ["burn", "charge", "confined", "confusion", "curse", "disguise", "extra_draw", "fear", "freeze", "grounded", "immunity", "ingrain", "kings_protection",
+    "leech_seed", "levitation", "paralysis", "poison", "protection", "sleep", "slow_start", "spikes", "stealth_rock", "sticky_web", "taunt", "thick_fat",
+    "toxic_spikes", "trap", "trap_damage", "type_changed", "wish"];
 
 function applyEffect(type, stacks, p, extra) {
     var effect = createEffect(type, stacks, extra);

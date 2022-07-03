@@ -831,6 +831,16 @@ button.launch-tuto:hover {
     grid-column: 1 / 3;
 }
 
+.filter-black {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, .9);
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
 
 
 /* The switch - the box around the slider */
