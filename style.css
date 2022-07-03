@@ -221,10 +221,12 @@ button.start:hover {
     grid-template-columns: auto auto;
     background-color: lightgrey;
     grid-column-gap: .5vw;
+    grid-row-gap: .2vh;
+    padding-top: .3vh;
     border-bottom-left-radius: 1.3vh;
     border-bottom-right-radius: 1.3vh;
-    border-top-left-radius: .5vh;
-    border-top-right-radius: .5vh;
+    border-top-left-radius: 1.2vh;
+    border-top-right-radius: 1.2vh;
 }
 
 .pokemon-hp {
@@ -244,10 +246,12 @@ button.start:hover {
 
 .pokemon-name {
     font-weight: bold;
+    padding-left: .2vw;
 }
 
 .pokemon-hp-text {
     text-align: right;
+    padding-right: .2vw;
 }
 
 .effect-section {
