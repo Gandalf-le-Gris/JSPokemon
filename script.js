@@ -322,7 +322,7 @@ function resizeSprites(both) {
     }
 }
 
-baseVolume = .2;
+baseVolume = .5;
 masterVolume = 1;
 musicVolume = 1;
 sfxVolume = 1;
@@ -1010,7 +1010,7 @@ function launchGame() {
                 pokemon = createPokemon(pokemonList[Math.floor(Math.random() * pokemonList.length)]);
                 exists = false;
                 for (let j = 0; j < i; j++)
-                    exists = exists || team[j].name === team[i].name;
+                    exists = exists || team[j].name === pokemon.name;
             }
             adjustBST(pokemon, 600, false);
             team[i] = pokemon;
@@ -5305,7 +5305,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "precipice_blades", "heat_crash", "origin_pulse", "dragon_ascent", "v_create", "shadow_force", "eternabeam", "dynamax_cannon", "crush_grip",
     "diamond_storm", "burning_jealousy", "extrasensory", "belly_drum", "eerie_impulse", "ominous_wind", "boomburst", "clanging_scales", "clangorous_soul",
     "drill_run", "megahorn", "poison_sting", "poison_tail", "cotton_guard", "cotton_spore", "fairy_wind", "stun_spore", "grass_whistle", "frost_breath",
-    "freeze_dry"];
+    "freeze_dry", "dragon_breath"];
 
 function createMove(move) {
     switch (move) {
@@ -5469,6 +5469,8 @@ function createMove(move) {
             return new DrainingKiss();
         case "drain_punch":
             return new DrainPunch();
+        case "dragon_breath":
+            return new DragonBreath();
         case "dragon_tail":
             return new DragonTail();
         case "drill_run":
@@ -7011,6 +7013,37 @@ function DracoMeteor() {
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's special attack by 2 stages unless it has 2 other dragon type moves in hand.";
 }
 
+function DragonAscent() {
+    this.name = "Dragon Ascent";
+    this.type = "flying";
+    this.cat = "physical";
+    this.bp = 130;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) { };
+    this.postEffect = function (move, pA, pD) {
+        boostStat(pA, "defense", -1);
+        boostStat(pA, "spdefense", -1);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense and special defense by 1 stage.";
+}
+
+function DragonBreath() {
+    this.name = "Dragon Breath";
+    this.type = "dragon";
+    this.cat = "special";
+    this.bp = 30;
+    this.cost = 1;
+    this.effect = function (move, pA, pD) {
+        var c = 0;
+        for (let m of pA.moves) {
+            c += (m.type === "dragon")
+        }
+        if (c >= 3)
+            applyEffect("paralysis", 1, pD);
+    };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the opponent of the user's deck contains at least 2 other dragon type moves.";
+}
+
 function DragonClaw() {
     this.name = "Dragon Claw";
     this.type = "dragon";
@@ -7025,20 +7058,6 @@ function DragonClaw() {
         }
     };
     this.description = "Deals 70 base power damage to the opponent. Base damage increases by 10 for each dragon move in the user's deck.";
-}
-
-function DragonAscent() {
-    this.name = "Dragon Ascent";
-    this.type = "flying";
-    this.cat = "physical";
-    this.bp = 130;
-    this.cost = 2;
-    this.effect = function (move, pA, pD) { };
-    this.postEffect = function (move, pA, pD) {
-        boostStat(pA, "defense", -1);
-        boostStat(pA, "spdefense", -1);
-    };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers user's defense and special defense by 1 stage.";
 }
 
 function DragonDance() {

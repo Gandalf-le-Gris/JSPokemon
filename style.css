@@ -221,14 +221,26 @@ button.start:hover {
     grid-template-columns: auto auto;
     background-color: lightgrey;
     grid-column-gap: .5vw;
+    border-bottom-left-radius: 1.3vh;
+    border-bottom-right-radius: 1.3vh;
+    border-top-left-radius: .5vh;
+    border-top-right-radius: .5vh;
 }
 
 .pokemon-hp {
     grid-column: 1 / 3;
-    background: green;
+    background-color: transparent;
     width: 100%;
-    border-radius: 1vh;
 }
+
+    .pokemon-hp::-webkit-progress-bar {
+        border-radius: 1.2vh;
+    }
+
+    .pokemon-hp::-webkit-progress-value {
+        border-radius: 1.2vh;
+        background: green;
+    }
 
 .pokemon-name {
     font-weight: bold;
@@ -251,6 +263,7 @@ button.start:hover {
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
     text-align: right;
+    border-radius: 1vh;
 }
 
 .effect-cell {
@@ -385,6 +398,7 @@ button.start:hover {
     background-color: lightslategrey;
     border: solid;
     justify-self: right;
+    border-radius: 1vh;
 }
 
 .end-turn:hover {
