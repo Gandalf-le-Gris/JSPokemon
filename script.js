@@ -14,18 +14,45 @@ function loadResources() {
 
     async function loadAssets(imageUrlArray, isImage) {
         const promiseArray = [];
-        const imageArray = [];
 
         for (let imageUrl of imageUrlArray) {
             promiseArray.push(new Promise(resolve => {
-                const img = isImage ? new Image() : new Audio();
-                img.onload = () => {
-                    assetsLoaded++;
-                    console.log(assetsLoaded);
-                    resolve();
-                }
+                const img = isImage ? new Image() : document.createElement('audio');
+                if (isImage)
+                    img.onload = () => {
+                        assetsLoaded++;
+                        var progress = 100 * assetsLoaded / totalAssets;
+                        progressSpan.style.width = progress + "%";
+                        progressText.innerHTML = Math.floor(progress) + "%";
+                        if (progress == 100) {
+                            text.innerHTML = "Click to continue";
+                            music = true;
+                            filter.onclick = () => {
+                                fadeOutTransition(2);
+                                setTimeout(drawStartingMenu, 1000);
+                            }
+                        }
+                        resolve();
+                    }
+                else
+                    img.addEventListener('canplay', () => {
+                        assetsLoaded++;
+                        var progress = 100 * assetsLoaded / totalAssets;
+                        progressSpan.style.width = progress + "%";
+                        progressText.innerHTML = Math.floor(progress) + "%";
+                        img.id = imageUrl;
+                        document.body.appendChild(img);
+                        if (progress == 100) {
+                            text.innerHTML = "Click to continue";
+                            music = true;
+                            filter.onclick = () => {
+                                fadeOutTransition(2);
+                                setTimeout(drawStartingMenu, 1000);
+                            }
+                        }
+                        resolve();
+                    });
                 img.src = imageUrl;
-                imageArray.push(img);
             }));
         }
 
@@ -36,9 +63,9 @@ function loadResources() {
     imgs = [];
     sounds = [];
 
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/homescreen.jfif");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/teamscreen.webp");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/battle_backgrounds/plains.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jfif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png");
     for (let e of effectList) {
         imgs.push(createEffect(e, 0).icon);
     }
@@ -46,67 +73,133 @@ function loadResources() {
         imgs.push(createHeldItem(i).img);
     }
     for (let t of types) {
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/" + t + ".png");
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/types/" + t + ".webp");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/" + t + ".png");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/" + t + ".webp");
     }
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/boss.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/boss.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/pokemart.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/pokemon_center.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/physical.webp");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/special.webp");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/status.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/physical.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/special.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/status.webp");
     for (let poke of pokemonList) {
         var p = createPokemon(poke);
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_icons/" + p.id + ".png");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/" + p.id + ".png");
         sounds.push(p.cry);
     }
     for (let poke of bossList) {
         var p = createPokemon(poke);
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
-        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
         sounds.push(p.cry);
     }
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/buff.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/debuff.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/deck.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/discard.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/energy.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/mute.webp");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/random.webp");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/remove.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/sound.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/giratina_origin.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/giratina_origin.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_fan.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_fan.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_heat.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_heat.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_frost.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_frost.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_wash.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_wash.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_mow.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_mow.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_rainy.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_rainy.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_sunny.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_sunny.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_snowy.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_snowy.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/nidoqueen.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/nidoqueen.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/nidoking.gif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/nidoking.gif");
 
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/battle.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/boss.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/crossroads.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/game_over.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/pokemart.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/pokemon_center.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/run_complete.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/title_screen.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/victory.mp3");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/deck.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/discard.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/energy.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/random.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/remove.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp");
 
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/button_click.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/healer.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/hit.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/pc.mp3");
-    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/super_effective_hit.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/battle.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/boss.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/crossroads.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/game_over.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemart.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/run_complete.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/title_screen.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/victory.mp3");
+
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/healer.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/hit.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/pc.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/super_effective_hit.mp3");
 
     var assetsLoaded = 0;
-    var assetsTotal = imgs.length + sounds.length;
+    var totalAssets = imgs.length + sounds.length;
+
+    var grid = document.createElement('div');
+    grid.className = "settings-grid";
+    filter.appendChild(grid);
+
+    var progressBar = document.createElement('div');
+    progressBar.className = "meter";
+    grid.appendChild(progressBar);
+    var progressSpan = document.createElement('span');
+    progressSpan.style.width = 0;
+    progressBar.appendChild(progressSpan);
+    var progressText = document.createElement('div');
+    progressText.innerHTML = "0%";
+    progressBar.appendChild(progressText);
+
+    var text = document.createElement('div');
+    text.innerHTML = "Loading assets...";
+    text.style.fontSize = "3vw";
+    grid.appendChild(text);
+
+    var disclaimer = document.createElement('div');
+    disclaimer.className = "disclaimer";
+    disclaimer.innerHTML = "Loading speed may depend on the network. Please ensure you have a good Internet connection if loading takes too long.<br/>© 2022 Pokémon. © 1995–2022 Nintendo/Creatures Inc./GAME FREAK inc. Pokémon, Pokémon character names, Nintendo Switch, Nintendo 3DS, Nintendo DS, Wii, Wii U, and WiiWare are trademarks of Nintendo.";
+    filter.appendChild(disclaimer);
 
     loadAssets(imgs, true);
     loadAssets(sounds, false);
 }
 
+function clearBody() {
+    var nodes = Array.prototype.slice.call(document.body.childNodes);
+    var audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
+    for (let i = 0; i < nodes.length; i++) {
+        if (!contains(audios, nodes[i])) {
+            document.body.removeChild(nodes[i]);
+        }
+    }
+    stopMusic();
+}
 
 function drawStartingMenu() {
-    document.body.innerHTML = "";
+    clearBody();
+    fadeInTransition();
 
-    ambientMusic = "resources/sounds/musics/title_screen.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/title_screen.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -118,7 +211,7 @@ function drawStartingMenu() {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     document.body.appendChild(startButton);
     var tutoButton = document.createElement('button');
@@ -129,22 +222,18 @@ function drawStartingMenu() {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     document.body.appendChild(tutoButton);
     var soundButton = document.createElement('div');
     soundButton.className = "sound-button";
     soundButton.addEventListener('click', () => {
         if (music) {
-            soundImage.src = "resources/sprites/ui_icons/mute.webp"
-            var audios = document.getElementsByTagName('audio');
-            for (let a of audios) {
-                a.pause();
-                a = null;
-            }
+            soundImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
+            stopMusic();
             music = false;
         } else {
-            soundImage.src = "resources/sprites/ui_icons/sound.webp"
+            soundImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp"
             playMusic(ambientMusic, true);
             music = true;
         }
@@ -153,9 +242,9 @@ function drawStartingMenu() {
     var soundImage = new Image();
     soundImage.id = "soundImage";
     soundImage.className = "pixel-sprite";
-    soundImage.src = "resources/sprites/ui_icons/mute.webp"
+    soundImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
     soundButton.appendChild(soundImage);
-    var gArea = new gameArea("resources/homescreen.jfif", () => { });
+    var gArea = new gameArea("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jfif", () => { });
     gArea.start();
 }
 
@@ -175,7 +264,7 @@ function gameArea(img, updater) {
 }
 
 function startGame() {
-    drawStartingMenu();
+    loadResources();
 }
 
 const init = (e) => {
@@ -234,21 +323,21 @@ musicVolume = 1;
 sfxVolume = 1;
 
 function playMusic(src, repeat) {
-    var music = document.createElement("audio");
+    var music = document.getElementById(src);
     music.volume = baseVolume * masterVolume;
     if (repeat)
         music.volume *= musicVolume;
     else
         music.volume *= sfxVolume;
-    music.autoplay = true;
+    music.currentTime = 0;
     music.loop = repeat;
-    music.src = src;
-    document.body.appendChild(music);
-    music.onended = function () {
-        music.pause();
-        if (document.body.contains(music))
-            document.body.removeChild(music);
-    }
+    music.play();
+}
+
+function stopMusic() {
+    var audios = document.getElementsByTagName('audio');
+    for (let a of audios)
+        a.pause();
 }
 
 function toggleEscapeScreen() {
@@ -282,16 +371,12 @@ function toggleEscapeScreen() {
         soundSwitchInput.onclick = () => {
             if (music) {
                 if (soundImage != undefined)
-                    soundImage.src = "resources/sprites/ui_icons/mute.webp"
-                var audios = document.getElementsByTagName('audio');
-                for (let a of audios) {
-                    a.pause();
-                    a = null;
-                }
+                    soundImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
+                stopMusic()
                 music = false;
             } else {
                 if (soundImage != undefined)
-                    soundImage.src = "resources/sprites/ui_icons/sound.webp"
+                    soundImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp"
                 playMusic(ambientMusic, true);
                 music = true;
             }
@@ -562,14 +647,14 @@ function unlockAll() {
 }
 
 function drawTeamSelection() {
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    gArea = new gameArea('resources/teamscreen.webp', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
-    ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3";
     if (music) {
-        playMusic("resources/sounds/sfx/pc.mp3", false);
+        playMusic("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/pc.mp3", false);
         playMusic(ambientMusic, true);
     }
 
@@ -647,7 +732,7 @@ function pokemonSelector(name) {
     name = this.cell.p.id;
     this.name = name;
     image = new Image();
-    image.src = 'resources/sprites/pokemon_icons/' + name + '.png';
+    image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + name + '.png';
     image.className = 'selector-pixel-sprite';
     if (!this.cell.p.unlocked)
         image.className += " not-unlocked";
@@ -672,7 +757,7 @@ function pokemonSelector(name) {
                             fadeOutTransition(2);
                             setTimeout(launchGame, 2000);
                             if (music)
-                                playMusic('resources/sounds/sfx/button_click.mp3', false);
+                                playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                         }
                     };
                 }
@@ -704,7 +789,7 @@ function randomSelector(n) {
     var name = "random" + n;
     this.cell = document.createElement('div');
     image = new Image();
-    image.src = 'resources/sprites/ui_icons/random.webp';
+    image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/random.webp';
     image.className = 'random-selector-pixel-sprite';
     image.style.filter = "invert()";
     title = document.createElement('div');
@@ -727,7 +812,7 @@ function randomSelector(n) {
                         fadeOutTransition(2);
                         setTimeout(launchGame, 2000);
                         if (music)
-                            playMusic('resources/sounds/sfx/button_click.mp3', false);
+                            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     }
                 };
             }
@@ -837,7 +922,7 @@ function damageCalculator(move, pA, pD) {
     }
     if (crit)
         baseDam *= 1.5
-    if (move.cat !== "status")
+    if (move.bp > 0)
         baseDam = Math.max(1, baseDam);
 
     var other = 1;
@@ -846,14 +931,14 @@ function damageCalculator(move, pA, pD) {
     if (weather != undefined) {
         if (weather.name === "Rain") {
             if (move.type === "water")
-                other *= 1.5;
+                other *= 1.3;
             if (move.type === "fire")
-                other *= .5;
+                other *= .7;
         } else if (weather.name === "Sun") {
             if (move.type === "water")
-                other *= .5;
+                other *= .7;
             if (move.type === "fire")
-                other *= 1.5;
+                other *= 1.3;
         }
     }
     if (isCharged(pA) && move.type === "electric")
@@ -891,6 +976,7 @@ function launchGame() {
     pokemonCenterChance = 0;
     pokemartChance = 0;
     flawless = true;
+    team = [];
 
     for (let i = 0; i < pSelected.length; i++) {
         if (!pSelected[i].includes("random")) {
@@ -902,9 +988,16 @@ function launchGame() {
     for (let i = 0; i < pSelected.length; i++) {
         if (team[i] == undefined) {
             var name = pokemonList[Math.floor(Math.random() * pokemonList.length)];
-            while (contains(pSelected, name) || !(createPokemon(name)).unlocked)
-                name = pokemonList[Math.floor(Math.random() * pokemonList.length)];
-            pokemon = createPokemon(name);
+            var pokemon = createPokemon(name);
+            var exists = false;
+            for (let j = 0; j < i; j++)
+                exists = exists || team[j].name === pokemon.name;
+            while (exists || !pokemon.unlocked) {
+                pokemon = createPokemon(pokemonList[Math.floor(Math.random() * pokemonList.length)]);
+                exists = false;
+                for (let j = 0; j < i; j++)
+                    exists = exists || team[j].name === team[i].name;
+            }
             adjustBST(pokemon, 600, false);
             team[i] = pokemon;
         }
@@ -925,12 +1018,12 @@ function launchGame() {
 var types = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "flying", "ghost", "grass", "ground", "ice", "normal", "poison", "psychic", "rock", "steel", "water"]
 
 function mapSelection() {
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    gArea = new gameArea('resources/teamscreen.webp', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
-    ambientMusic = "resources/sounds/musics/crossroads.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/crossroads.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -962,7 +1055,7 @@ function pathSelector() {
         image = new Image();
         image.className = 'pixel-sprite';
         title = document.createElement('div');
-        image.src = 'resources/sprites/map_icons/boss.png';
+        image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png';
         title.innerHTML = "boss";
         cell.appendChild(image);
         cell.appendChild(title);
@@ -973,7 +1066,7 @@ function pathSelector() {
             fadeOutTransition(1);
             setTimeout(() => { startEncounter(encounter) }, 1000);
             if (music)
-                playMusic('resources/sounds/sfx/button_click.mp3', false);
+                playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
         }
         grid.appendChild(cell);
     } else if (area == 9) {
@@ -982,7 +1075,7 @@ function pathSelector() {
         image = new Image();
         image.className = 'pixel-sprite';
         title = document.createElement('div');
-        image.src = 'resources/sprites/map_icons/pokemon_center.png';
+        image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png';
         title.innerHTML = "pokémon center";
         cell.appendChild(image);
         cell.appendChild(title);
@@ -993,7 +1086,7 @@ function pathSelector() {
             fadeOutTransition(1);
             setTimeout(() => { startEncounter(encounter) }, 1000);
             if (music)
-                playMusic('resources/sounds/sfx/button_click.mp3', false);
+                playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
         }
         grid.appendChild(cell);
     } else {
@@ -1010,16 +1103,16 @@ function pathSelector() {
             cell.appendChild(title);
             cell.className = "team-selector-element";
             if (Math.random() < pokemonCenterChance && pokemonCenterChance > .15) {
-                image.src = 'resources/sprites/map_icons/pokemon_center.png';
+                image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png';
                 title.innerHTML = "pokémon center";
                 encounter = "pokemon_center";
             } else if (Math.random() < pokemartChance && pokemartChance > .15) {
-                image.src = 'resources/sprites/map_icons/pokemart.png';
+                image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
             } else {
                 type = types[Math.floor(Math.random() * 18)];
-                image.src = 'resources/sprites/map_icons/' + type + '.png';
+                image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/' + type + '.png';
                 title.innerHTML = type + " type battle";
                 encounter = type;
             }
@@ -1028,7 +1121,7 @@ function pathSelector() {
                 fadeOutTransition(1);
                 setTimeout(() => { startEncounter(this.encounter) }, 1000);
                 if (music)
-                    playMusic('resources/sounds/sfx/button_click.mp3', false);
+                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
             }
             grid.appendChild(cell);
         }
@@ -1108,15 +1201,15 @@ function battleEncounter(encounter) {
         switchInd = [0, 1];
     }
 
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    gArea = new gameArea('resources/sprites/battle_backgrounds/plains.png', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png', () => { });
     gArea.start();
 
     if (area < 10)
-        ambientMusic = "resources/sounds/musics/battle.mp3";
+        ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/battle.mp3";
     else
-        ambientMusic = "resources/sounds/musics/boss.mp3";
+        ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/boss.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -1208,7 +1301,7 @@ function battleEncounter(encounter) {
     discardCell.className = "action-information-cell";
     info.appendChild(discardCell);
     discardIcon = new Image();
-    discardIcon.src = 'resources/sprites/ui_icons/discard.png';
+    discardIcon.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/discard.png';
     discardIcon.className = "stack";
     discardCell.appendChild(discardIcon);
     discardCount = document.createElement('div');
@@ -1221,7 +1314,7 @@ function battleEncounter(encounter) {
     deckCell.className = "action-information-cell";
     info.appendChild(deckCell);
     deckIcon = new Image();
-    deckIcon.src = 'resources/sprites/ui_icons/deck.png';
+    deckIcon.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/deck.png';
     deckIcon.className = "stack";
     deckCell.appendChild(deckIcon);
     deckCount = document.createElement('div');
@@ -1234,7 +1327,7 @@ function battleEncounter(encounter) {
     energyCell.className = "action-information-cell";
     info.appendChild(energyCell);
     energyIcon = new Image();
-    energyIcon.src = 'resources/sprites/ui_icons/energy.png';
+    energyIcon.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/energy.png';
     energyIcon.className = "stack";
     energyCell.appendChild(energyIcon);
     energyCount = document.createElement('div');
@@ -1339,7 +1432,7 @@ function battleEncounter(encounter) {
         itemSection.appendChild(itemSubsection);
 
         var pImage = new Image();
-        pImage.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+        pImage.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
         pImage.className = "item-pokemon-sprite";
         itemSubsection.appendChild(pImage);
 
@@ -1486,11 +1579,11 @@ function drawHand() {
 
                 var type = new Image();
                 if (move.type !== "")
-                    type.src = 'resources/sprites/move_icons/types/' + move.type + '.webp'
+                    type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
                 type.className = "type-icon";
                 bottom.appendChild(type);
                 var cat = new Image();
-                cat.src = 'resources/sprites/move_icons/category/' + move.cat + '.webp'
+                cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
                 cat.className = "category-icon";
                 bottom.appendChild(cat);
             }
@@ -1545,9 +1638,9 @@ function drawStats(side) {
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.attack > 0)
-            image.src = 'resources/sprites/ui_icons/buff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png';
         else
-            image.src = 'resources/sprites/ui_icons/debuff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
 
         image.className = "effect-icon stack";
         grid.appendChild(image);
@@ -1563,9 +1656,9 @@ function drawStats(side) {
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.defense > 0)
-            image.src = 'resources/sprites/ui_icons/buff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png';
         else
-            image.src = 'resources/sprites/ui_icons/debuff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
 
         image.className = "effect-icon stack";
         grid.appendChild(image);
@@ -1581,9 +1674,9 @@ function drawStats(side) {
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.spattack > 0)
-            image.src = 'resources/sprites/ui_icons/buff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png';
         else
-            image.src = 'resources/sprites/ui_icons/debuff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
 
         image.className = "effect-icon stack";
         grid.appendChild(image);
@@ -1599,9 +1692,9 @@ function drawStats(side) {
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.spdefense > 0)
-            image.src = 'resources/sprites/ui_icons/buff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png';
         else
-            image.src = 'resources/sprites/ui_icons/debuff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
 
         image.className = "effect-icon stack";
         grid.appendChild(image);
@@ -1617,9 +1710,9 @@ function drawStats(side) {
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.speed > 0)
-            image.src = 'resources/sprites/ui_icons/buff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/buff.png';
         else
-            image.src = 'resources/sprites/ui_icons/debuff.png';
+            image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
 
         image.className = "effect-icon stack";
         grid.appendChild(image);
@@ -2013,9 +2106,9 @@ function dealDamage(damage, p, move) {
     moveAnimation(move, damage, p);
     if (music && move != undefined && damage > 0) {
         if (effectiveMultiplier(move, p) > 1)
-            playMusic("resources/sounds/sfx/super_effective_hit.mp3", false);
+            playMusic("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/super_effective_hit.mp3", false);
         else
-            playMusic("resources/sounds/sfx/hit.mp3", false);
+            playMusic("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/hit.mp3", false);
     }
 
     if (damage != 0) {
@@ -2323,13 +2416,13 @@ function nextEncounter() {
 /* ------------------------------------------------------- */
 
 function victoryScreen() {
-    document.body.innerHTML = "";
+    clearBody();
 
-    ambientMusic = "resources/sounds/musics/run_complete.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/run_complete.mp3";
     if (music)
         playMusic(ambientMusic, true);
     fadeInTransition();
-    var gArea = new gameArea('resources/teamscreen.webp', () => { });
+    var gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
     var title = document.createElement('div');
@@ -2343,7 +2436,7 @@ function victoryScreen() {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
 
     var grid = document.createElement('div');
@@ -2379,12 +2472,8 @@ function victoryScreen() {
 /* ------------------------------------------------------ */
 
 function rewardScreen() {
-    var audios = document.getElementsByTagName('audio');
-    for (let a of audios) {
-        a.pause();
-        a = null;
-    }
-    ambientMusic = "resources/sounds/musics/victory.mp3";
+    stopMusic();
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/victory.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -2411,7 +2500,7 @@ function rewardScreen() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+            sprite1.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2438,11 +2527,11 @@ function rewardScreen() {
 
                 var type = new Image();
                 if (move.type !== "")
-                    type.src = 'resources/sprites/move_icons/types/' + move.type + '.webp'
+                    type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
                 type.className = "type-icon";
                 bottom.appendChild(type);
                 var cat = new Image();
-                cat.src = 'resources/sprites/move_icons/category/' + move.cat + '.webp'
+                cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
                 cat.className = "category-icon";
                 bottom.appendChild(cat);
             }
@@ -2460,7 +2549,7 @@ function rewardScreen() {
             this.reward1.onclick = function () {
                 team[this.p].moves.push(this.move);
                 if (music)
-                    playMusic('resources/sounds/sfx/button_click.mp3', false);
+                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                 if (Math.random() < extraLoot || tuto || area == 10) {
                     extraLoot = 0;
                     extraReward();
@@ -2480,7 +2569,7 @@ function rewardScreen() {
         money += 100;
         earnedMoney += 100;
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
         if (Math.random() < extraLoot || tuto || area == 10) {
             extraLoot = 0;
             extraReward();
@@ -2526,7 +2615,7 @@ function extraReward() {
             this.reward1.className = "reward";
 
             var sprite = new Image();
-            sprite.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+            sprite.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite.className = "reward-sprite";
             this.reward1.appendChild(sprite);
 
@@ -2559,7 +2648,7 @@ function extraReward() {
             this.reward1.onclick = function () {
                 team[this.p].items.push(this.item);
                 if (music)
-                    playMusic('resources/sounds/sfx/button_click.mp3', false);
+                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                 if (this.item.pickup != undefined)
                     this.item.effect(this.p);
                 nextEncounter();
@@ -2576,7 +2665,7 @@ function extraReward() {
         earnedMoney += 150;
         extraLoot += .35;
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
         nextEncounter();
     };
     grid.appendChild(skip);
@@ -2627,15 +2716,15 @@ function pokemonCenterEncounter() {
     pokemonCenterChance = 0;
     pokemartChance += .05;
 
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    gArea = new gameArea('resources/teamscreen.webp', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
-    ambientMusic = "resources/sounds/musics/pokemon_center.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3";
     if (music) {
         playMusic(ambientMusic, true);
-        playMusic("resources/sounds/sfx/healer.mp3", false);
+        playMusic("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/healer.mp3", false);
     }
 
     var title = document.createElement('div');
@@ -2652,7 +2741,7 @@ function pokemonCenterEncounter() {
     replay.onclick = () => {
         nextEncounter();
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
 
     var grid = document.createElement('div');
@@ -2684,12 +2773,12 @@ function pokemartEncounter() {
     pokemonCenterChance += .05;
     pokemartChance = 0;
 
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    gArea = new gameArea('resources/teamscreen.webp', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
-    ambientMusic = "resources/sounds/musics/pokemart.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemart.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -2736,7 +2825,7 @@ function pokemartEncounter() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+            sprite1.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2763,11 +2852,11 @@ function pokemartEncounter() {
 
                 var type = new Image();
                 if (move.type !== "")
-                    type.src = 'resources/sprites/move_icons/types/' + move.type + '.webp'
+                    type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
                 type.className = "type-icon";
                 bottom.appendChild(type);
                 var cat = new Image();
-                cat.src = 'resources/sprites/move_icons/category/' + move.cat + '.webp'
+                cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
                 cat.className = "category-icon";
                 bottom.appendChild(cat);
             }
@@ -2789,7 +2878,7 @@ function pokemartEncounter() {
                     team[this.p].moves.push(this.move);
                     money -= movePrice;
                     if (music)
-                        playMusic('resources/sounds/sfx/button_click.mp3', false);
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
                     this.priceTag.innerHTML = "sold";
                     this.article.className += " sold";
@@ -2819,7 +2908,7 @@ function pokemartEncounter() {
             this.reward1 = document.createElement('div');
             this.reward1.className = "reward";
             var sprite1 = new Image();
-            sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+            sprite1.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
@@ -2856,7 +2945,7 @@ function pokemartEncounter() {
                     team[this.p].items.push(this.item);
                     money -= itemPrice;
                     if (music)
-                        playMusic('resources/sounds/sfx/button_click.mp3', false);
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
                     this.priceTag.innerHTML = "sold";
                     this.article.className += " sold";
@@ -2873,7 +2962,7 @@ function pokemartEncounter() {
     deleteB.onclick = () => {
         drawRemoveCard();
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
     grid.appendChild(deleteB);
 
@@ -2886,7 +2975,7 @@ function pokemartEncounter() {
     wrapper.appendChild(priceTag);
 
     var deleteImage = new Image();
-    deleteImage.src = 'resources/sprites/ui_icons/remove.png';
+    deleteImage.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/remove.png';
     deleteImage.className = "reward-sprite";
     deleteB.appendChild(deleteImage);
 
@@ -2904,7 +2993,7 @@ function pokemartEncounter() {
     continueB.onclick = () => {
         nextEncounter();
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
     grid.appendChild(continueB);
 }
@@ -2931,7 +3020,7 @@ function drawRemoveCard() {
                 this.reward1 = document.createElement('div');
                 this.reward1.className = "reward";
                 var sprite1 = new Image();
-                sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+                sprite1.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
                 sprite1.className = "reward-sprite";
                 this.reward1.appendChild(sprite1);
 
@@ -2957,11 +3046,11 @@ function drawRemoveCard() {
 
                     var type = new Image();
                     if (move.type !== "")
-                        type.src = 'resources/sprites/move_icons/types/' + move.type + '.webp'
+                        type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
                     type.className = "type-icon";
                     bottom.appendChild(type);
                     var cat = new Image();
-                    cat.src = 'resources/sprites/move_icons/category/' + move.cat + '.webp'
+                    cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
                     cat.className = "category-icon";
                     bottom.appendChild(cat);
                 }
@@ -2981,7 +3070,7 @@ function drawRemoveCard() {
                         var i = this.p.moves.findIndex(e => e === this.move);
                         this.p.moves.splice(i, 1);
                         if (music)
-                            playMusic('resources/sounds/sfx/button_click.mp3', false);
+                            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                         hideCardRemove();
                         money -= removePrice;
                         removePrice += 250;
@@ -3000,7 +3089,7 @@ function drawRemoveCard() {
     continueB.onclick = () => {
         hideCardRemove();
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
     grid.appendChild(continueB);
 }
@@ -3019,12 +3108,12 @@ function hideCardRemove() {
 /* ------------------------------------------------------- */
 
 function gameOver() {
-    document.body.innerHTML = "";
+    clearBody();
     fadeInTransition();
-    var gArea = new gameArea('resources/teamscreen.webp', () => { });
+    var gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
-    ambientMusic = "resources/sounds/musics/game_over.mp3";
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/game_over.mp3";
     if (music)
         playMusic(ambientMusic, true);
 
@@ -3043,7 +3132,7 @@ function gameOver() {
         fadeOutTransition(2);
         setTimeout(drawTeamSelection, 2000);
         if (music)
-            playMusic('resources/sounds/sfx/button_click.mp3', false);
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
 
     var grid = document.createElement('div');
@@ -3187,8 +3276,8 @@ function MissingNo() {
     this.types = [];
     this.moves = [createMove("struggle")];
     this.movepool = [];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/missingno.png';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/missingno.png';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/missingno.png';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/missingno.png';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3215,8 +3304,8 @@ function Venusaur() {
     this.opponentMoves =
         [[createMove("vine_whip"), createMove("synthesis"), createMove("power_whip"), createMove("sunny_day"), createMove("solar_beam"), createMove("mega_drain"), createMove("growth"), createMove("energy_ball"), createMove("sludge_bomb"), createMove("double_edge")],
         [createMove("poison_powder"), createMove("poison_powder"), createMove("sludge"), createMove("toxic"), createMove("mega_drain"), createMove("leech_seed"), createMove("venom_drench"), createMove("toxic"), createMove("sludge_bomb"), createMove("sludge_bomb")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/venusaur.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/venusaur.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/venusaur.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/venusaur.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3227,7 +3316,7 @@ function Venusaur() {
     this.talentDesc = "Increases the power of grass type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "grass"); };
     this.unlocked = true;
-    this.cry = "resources/sounds/sfx/cries/venusaur.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/venusaur.ogg"
 }
 
 function Charizard() {
@@ -3243,13 +3332,13 @@ function Charizard() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire", "flying"];
-    this.moves = [createMove("ember"), createMove("wing_attack"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("roost"), createMove("sunny_day")];
+    this.moves = [createMove("ember"), createMove("heat_wave"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("roost"), createMove("sunny_day")];
     this.movepool = ["ember", "wing_attack", "flamethrower", "ancient_power", "crunch", "double_edge", "outrage", "roost", "sunny_day", "solar_beam", "swords_dance", "weather_ball", "air_cutter", "air_slash", "blast_burn", "breaking_swipe", "brick_break", "defog", "dragon_claw", "dragon_dance", "dragon_pulse", "dual_wingbeat", "fire_blast", "fire_spin", "flame_charge", "flare_blitz", "focus_blast", "heat_wave", "hurricane", "inferno", "overheat", "scale_shot", "scorching_sands", "shadow_claw", "will_o_wisp"];
     this.opponentMoves =
         [[createMove("ember"), createMove("blast_burn"), createMove("flamethrower"), createMove("sunny_day"), createMove("solar_beam"), createMove("weather_ball"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("heat_wave"), createMove("hurricane")],
         [createMove("outrage"), createMove("dragon_claw"), createMove("breaking_swipe"), createMove("swords_dance"), createMove("crunch"), createMove("wing_attack"), createMove("wing_attack"), createMove("dual_wingbeat"), createMove("flare_blitz"), createMove("flame_charge")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/charizard.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/charizard.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/charizard.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/charizard.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3260,7 +3349,7 @@ function Charizard() {
     this.talentDesc = "Increases the power of fire type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "fire"); };
     this.unlocked = true;
-    this.cry = "resources/sounds/sfx/cries/charizard.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/charizard.ogg"
 }
 
 function Blastoise() {
@@ -3281,8 +3370,8 @@ function Blastoise() {
     this.opponentMoves =
         [[createMove("water_gun"), createMove("water_pulse"), createMove("rain_dance"), createMove("flip_turn"), createMove("weather_ball"), createMove("earthquake"), createMove("shell_smash"), createMove("brine"), createMove("hydro_pump"), createMove("ice_beam")],
         [createMove("rapid_spin"), createMove("curse"), createMove("iron_defense"), createMove("iron_tail"), createMove("liquidation"), createMove("skull_bash"), createMove("water_spout"), createMove("rest"), createMove("dive"), createMove("waterfall")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/blastoise.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/blastoise.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/blastoise.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/blastoise.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3293,7 +3382,7 @@ function Blastoise() {
     this.talentDesc = "Increases the power of water type moves by 50% when under 30% HP."
     this.boost = function (move) { return 1 + .5 * (this.currenthp < .3 * this.maxhp && move.type === "water"); }
     this.unlocked = true;
-    this.cry = "resources/sounds/sfx/cries/blastoise.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/blastoise.ogg"
 }
 
 function Pikachu() {
@@ -3314,8 +3403,8 @@ function Pikachu() {
     this.opponentMoves =
         [[createMove("thunder_shock"), createMove("nasty_plot"), createMove("charge"), createMove("charge_beam"), createMove("agility"), createMove("electro_ball"), createMove("thunderbolt"), createMove("grass_knot"), createMove("discharge"), createMove("electroweb")],
         [createMove("nuzzle"), createMove("quick_attack"), createMove("fake_out"), createMove("iron_tail"), createMove("volt_tackle"), createMove("play_rough"), createMove("spark"), createMove("extreme_speed"), createMove("double_kick"), createMove("facade")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/pikachu.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/pikachu.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/pikachu.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/pikachu.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3327,7 +3416,7 @@ function Pikachu() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
     this.unlocked = defeatedPokemon >= 5;
     this.hint = "Defeat 5 Pokémon\n" + defeatedPokemon + "/5";
-    this.cry = "resources/sounds/sfx/cries/pikachu.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/pikachu.ogg"
 }
 
 function Garchomp() {
@@ -3348,8 +3437,8 @@ function Garchomp() {
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("outrage"), createMove("dragon_claw"), createMove("dual_chop"), createMove("dragon_rush"), createMove("dragon_tail"), createMove("earthquake"), createMove("scale_shot"), createMove("rock_slide"), createMove("iron_tail")],
         [createMove("earthquake"), createMove("sand_tomb"), createMove("stomping_tantrum"), createMove("hone_claws"), createMove("stone_edge"), createMove("rock_slide"), createMove("sandstorm"), createMove("stealth_rock"), createMove("bulldoze"), createMove("fire_blast")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/garchomp.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/garchomp.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/garchomp.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/garchomp.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3361,7 +3450,7 @@ function Garchomp() {
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
     this.unlocked = defeatedPokemon >= 20;
     this.hint = "Defeat 20 Pokémon\n" + defeatedPokemon + "/20";
-    this.cry = "resources/sounds/sfx/cries/garchomp.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/garchomp.ogg"
 }
 
 function Cinderace() {
@@ -3382,8 +3471,8 @@ function Cinderace() {
     this.opponentMoves =
         [[createMove("fire_punch"), createMove("fire_fang"), createMove("pyro_ball"), createMove("flame_charge"), createMove("flare_blitz"), createMove("blaze_kick"), createMove("sunny_day"), createMove("double_edge"), createMove("iron_head"), createMove("bounce")],
         [createMove("pyro_ball"), createMove("quick_attack"), createMove("u_turn"), createMove("iron_head"), createMove("bounce"), createMove("gunk_shot"), createMove("high_jump_kick"), createMove("zen_headbutt"), createMove("super_fang"), createMove("bulk_up")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/cinderace.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/cinderace.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/cinderace.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/cinderace.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3401,7 +3490,7 @@ function Cinderace() {
     }
     this.unlocked = defeatedPokemon >= 50;
     this.hint = "Defeat 50 Pokémon\n" + defeatedPokemon + "/50";
-    this.cry = "resources/sounds/sfx/cries/cinderace.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/cinderace.ogg"
 }
 
 function Lucario() {
@@ -3422,8 +3511,8 @@ function Lucario() {
     this.opponentMoves =
         [[createMove("rock_smash"), createMove("metal_claw"), createMove("brick_break"), createMove("bulk_up"), createMove("bullet_punch"), createMove("extreme_speed"), createMove("high_jump_kick"), createMove("meteor_mash"), createMove("iron_tail"), createMove("bone_rush")],
         [createMove("aura_sphere"), createMove("calm_mind"), createMove("dark_pulse"), createMove("dragon_pulse"), createMove("flash_cannon"), createMove("focus_blast"), createMove("nasty_plot"), createMove("psychic"), createMove("vacuum_wave"), createMove("steel_beam")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/lucario.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/lucario.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/lucario.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/lucario.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3435,7 +3524,7 @@ function Lucario() {
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = defeatedPokemon >= 100;
     this.hint = "Defeat 100 Pokémon\n" + defeatedPokemon + "/100";
-    this.cry = "resources/sounds/sfx/cries/lucario.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/lucario.ogg"
 }
 
 function Volcarona() {
@@ -3456,8 +3545,8 @@ function Volcarona() {
     this.opponentMoves =
         [[createMove("quiver_dance"), createMove("struggle_bug"), createMove("giga_drain"), createMove("fiery_dance"), createMove("bug_buzz"), createMove("signal_beam"), createMove("silver_wind"), createMove("hurricane"), createMove("psychic"), createMove("flamethrower")],
         [createMove("quiver_dance"), createMove("fiery_dance"), createMove("bug_buzz"), createMove("giga_drain"), createMove("fire_blast"), createMove("sunny_day"), createMove("heat_wave"), createMove("fire_blast"), createMove("mystical_fire"), createMove("ember")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/volcarona.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/volcarona.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/volcarona.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/volcarona.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3469,7 +3558,7 @@ function Volcarona() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
     this.unlocked = defeatedPokemon >= 150;
     this.hint = "Defeat 150 Pokémon\n" + defeatedPokemon + "/150";
-    this.cry = "resources/sounds/sfx/cries/volcarona.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/volcarona.ogg"
 }
 
 function Eevee() {
@@ -3490,8 +3579,8 @@ function Eevee() {
     this.opponentMoves =
         [[createMove("extreme_evoboost"), createMove("quick_attack"), createMove("double_edge"), createMove("tackle"), createMove("shadow_ball"), createMove("skull_bash"), createMove("echoed_voice"), createMove("bite"), createMove("stored_power"), createMove("hyper_voice")],
         [createMove("extreme_evoboost"), createMove("hidden_power"), createMove("psychic"), createMove("flamethrower"), createMove("ice_beam"), createMove("thunderbolt"), createMove("hydro_pump"), createMove("leaf_blade"), createMove("moonblast"), createMove("snarl")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/eevee.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/eevee.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/eevee.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/eevee.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3503,7 +3592,7 @@ function Eevee() {
     this.boost = function (move) { return 1 + .3 * (contains(this.types, move.type)); }
     this.unlocked = victories >= 1;
     this.hint = "Beat the game"
-    this.cry = "resources/sounds/sfx/cries/eevee.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/eevee.ogg"
 }
 
 function Gardevoir() {
@@ -3524,8 +3613,8 @@ function Gardevoir() {
     this.opponentMoves =
         [[createMove("calm_mind"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("psychic"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("shadow_ball"), createMove("confusion"), createMove("draining_kiss")],
         [createMove("calm_mind"), createMove("charge_beam"), createMove("psychic"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("energy_ball"), createMove("heal_pulse"), createMove("hyper_beam"), createMove("confuse_ray")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/gardevoir.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/gardevoir.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/gardevoir.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/gardevoir.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3543,7 +3632,7 @@ function Gardevoir() {
     }
     this.unlocked = flawlessVictories >= 1;
     this.hint = "Beat the game without any Pokémon fainting"
-    this.cry = "resources/sounds/sfx/cries/gardevoir.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/gardevoir.ogg"
 }
 
 function Dragonite() {
@@ -3564,8 +3653,8 @@ function Dragonite() {
     this.opponentMoves =
         [[createMove("dragon_dance"), createMove("breaking_swipe"), createMove("dragon_claw"), createMove("dragon_rush"), createMove("dragon_tail"), createMove("draco_meteor"), createMove("extreme_speed"), createMove("hone_claws"), createMove("earthquake"), createMove("wing_attack")],
         [createMove("wing_attack"), createMove("dual_wingbeat"), createMove("roost"), createMove("fly"), createMove("steel_wing"), createMove("draco_meteor"), createMove("extreme_speed"), createMove("brick_break"), createMove("aqua_tail"), createMove("rock_slide")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/dragonite.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/dragonite.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/dragonite.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/dragonite.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3577,7 +3666,7 @@ function Dragonite() {
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = starterVictories >= 1;
     this.hint = "Beat the game with the starters"
-    this.cry = "resources/sounds/sfx/cries/dragonite.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/dragonite.ogg"
 }
 
 function Ferrothorn() {
@@ -3598,8 +3687,8 @@ function Ferrothorn() {
     this.opponentMoves =
         [[createMove("curse"), createMove("leech_seed"), createMove("iron_defense"), createMove("body_press"), createMove("gyro_ball"), createMove("protect"), createMove("stealth_rock"), createMove("ingrain"), createMove("spikes"), createMove("vine_whip")],
         [createMove("curse"), createMove("gyro_ball"), createMove("power_whip"), createMove("bullet_seed"), createMove("iron_head"), createMove("payback"), createMove("poison_jab"), createMove("swords_dance"), createMove("seed_bomb"), createMove("metal_claw")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/ferrothorn.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/ferrothorn.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/ferrothorn.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/ferrothorn.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3611,7 +3700,7 @@ function Ferrothorn() {
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
     this.unlocked = physicalDamageTaken >= 15000;
     this.hint = "Take 15,000 physical damage\n" + physicalDamageTaken + "/15000";
-    this.cry = "resources/sounds/sfx/cries/ferrothorn.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/ferrothorn.ogg"
 }
 
 function Blissey() {
@@ -3631,8 +3720,8 @@ function Blissey() {
     this.movepool = ["echoed_voice", "soft_boiled", "heal_pulse", "toxic", "blizzard", "bubble_beam", "calm_mind", "charge_beam", "charm", "dazzling_gleam", "disarming_voice", "flamethrower", "focus_blast", "grass_knot", "heal_bell", "hyper_voice", "ice_beam", "life_dew", "metronome", "mimic", "protect", "psychic", "shadow_ball", "stealth_rock", "substitute", "thunderbolt", "thunder_wave", "toxic", "water_pulse", "wish", "rain_dance", "sunny_day", "hail", "sandstorm", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar"];
     this.opponentMoves =
         [[createMove("soft_boiled"), createMove("wish"), createMove("heal_pulse"), createMove("calm_mind"), createMove("charge_beam"), createMove("echoed_voice"), createMove("focus_blast"), createMove("hyper_voice"), createMove("toxic"), createMove("psychic")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/blissey.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/blissey.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/blissey.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/blissey.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3650,7 +3739,7 @@ function Blissey() {
     }
     this.unlocked = specialDamageTaken >= 15000;
     this.hint = "Take 15,000 special damage\n" + specialDamageTaken + "/15000";
-    this.cry = "resources/sounds/sfx/cries/blissey.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/blissey.ogg"
 }
 
 function Sableye() {
@@ -3671,8 +3760,8 @@ function Sableye() {
     this.opponentMoves =
         [[createMove("detect"), createMove("toxic"), createMove("will_o_wisp"), createMove("confuse_ray"), createMove("swagger"), createMove("hex"), createMove("foul_play"), createMove("flatter"), createMove("taunt"), createMove("disable")],
         [createMove("shadow_sneak"), createMove("will_o_wisp"), createMove("hex"), createMove("recover"), createMove("dark_pulse"), createMove("metronome"), createMove("psych_up"), createMove("payback"), createMove("seismic_toss"), createMove("snarl")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/sableye.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/sableye.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/sableye.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/sableye.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3688,7 +3777,7 @@ function Sableye() {
     }
     this.unlocked = statusMovesUsed >= 150;
     this.hint = "Use 150 status moves\n" + statusMovesUsed + "/150";
-    this.cry = "resources/sounds/sfx/cries/sableye.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/sableye.ogg"
 }
 
 function Scizor() {
@@ -3709,8 +3798,8 @@ function Scizor() {
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("metal_claw"), createMove("bullet_punch"), createMove("iron_defense"), createMove("iron_head"), createMove("steel_wing"), createMove("x_scissor"), createMove("fury_cutter"), createMove("wing_attack"), createMove("slash")],
         [createMove("swords_dance"), createMove("fury_cutter"), createMove("u_turn"), createMove("bug_bite"), createMove("x_scissor"), createMove("metal_claw"), createMove("roost"), createMove("dual_wingbeat"), createMove("night_slash"), createMove("psycho_cut")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/scizor.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/scizor.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/scizor.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/scizor.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3722,7 +3811,7 @@ function Scizor() {
     this.boost = function (move) { return 1 + .2 * (move.bp > 0 && move.cost <= 1); }
     this.unlocked = damageDealt >= 50000;
     this.hint = "Deal 50,000 damage\n" + damageDealt + "/50000";
-    this.cry = "resources/sounds/sfx/cries/scizor.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/scizor.ogg"
 }
 
 function Aegislash() {
@@ -3743,8 +3832,8 @@ function Aegislash() {
     this.opponentMoves =
         [[createMove("kings_shield"), createMove("kings_shield"), createMove("swords_dance"), createMove("metal_claw"), createMove("shadow_sneak"), createMove("sacred_sword"), createMove("gyro_ball"), createMove("iron_head"), createMove("shadow_claw"), createMove("rock_slide")],
         [createMove("kings_shield"), createMove("kings_shield"), createMove("flash_cannon"), createMove("flash_cannon"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("metal_sound"), createMove("shock_wave"), createMove("air_slash"), createMove("magnet_rise")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3764,7 +3853,7 @@ function Aegislash() {
     }
     this.unlocked = blockedHits >= 30;
     this.hint = "Block 30 attacks\n" + blockedHits + "/30";
-    this.cry = "resources/sounds/sfx/cries/aegislash.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/aegislash.ogg"
 }
 
 function switchAegislash(p, shield) {
@@ -3776,8 +3865,8 @@ function switchAegislash(p, shield) {
             temp = p.spattack;
             p.spattack = p.spdefense;
             p.spdefense = temp;
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash.gif';
             resizeSprites(true);
             p.stance = "shield";
             if (team[activePokemon] === p) {
@@ -3792,8 +3881,8 @@ function switchAegislash(p, shield) {
             temp = p.spattack;
             p.spattack = p.spdefense;
             p.spdefense = temp;
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
             resizeSprites(true);
             p.stance = "blade";
             if (team[activePokemon] === p) {
@@ -3823,8 +3912,8 @@ function Meowth() {
     this.opponentMoves =
         [[createMove("scratch"), createMove("fury_swipes"), createMove("fake_out"), createMove("bite"), createMove("flail"), createMove("gunk_shot"), createMove("hone_claws"), createMove("night_slash"), createMove("slash"), createMove("feint")],
         [createMove("nasty_plot"), createMove("charm"), createMove("dark_pulse"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("hypnosis"), createMove("thunderbolt"), createMove("water_pulse"), createMove("screech"), createMove("uproar")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/meowth.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/meowth.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/meowth.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/meowth.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3836,7 +3925,7 @@ function Meowth() {
     this.endBattle = function () { extraLoot += .1; }
     this.unlocked = earnedMoney >= 10000;
     this.hint = "Earn " + String.fromCharCode(08381) + "10,000\n" + earnedMoney + "/10000";
-    this.cry = "resources/sounds/sfx/cries/meowth.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/meowth.ogg"
 }
 
 function Metagross() {
@@ -3857,8 +3946,8 @@ function Metagross() {
     this.opponentMoves =
         [[createMove("gyro_ball"), createMove("metal_claw"), createMove("bullet_punch"), createMove("iron_defense"), createMove("iron_head"), createMove("meteor_mash"), createMove("zen_headbutt"), createMove("dynamic_punch"), createMove("body_press"), createMove("giga_impact")],
         [createMove("agility"), createMove("hammer_arm"), createMove("bullet_punch"), createMove("metal_claw"), createMove("zen_headbutt"), createMove("confusion"), createMove("earthquake"), createMove("magnet_rise"), createMove("psycho_cut"), createMove("psychic")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/metagross.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/metagross.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/metagross.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/metagross.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3877,7 +3966,7 @@ function Metagross() {
     }
     this.unlocked = drawnCards >= 1000;
     this.hint = "Draw 1,000 cards\n" + drawnCards + "/1000";
-    this.cry = "resources/sounds/sfx/cries/metagross.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/metagross.ogg"
 }
 
 function Weavile() {
@@ -3898,8 +3987,8 @@ function Weavile() {
     this.opponentMoves =
         [[createMove("ice_shard"), createMove("avalanche"), createMove("hail"), createMove("ice_punch"), createMove("icicle_crash"), createMove("icicle_spear"), createMove("triple_axel"), createMove("assurance"), createMove("foul_play"), createMove("night_slash")],
         [createMove("assurance"), createMove("bite"), createMove("fake_out"), createMove("fake_tears"), createMove("low_kick"), createMove("slash"), createMove("night_slash"), createMove("hone_claws"), createMove("icicle_spear"), createMove("ice_shard")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/weavile.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/weavile.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/weavile.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/weavile.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3911,7 +4000,7 @@ function Weavile() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
     this.unlocked = fastBoss >= 1;
     this.hint = "Defeat a boss in 3 turns or less";
-    this.cry = "resources/sounds/sfx/cries/weavile.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/weavile.ogg"
 }
 
 function Zeraora() {
@@ -3932,8 +4021,8 @@ function Zeraora() {
     this.opponentMoves =
         [[createMove("plasma_fists"), createMove("spark"), createMove("power_up_punch"), createMove("bulk_up"), createMove("blaze_kick"), createMove("throat_chop"), createMove("play_rough"), createMove("drain_punch"), createMove("thunder_punch"), createMove("wild_charge")],
         [createMove("volt_switch"), createMove("aura_sphere"), createMove("calm_mind"), createMove("charge"), createMove("discharge"), createMove("electro_ball"), createMove("electroweb"), createMove("focus_blast"), createMove("grass_knot"), createMove("thunderbolt")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/zeraora.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/zeraora.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/zeraora.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/zeraora.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3945,7 +4034,7 @@ function Zeraora() {
     this.init = function () { applyEffect("immunity", 1, this, "electric"); }
     this.unlocked = cardsPerTurn >= 8;
     this.hint = "Use 8 cards in a single turn\n" + cardsPerTurn + "/8";
-    this.cry = "resources/sounds/sfx/cries/zeraora.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/zeraora.ogg"
 }
 
 function Omanyte() {
@@ -3966,8 +4055,8 @@ function Omanyte() {
     this.opponentMoves =
         [[createMove("rain_dance"), createMove("water_gun"), createMove("ancient_power"), createMove("brine"), createMove("bubble_beam"), createMove("hydro_pump"), createMove("meteor_beam"), createMove("scald"), createMove("water_pulse"), createMove("stealth_rock")],
         [createMove("hail"), createMove("scald"), createMove("blizzard"), createMove("aurora_beam"), createMove("ice_beam"), createMove("icy_wind"), createMove("withdraw"), createMove("stealth_rock"), createMove("spikes"), createMove("ancient_power")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/omanyte.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/omanyte.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/omanyte.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/omanyte.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -3982,7 +4071,7 @@ function Omanyte() {
     }
     this.unlocked = helixQuest >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/omanyte.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/omanyte.ogg"
 }
 
 function Tyranitar() {
@@ -4003,8 +4092,8 @@ function Tyranitar() {
     this.opponentMoves =
         [[createMove("sandstorm"), createMove("rock_throw"), createMove("dragon_dance"), createMove("rock_slide"), createMove("stone_edge"), createMove("rock_blast"), createMove("rock_tomb"), createMove("stealth_rock"), createMove("crunch"), createMove("stomping_tantrum")],
         [createMove("sandstorm"), createMove("payback"), createMove("assurance"), createMove("brutal_swing"), createMove("crunch"), createMove("hone_claws"), createMove("stone_edge"), createMove("rock_blast"), createMove("earthquake"), createMove("bite")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/tyranitar.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/tyranitar.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/tyranitar.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/tyranitar.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4016,7 +4105,7 @@ function Tyranitar() {
     this.init = function () { setWeather("sandstorm", 10); }
     this.unlocked = sandstormDamage >= 300;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/tyranitar.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/tyranitar.ogg"
 }
 
 function Gyarados() {
@@ -4037,8 +4126,8 @@ function Gyarados() {
     this.opponentMoves =
         [[createMove("rain_dance"), createMove("waterfall"), createMove("aqua_tail"), createMove("dive"), createMove("dragon_dance"), createMove("flail"), createMove("power_whip"), createMove("bounce"), createMove("ice_fang"), createMove("thrash")],
         [createMove("aqua_tail"), createMove("dive"), createMove("bounce"), createMove("dragon_dance"), createMove("dragon_tail"), createMove("scale_shot"), createMove("crunch"), createMove("earthquake"), createMove("bulldoze"), createMove("rock_smash")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/gyarados.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/gyarados.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/gyarados.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/gyarados.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4050,7 +4139,7 @@ function Gyarados() {
     this.endBattle = function () { this.attack *= 1.01; }
     this.unlocked = survive1hp >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/gyarados.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/gyarados.ogg"
 }
 
 function Ditto() {
@@ -4068,8 +4157,8 @@ function Ditto() {
     this.types = ["normal"];
     this.moves = [createMove("struggle")];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/ditto.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/ditto.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/ditto.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/ditto.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4093,11 +4182,11 @@ function Ditto() {
     }
     this.endBattle = function () {
         this.moves = [createMove("struggle")];
-        this.imgb = 'resources/sprites/pokemon_battle_icons/back/ditto.gif';
+        this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/ditto.gif';
     }
     this.unlocked = unlockedPokemon >= 10;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/ditto.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/ditto.ogg"
 }
 
 function Mew() {
@@ -4116,8 +4205,8 @@ function Mew() {
     this.moves = [createMove("aura_sphere"), createMove("psychic"), createMove("ancient_power"), createMove("metronome"), createMove("nasty_plot"), createMove("life_dew")];
     this.movepool = movesList;
     this.opponentMoves = [[]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/mew.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/mew.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mew.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mew.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4135,7 +4224,7 @@ function Mew() {
     }
     this.unlocked = transforms >= 50;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/mew.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/mew.ogg"
 }
 
 function Urshifu() {
@@ -4156,8 +4245,8 @@ function Urshifu() {
     this.opponentMoves =
         [[createMove("wicked_blow"), createMove("sucker_punch"), createMove("assurance"), createMove("crunch"), createMove("foul_play"), createMove("darkest_lariat"), createMove("bulk_up"), createMove("drain_punch"), createMove("zen_headbutt"), createMove("rock_smash")],
         [createMove("surging_strikes"), createMove("aqua_jet"), createMove("rock_smash"), createMove("bulk_up"), createMove("brick_break"), createMove("close_combat"), createMove("drain_punch"), createMove("poison_jab"), createMove("revenge"), createMove("stone_edge")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/urshifu.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/urshifu.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/urshifu.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/urshifu.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4168,7 +4257,7 @@ function Urshifu() {
     this.talentDesc = "This Pokémon's attacks ignore protections."
     this.unlocked = flawlessKO >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/urshifu.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/urshifu.ogg"
 }
 
 function Gengar() {
@@ -4189,8 +4278,8 @@ function Gengar() {
     this.opponentMoves =
         [[createMove("shadow_ball"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("dark_pulse"), createMove("hex"), createMove("hex"), createMove("sludge_bomb"), createMove("toxic"), createMove("will_o_wisp")],
         [createMove("shadow_ball"), createMove("nasty_plot"), createMove("sludge_wave"), createMove("sludge_bomb"), createMove("toxic"), createMove("focus_blast"), createMove("giga_drain"), createMove("thunderbolt"), createMove("dazzling_gleam"), createMove("clear_smog")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/gengar.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/gengar.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/gengar.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/gengar.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4202,7 +4291,7 @@ function Gengar() {
     this.init = function () { applyEffect("levitation", 99, this); }
     this.unlocked = area1loss >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/gengar.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/gengar.ogg"
 }
 
 function Shuckle() {
@@ -4222,8 +4311,8 @@ function Shuckle() {
     this.movepool = ["rollout", "struggle_bug", "sticky_web", "rest", "ancient_power", "curse", "iron_defense", "mimic", "protect", "rock_polish", "sandstorm", "stealth_rock", "string_shot", "substitute", "swagger", "toxic", "withdraw", "acupressure", "bind", "infestation", "skitter_smack"];
     this.opponentMoves =
         [[createMove("struggle_bug"), createMove("rollout"), createMove("sticky_web"), createMove("rock_polish"), createMove("sandstorm"), createMove("string_shot"), createMove("swagger"), createMove("stealth_rock"), createMove("infestation"), createMove("rest")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/shuckle.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/shuckle.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/shuckle.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/shuckle.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4234,7 +4323,7 @@ function Shuckle() {
     this.talentDesc = "This Pokémon cannot be knocked out unless at 1HP already."
     this.unlocked = maxRound >= 20;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/shuckle.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/shuckle.ogg"
 }
 
 function Mimikyu() {
@@ -4255,8 +4344,8 @@ function Mimikyu() {
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("play_rough"), createMove("shadow_claw"), createMove("bulk_up"), createMove("drain_punch"), createMove("leech_life"), createMove("wood_hammer"), createMove("phantom_force"), createMove("astonish"), createMove("feint_attack")],
         [createMove("swords_dance"), createMove("play_rough"), createMove("shadow_claw"), createMove("curse"), createMove("charm"), createMove("spite"), createMove("x_scissor"), createMove("drain_punch"), createMove("payback"), createMove("hone_claws")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4272,14 +4361,14 @@ function Mimikyu() {
     }
     this.unlocked = pikachuVictory >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/mimikyu.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/mimikyu.ogg"
 }
 
 function switchMimikyu(p, disguise) {
     if (p.name === "Mimikyu") {
         if (disguise && !p.disguise) {
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
             resizeSprites(true);
             p.disguise = true;
             if (team[activePokemon] === p) {
@@ -4288,8 +4377,8 @@ function switchMimikyu(p, disguise) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
         } else if (!disguise && p.disguise) {
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
             resizeSprites(true);
             p.disguise = false;
             if (team[activePokemon] === p) {
@@ -4319,8 +4408,8 @@ function Mamoswine() {
     this.opponentMoves =
         [[createMove("hail"), createMove("ice_shard"), createMove("avalanche"), createMove("icicle_crash"), createMove("icicle_spear"), createMove("earthquake"), createMove("giga_impact"), createMove("double_edge"), createMove("bulldoze"), createMove("body_press")],
         [createMove("sandstorm"), createMove("earthquake"), createMove("bulldoze"), createMove("sand_tomb"), createMove("stomping_tantrum"), createMove("high_horsepower"), createMove("stone_edge"), createMove("rock_blast"), createMove("rock_slide"), createMove("icicle_crash")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/mamoswine.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/mamoswine.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mamoswine.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mamoswine.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4332,7 +4421,7 @@ function Mamoswine() {
     this.init = function () { applyEffect("thick_fat", 1, this); }
     this.unlocked = rockIceKO >= 1;
     this.hint = "???";
-    this.cry = "resources/sounds/sfx/cries/mamoswine.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/mamoswine.ogg"
 }
 
 function Darmanitan() {
@@ -4354,8 +4443,8 @@ function Darmanitan() {
     this.movepool2 = ["ember", "fire_blast", "fire_spin", "flamethrower", "focus_blast", "future_sight", "grass_knot", "heat_wave", "mystical_fire", "overheat", "psychic", "rest", "solar_beam", "uproar", "hidden_power", "hyper_beam", "burning_jealousy", "extrasensory"];
     this.opponentMoves = [[createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("bite"), createMove("rock_tomb"), createMove("hammer_arm"), createMove("earthquake"), createMove("stone_edge"), createMove("zen_headbutt"), createMove("body_slam")]];
     this.opponentMoves2 = [[createMove("ember"), createMove("fire_blast"), createMove("future_sight"), createMove("psychic"), createMove("extrasensory"), createMove("rest"), createMove("solar_beam"), createMove("burning_jealousy"), createMove("hidden_power"), createMove("focus_blast")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4388,14 +4477,14 @@ function Darmanitan() {
     }
     this.unlocked = recoilMoves >= 30;
     this.hint = "Use 30 moves with recoil\n" + recoilMoves + "/30";
-    this.cry = "resources/sounds/sfx/cries/darmanitan.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/darmanitan.ogg"
 }
 
 function switchDarmanitan(p, zen) {
     if (p.name === "Darmanitan") {
         if (zen && !p.zen) {
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
             resizeSprites(true);
             p.types = ["fire", "psychic"];
             if (team[activePokemon] === p) {
@@ -4410,8 +4499,8 @@ function switchDarmanitan(p, zen) {
             p.speed *= 11 / 19;
             p.zen = true;
         } else {
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
             resizeSprites(true);
             p.types = ["fire"];
             if (team[activePokemon] === p) {
@@ -4459,8 +4548,8 @@ function Rotom() {
         [createMove("overheat"), createMove("overheat"), createMove("overheat"), createMove("thunderbolt"), createMove("nasty_plot"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("nasty_plot")],
         [createMove("leaf_storm"), createMove("leaf_storm"), createMove("leaf_storm"), createMove("thunderbolt"), createMove("nasty_plot"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("nasty_plot")],
         [createMove("hydro_pump"), createMove("hydro_pump"), createMove("hydro_pump"), createMove("thunderbolt"), createMove("thunder"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("shock_wave")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4476,45 +4565,45 @@ function Rotom() {
     }
     this.unlocked = bossesDefeated >= 10;
     this.hint = "Defeat 10 bosses\n" + bossesDefeated + "/10";
-    this.cry = "resources/sounds/sfx/cries/rotom.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/rotom.ogg"
 }
 
 function switchRotom(p, move) {
     if (p.name === "Rotom" && !contains(p.types, move.type)) {
         switch (move.type) {
             case "ghost":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom.gif';
                 resizeSprites(true);
                 p.types = ["electric", "ghost"];
                 break;
             case "flying":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
                 resizeSprites(true);
                 p.types = ["electric", "flying"];
                 break;
             case "ice":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
                 resizeSprites(true);
                 p.types = ["electric", "ice"];
                 break;
             case "fire":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
                 resizeSprites(true);
                 p.types = ["electric", "fire"];
                 break;
             case "grass":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
                 resizeSprites(true);
                 p.types = ["electric", "grass"];
                 break;
             case "water":
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
                 resizeSprites(true);
                 p.types = ["electric", "fire"];
                 break;
@@ -4542,8 +4631,8 @@ function Castform() {
         [[createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("rain_dance"), createMove("hydro_pump"), createMove("thunder"), createMove("thunderbolt"), createMove("water_pulse"), createMove("hurricane"), createMove("scald")],
         [createMove("weather_ball"), createMove("weather_ball"), createMove("sunny_day"), createMove("sunny_day"), createMove("fire_blast"), createMove("ember"), createMove("flamethrower"), createMove("solar_beam"), createMove("energy_ball"), createMove("defog")],
         [createMove("weather_ball"), createMove("weather_ball"), createMove("hail"), createMove("hail"), createMove("blizzard"), createMove("ice_beam"), createMove("icy_wind"), createMove("avalanche"), createMove("blizzard"), createMove("defog")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4555,38 +4644,38 @@ function Castform() {
     this.talentDesc = "Changes form depending on the current weather."
     this.unlocked = weatherChanged >= 50;
     this.hint = "Change the weather 50 times\n" + weatherChanged + "/50";
-    this.cry = "resources/sounds/sfx/cries/castform.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/castform.ogg"
 }
 
 function switchCastform(p) {
     if (p.name === "Castform") {
         if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
-            p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
-            p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
             resizeSprites(true);
             p.types = ["normal"];
         } else if (weather != undefined) {
             switch (weather.name) {
                 case "Sun":
                     if (!contains(p.types, "fire")) {
-                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
-                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
+                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
+                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
                         resizeSprites(true);
                         p.types = ["fire"];
                     }
                     break;
                 case "Rain":
                     if (!contains(p.types, "water")) {
-                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
-                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
+                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
+                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
                         resizeSprites(true);
                         p.types = ["water"];
                     }
                     break;
                 case "Hail":
                     if (!contains(p.types, "ice")) {
-                        p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
-                        p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
+                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
+                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
                         resizeSprites(true);
                         p.types = ["ice"];
                     }
@@ -4615,8 +4704,8 @@ function KommoO() {
     this.opponentMoves =
         [[createMove("clangorous_soul"), createMove("clanging_scales"), createMove("clanging_scales"), createMove("boomburst"), createMove("focus_blast"), createMove("aura_sphere"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("dragon_pulse"), createMove("aura_sphere")],
         [createMove("bulk_up"), createMove("dragon_dance"), createMove("close_combat"), createMove("drain_punch"), createMove("brick_break"), createMove("dragon_claw"), createMove("dragon_tail"), createMove("dual_chop"), createMove("rock_slide"), createMove("poison_jab")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/kommo-o.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/kommo-o.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/kommo-o.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/kommo-o.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4627,7 +4716,7 @@ function KommoO() {
     this.talentDesc = "Immunity to ballistic moves."
     this.unlocked = statRaised >= 100;
     this.hint = "Raise any stat 100 times\n" + statRaised + "/100";
-    this.cry = "resources/sounds/sfx/cries/kommo-o.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/kommo-o.ogg"
 }
 
 function Nidoking() {
@@ -4649,8 +4738,8 @@ function Nidoking() {
     this.opponentMoves =
         [[createMove("poison_jab"), createMove("toxic_spikes"), createMove("toxic"), createMove("poison_tail"), createMove("poison_sting"), createMove("venoshock"), createMove("venom_drench"), createMove("earthquake"), createMove("earth_power"), createMove("flamethrower")],
         [createMove("earthquake"), createMove("drill_run"), createMove("earth_power"), createMove("stomping_tantrum"), createMove("scorching_sands"), createMove("stealth_rock"), createMove("sandstorm"), createMove("stone_edge"), createMove("rock_slide"), createMove("ice_beam")]];
-    this.imgf = this.gender ? 'resources/sprites/pokemon_battle_icons/front/nidoking.gif' : 'resources/sprites/pokemon_battle_icons/front/nidoqueen.gif';
-    this.imgb = this.gender ? 'resources/sprites/pokemon_battle_icons/back/nidoking.gif' : 'resources/sprites/pokemon_battle_icons/back/nidoqueen.gif';
+    this.imgf = this.gender ? 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/nidoking.gif' : 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/nidoqueen.gif';
+    this.imgb = this.gender ? 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/nidoking.gif' : 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/nidoqueen.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4662,7 +4751,7 @@ function Nidoking() {
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("poison", 6, pD); }
     this.unlocked = statRaised >= 100;
     this.hint = "Apply 300 poison stacks to foes\n" + poisonApplied + "/300";
-    this.cry = this.gender ? "resources/sounds/sfx/cries/nidoking.ogg" : "resources/sounds/sfx/cries/nidoqueen.ogg"
+    this.cry = this.gender ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/nidoking.ogg" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/nidoqueen.ogg"
 }
 
 function Whimsicott() {
@@ -4683,8 +4772,8 @@ function Whimsicott() {
     this.opponentMoves =
         [[createMove("absorb"), createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("solar_beam"), createMove("sunny_day"), createMove("growth"), createMove("leech_seed"), createMove("charm"), createMove("fake_tears")],
         [createMove("mega_drain"), createMove("energy_ball"), createMove("sunny_day"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("fairy_wind"), createMove("grass_whistle"), createMove("stun_spore"), createMove("play_rough"), createMove("taunt")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/whimsicott.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/whimsicott.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/whimsicott.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/whimsicott.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4700,7 +4789,7 @@ function Whimsicott() {
     }
     this.unlocked = loweredStats >= 50;
     this.hint = "Lower the stats of foes 50 times\n" + loweredStats + "/50";
-    this.cry = "resources/sounds/sfx/cries/whimsicott.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/whimsicott.ogg"
 }
 
 function AlolanNinetales() {
@@ -4721,8 +4810,8 @@ function AlolanNinetales() {
     this.opponentMoves =
         [[createMove("hail"), createMove("blizzard"), createMove("aurora_beam"), createMove("icy_wind"), createMove("ice_beam"), createMove("frost_breath"), createMove("freeze_dry"), createMove("moonblast"), createMove("extrasensory"), createMove("nasty_plot")],
         [createMove("blizzard"), createMove("frost_breath"), createMove("weather_ball"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("hex"), createMove("dark_pulse")]];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/ninetales_alola.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/ninetales_alola.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/ninetales_alola.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/ninetales_alola.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4734,7 +4823,7 @@ function AlolanNinetales() {
     this.init = function () { setWeather("hail", 10); }
     this.unlocked = hailStarted >= 10;
     this.hint = "Make the hail fall 10 times\n" + hailStarted + "/10";
-    this.cry = "resources/sounds/sfx/cries/ninetales_alola.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/ninetales_alola.ogg"
 }
 
 
@@ -4753,8 +4842,8 @@ function Arceus() {
     this.moves = [];
     this.opponentMoves = [[createMove("judgment"), createMove("judgment"), createMove("hyper_beam"), createMove("extreme_speed"), createMove("extreme_speed"), createMove("ancient_power"), createMove("shadow_claw"), createMove("earth_power"), createMove("calm_mind"), createMove("swords_dance")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/arceus.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/arceus.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/arceus.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/arceus.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4769,7 +4858,7 @@ function Arceus() {
         removeEffect(this, "Type changed");
         applyEffect("type_changed", 1, this, this.types[0]);
     }
-    this.cry = "resources/sounds/sfx/cries/arceus.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/arceus.ogg"
 }
 
 function Heatran() {
@@ -4786,8 +4875,8 @@ function Heatran() {
     this.moves = [];
     this.opponentMoves = [[createMove("magma_storm"), createMove("sunny_day"), createMove("solar_beam"), createMove("lava_plume"), createMove("flash_cannon"), createMove("flash_cannon"), createMove("earth_power"), createMove("will_o_wisp"), createMove("fire_blast"), createMove("stone_edge")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/heatran.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/heatran.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/heatran.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/heatran.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4797,7 +4886,7 @@ function Heatran() {
     this.talent = "Flash fire";
     this.talentDesc = "Immunity to fire type moves.";
     this.init = function () { applyEffect("immunity", 1, this, "fire"); }
-    this.cry = "resources/sounds/sfx/cries/heatran.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/heatran.ogg"
 }
 
 function Mewtwo() {
@@ -4814,8 +4903,8 @@ function Mewtwo() {
     this.moves = [];
     this.opponentMoves = [[createMove("psystrike"), createMove("psystrike"), createMove("psychic"), createMove("fire_blast"), createMove("ice_beam"), createMove("focus_blast"), createMove("nasty_plot"), createMove("calm_mind"), createMove("energy_ball"), createMove("shadow_ball")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/mewtwo.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/mewtwo.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mewtwo.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mewtwo.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4825,7 +4914,7 @@ function Mewtwo() {
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
-    this.cry = "resources/sounds/sfx/cries/mewtwo.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/mewtwo.ogg"
 }
 
 function Hoopa() {
@@ -4842,8 +4931,8 @@ function Hoopa() {
     this.moves = [];
     this.opponentMoves = [[createMove("nasty_plot"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("hyperspace_hole"), createMove("focus_blast"), createMove("thunderbolt"), createMove("substitute"), createMove("hyperspace_hole"), createMove("grass_knot"), createMove("psychic")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/hoopa.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/hoopa.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4853,13 +4942,13 @@ function Hoopa() {
     this.talent = "Confined"
     this.talentDesc = "Breaks free after 3 turns."
     this.init = function () { applyEffect("confined", 3, this); }
-    this.cry = "resources/sounds/sfx/cries/hoopa.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/hoopa.ogg"
 }
 
 function switchHoopa(p) {
     if (p.name === "Hoopa") {
-        p.imgf = 'resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
-        p.imgb = 'resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
+        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
+        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
         resizeSprites(true);
         p.types = ["psychic", "dark"];
         if (team[activePokemon] === p) {
@@ -4892,8 +4981,8 @@ function Groudon() {
     this.moves = [];
     this.opponentMoves = [[createMove("swords_dance"), createMove("precipice_blades"), createMove("precipice_blades"), createMove("stone_edge"), createMove("rock_tomb"), createMove("heat_crash"), createMove("heat_crash"), createMove("rock_polish"), createMove("bulldoze"), createMove("rock_smash")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/groudon.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/groudon.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/groudon.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/groudon.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4903,7 +4992,7 @@ function Groudon() {
     this.talent = "Drought"
     this.talentDesc = "Changes the weather to sun at the beginning of the battle."
     this.init = function () { setWeather("sun", 99); }
-    this.cry = "resources/sounds/sfx/cries/groudon.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/groudon.ogg"
 }
 
 function Kyogre() {
@@ -4920,8 +5009,8 @@ function Kyogre() {
     this.moves = [];
     this.opponentMoves = [[createMove("calm_mind"), createMove("origin_pulse"), createMove("origin_pulse"), createMove("water_spout"), createMove("ice_beam"), createMove("ice_beam"), createMove("thunder"), createMove("scald"), createMove("hydro_pump"), createMove("thunder")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/kyogre.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/kyogre.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/kyogre.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/kyogre.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4931,7 +5020,7 @@ function Kyogre() {
     this.talent = "Drizzle"
     this.talentDesc = "Changes the weather to rain at the beginning of the battle."
     this.init = function () { setWeather("rain", 99); }
-    this.cry = "resources/sounds/sfx/cries/kyogre.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/kyogre.ogg"
 }
 
 function Rayquaza() {
@@ -4948,8 +5037,8 @@ function Rayquaza() {
     this.moves = [];
     this.opponentMoves = [[createMove("dragon_ascent"), createMove("dragon_ascent"), createMove("v_create"), createMove("haze"), createMove("extreme_speed"), createMove("earthquake"), createMove("dragon_claw"), createMove("draco_meteor"), createMove("dragon_dance"), createMove("scale_shot")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/rayquaza.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/rayquaza.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rayquaza.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rayquaza.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4959,7 +5048,7 @@ function Rayquaza() {
     this.talent = "Air lock"
     this.talentDesc = "Prevents weather changes."
     this.init = function () { setWeather("air_lock", 99); }
-    this.cry = "resources/sounds/sfx/cries/rayquaza.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/rayquaza.ogg"
 }
 
 function Giratina() {
@@ -4976,8 +5065,8 @@ function Giratina() {
     this.moves = [];
     this.opponentMoves = [[createMove("will_o_wisp"), createMove("hex"), createMove("shadow_force"), createMove("shadow_claw"), createMove("draco_meteor"), createMove("shadow_force"), createMove("dragon_claw"), createMove("dragon_claw"), createMove("dragon_tail"), createMove("steel_wing")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/giratina.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/giratina.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/giratina.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/giratina.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -4991,13 +5080,13 @@ function Giratina() {
         if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1);
         if (this.currenthp < .5 * this.maxhp && !this.origin) switchGiratina(this);
     }
-    this.cry = "resources/sounds/sfx/cries/giratina.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/giratina.ogg"
 }
 
 function switchGiratina(p) {
     if (p.name === "Giratina") {
-        p.imgf = 'resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
-        p.imgb = 'resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
+        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
+        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
         if (team[activePokemon] === p) {
             document.getElementById("leftSprite").src = p.imgb;
         } else if (opponent === p) {
@@ -5033,8 +5122,8 @@ function Eternatus() {
     this.moves = [];
     this.opponentMoves = [[createMove("sludge_bomb"), createMove("sludge_wave"), createMove("toxic"), createMove("toxic"), createMove("venoshock"), createMove("eternabeam"), createMove("dynamax_cannon"), createMove("dragon_pulse"), createMove("flamethrower"), createMove("shadow_ball")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/eternatus.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/eternatus.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/eternatus.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/eternatus.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -5044,7 +5133,7 @@ function Eternatus() {
     this.talent = "Pressure"
     this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
-    this.cry = "resources/sounds/sfx/cries/eternatus.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/eternatus.ogg"
 }
 
 function Regigigas() {
@@ -5061,8 +5150,8 @@ function Regigigas() {
     this.moves = [];
     this.opponentMoves = [[createMove("crush_grip"), createMove("crush_grip"), createMove("body_slam"), createMove("body_slam"), createMove("drain_punch"), createMove("brick_break"), createMove("darkest_lariat"), createMove("payback"), createMove("high_horsepower"), createMove("smack_down")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/regigigas.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/regigigas.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/regigigas.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/regigigas.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -5074,7 +5163,7 @@ function Regigigas() {
     this.talentDesc = "Reduced attack at the beginning of the battle."
     this.boost = function (move) { return 1 - .4 * (this.slowStart && move.cat === "physical"); }
     this.init = function (move, pD) { applyEffect("slow_start", 3, this); }
-    this.cry = "resources/sounds/sfx/cries/regigigas.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/regigigas.ogg"
 }
 
 function Diancie() {
@@ -5091,8 +5180,8 @@ function Diancie() {
     this.moves = [];
     this.opponentMoves = [[createMove("diamond_storm"), createMove("diamond_storm"), createMove("body_press"), createMove("body_press"), createMove("moonblast"), createMove("moonblast"), createMove("sandstorm"), createMove("rock_polish"), createMove("power_gem"), createMove("draining_kiss")]];
     this.movepool = ["struggle"];
-    this.imgf = 'resources/sprites/pokemon_battle_icons/front/diancie.gif';
-    this.imgb = 'resources/sprites/pokemon_battle_icons/back/diancie.gif';
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/diancie.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/diancie.gif';
     this.effects = [];
     this.statchanges = new StatChanges();
     this.draw = [];
@@ -5109,7 +5198,7 @@ function Diancie() {
         this.statchanges.speed = Math.max(0, this.statchanges.speed);
         drawStats(contains(team, this));
     }
-    this.cry = "resources/sounds/sfx/cries/diancie.ogg"
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/diancie.ogg"
 }
 
 function StatChanges() {
@@ -10316,7 +10405,7 @@ function WeatherBall() {
             else if (weather.name === "Sun") this.type = "fire";
             else if (weather.name === "Hail") this.type = "ice";
             else if (weather.name === "Sandstorm") this.type = "rock";
-            this.bp = 140;
+            this.bp = 120;
         } else {
             this.type = "normal";
             this.bp = 70;
@@ -10588,7 +10677,7 @@ function removeEffect(p, name) {
 function Burn(stacks) {
     this.name = "Burn";
     this.description = "Burn\nPhysical damage reduced by 40%. Remove 1 stack at the end of each turn.";
-    this.icon = 'resources/sprites/effect_icons/burn.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/burn.png';
     this.stacks = stacks;
     this.immune = ["fire"];
     this.effect = (pA, pD) => { this.stacks--; };
@@ -10597,7 +10686,7 @@ function Burn(stacks) {
 function ChargeE(stacks) {
     this.name = "Charge";
     this.description = "Charge\nIncreases the damage of eletric type moves. Remove 1 stack at the end of each turn.";
-    this.icon = 'resources/sprites/effect_icons/charge.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/charge.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
 }
@@ -10605,7 +10694,7 @@ function ChargeE(stacks) {
 function Confined(stacks) {
     this.name = "Confined";
     this.description = "Confined\nTries to break free from its prison bottle...";
-    this.icon = 'resources/sprites/effect_icons/confined.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/confined.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         this.stacks--;
@@ -10617,7 +10706,7 @@ function Confined(stacks) {
 function ConfusionE(stacks) {
     this.name = "Confusion";
     this.description = "Confusion\nNullify next attack's effects, then remove 1 stack. Take small physical damage.";
-    this.icon = 'resources/sprites/effect_icons/confusion.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/confusion.png';
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " hurt itself in confusion!<br/>"
@@ -10630,7 +10719,7 @@ function ConfusionE(stacks) {
 function CurseE(stacks) {
     this.name = "Curse";
     this.description = "Curse\nTake 30 damage at the end of each round.";
-    this.icon = 'resources/sprites/effect_icons/curse.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/curse.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { dealDamage(30, pA); };
 }
@@ -10638,7 +10727,7 @@ function CurseE(stacks) {
 function Disguise(stacks) {
     this.name = "Disguise";
     this.description = "Disguise\nCancel next attack targetting this Pokémon.";
-    this.icon = 'resources/sprites/effect_icons/shield.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
     this.effect = (pA, pD) => { };
@@ -10653,7 +10742,7 @@ function Disguise(stacks) {
 function ExtraDraw(stacks) {
     this.name = "Extra Draw";
     this.description = "Extra Draw\nDraw an extra card for each stack at the beginning of the turn.";
-    this.icon = 'resources/sprites/ui_icons/deck.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/deck.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { };
 }
@@ -10661,7 +10750,7 @@ function ExtraDraw(stacks) {
 function Fear(stacks) {
     this.name = "Fear";
     this.description = "Fear\nNullify next attack's effects, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/fear.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/fear.webp';
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " has flinched!<br/>"
@@ -10671,7 +10760,7 @@ function Fear(stacks) {
 function Freeze(stacks) {
     this.name = "Freeze";
     this.description = "Freeze\nNullify next attack's effects, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/freeze.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/freeze.webp';
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " is frozen solid!<br/>"
@@ -10682,7 +10771,7 @@ function Freeze(stacks) {
 function Grounded(stacks) {
     this.name = "Grounded";
     this.description = "Grounded";
-    this.icon = 'resources/sprites/ui_icons/debuff.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/debuff.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { };
 }
@@ -10690,7 +10779,7 @@ function Grounded(stacks) {
 function Immunity(stacks, type) {
     this.name = "Immunity (" + type + ")";
     this.description = "Immunity (" + type + ")\nImmune to " + type + " type moves.";
-    this.icon = 'resources/sprites/effect_icons/immunity.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/immunity.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { };
 }
@@ -10698,7 +10787,7 @@ function Immunity(stacks, type) {
 function IngrainE(stacks) {
     this.name = "Ingrain";
     this.description = "Ingrain\nRestore 20HP at the end of each turn.";
-    this.icon = 'resources/sprites/effect_icons/ingrain.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/ingrain.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { dealDamage(-20, pA); };
 }
@@ -10706,7 +10795,7 @@ function IngrainE(stacks) {
 function KingsProtection(stacks) {
     this.name = "King's Protection";
     this.description = "King's Protection\nCancel next attack targetting this Pokémon. Attackers making contact have their attack lowered by one stage.";
-    this.icon = 'resources/sprites/effect_icons/shield.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
     this.effect = (pA, pD) => { };
@@ -10720,7 +10809,7 @@ function KingsProtection(stacks) {
 function Levitation(stacks) {
     this.name = "Levitation";
     this.description = "Levitation\nImmunity to ground type moves and ground related effects.";
-    this.icon = 'resources/sprites/effect_icons/levitation.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/levitation.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
 }
@@ -10728,7 +10817,7 @@ function Levitation(stacks) {
 function Paralysis(stacks) {
     this.name = "Paralysis";
     this.description = "Paralysis\nNullify next attack's effects, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/paralysis.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/paralysis.png';
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " is paralyzed and cannot move!<br/>"
@@ -10739,7 +10828,7 @@ function Paralysis(stacks) {
 function Poison(stacks) {
     this.name = "Poison";
     this.description = "Poison\nTake 4 damage per stack at the end of the turn, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/poison.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/poison.webp';
     this.stacks = stacks;
     this.immune = ["steel", "poison"];
     this.effect = (pA, pD) => {
@@ -10751,7 +10840,7 @@ function Poison(stacks) {
 function Protection(stacks) {
     this.name = "Protection";
     this.description = "Protection\nCancel next attack targetting this Pokémon.";
-    this.icon = 'resources/sprites/effect_icons/shield.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
     this.effect = (pA, pD) => { };
@@ -10763,7 +10852,7 @@ function Protection(stacks) {
 function Seed(stacks) {
     this.name = "Leech Seed";
     this.description = "Leech Seed\nTransfer 15HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/seed.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/seed.png';
     this.stacks = stacks;
     this.immune = ["grass"];
     this.effect = (pA, pD) => {
@@ -10776,7 +10865,7 @@ function Seed(stacks) {
 function Sleep(stacks) {
     this.name = "Sleep";
     this.description = "Sleep\nNullify next attack's effects, then remove 1 stack.";
-    this.icon = 'resources/sprites/effect_icons/sleep.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/sleep.png';
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " is fast asleep!<br/>"
@@ -10786,7 +10875,7 @@ function Sleep(stacks) {
 function SlowStart(stacks) {
     this.name = "Slow Start";
     this.description = "Slow Start\nPhysical damage reduced by 40%.";
-    this.icon = 'resources/sprites/effect_icons/slow_start.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/slow_start.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         this.stacks--;
@@ -10798,7 +10887,7 @@ function SlowStart(stacks) {
 function SpikesE(stacks) {
     this.name = "Spikes";
     this.description = "Spikes\nDeals 10 damage at the end of the turn. Airborne Pokémon are immune.";
-    this.icon = 'resources/sprites/effect_icons/spike.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/spike.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         if (isGrounded(pA))
@@ -10809,7 +10898,7 @@ function SpikesE(stacks) {
 function StealthRockE(stacks) {
     this.name = "Stealth Rock";
     this.description = "Stealth Rock\nDeals 20 rock type damage at the end of each turn.";
-    this.icon = 'resources/sprites/effect_icons/stealth_rock.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/stealth_rock.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         dealDamage(20 * effectiveMultiplier(new RockThrow(), pA), pA);
@@ -10819,7 +10908,7 @@ function StealthRockE(stacks) {
 function StickyWebE(stacks) {
     this.name = "Sticky Web";
     this.description = "Sticky Web\nLower speed by one stage at the end of each turn if it hasn't been lowered already. Airborne Pokémon are immune.";
-    this.icon = 'resources/sprites/effect_icons/sticky_web.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/sticky_web.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         if (pA.statchanges.speed >= 0 && isGrounded(pA))
@@ -10830,7 +10919,7 @@ function StickyWebE(stacks) {
 function TauntE(stacks) {
     this.name = "Taunt";
     this.description = "Taunt\nPrevents the use of status moves.";
-    this.icon = 'resources/sprites/effect_icons/taunt.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/taunt.webp';
     this.stacks = stacks;
     this.specialMessage = " can't use non damaging moves after the taunt!<br/>"
     this.effect = (pA, pD) => { this.stacks--; };
@@ -10839,7 +10928,7 @@ function TauntE(stacks) {
 function ThickFat(stacks) {
     this.name = "Thick Fat";
     this.description = "Thick Fat\nLowers the damage of incoming ice and fire type moves.";
-    this.icon = 'resources/sprites/effect_icons/thick_fat.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/thick_fat.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { };
 }
@@ -10847,7 +10936,7 @@ function ThickFat(stacks) {
 function ToxicSpikesE(stacks) {
     this.name = "Toxic Spikes";
     this.description = "Toxic Spikes\nApplies 4 stacks of poison at the end of the turn. Airborne Pokémon are immune.";
-    this.icon = 'resources/sprites/effect_icons/spike.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/spike.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         if (isGrounded(pA))
@@ -10858,7 +10947,7 @@ function ToxicSpikesE(stacks) {
 function TrapDamage(stacks) {
     this.name = "Trap Damage";
     this.description = "Trap Damage\nTake 15 damage at the end of the turn, then remove 1 stack. Prevents switches.";
-    this.icon = 'resources/sprites/effect_icons/trap_damage.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/trap_damage.png';
     this.stacks = stacks;
     this.trapped = true;
     this.effect = (pA, pD) => {
@@ -10870,7 +10959,7 @@ function TrapDamage(stacks) {
 function Trap(stacks) {
     this.name = "Trap";
     this.description = "Trap\nPrevents switches.";
-    this.icon = 'resources/sprites/effect_icons/trap.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/trap.png';
     this.stacks = stacks;
     this.trapped = true;
     this.effect = (pA, pD) => { }
@@ -10879,7 +10968,7 @@ function Trap(stacks) {
 function TypeChanged(stacks, type) {
     this.name = "Type changed";
     this.description = "Type changed\nType changed to " + type + ".";
-    this.icon = 'resources/sprites/effect_icons/type_changed.png';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/type_changed.png';
     this.stacks = stacks;
     this.effect = (pA, pD) => { }
 }
@@ -10887,7 +10976,7 @@ function TypeChanged(stacks, type) {
 function WishE(stacks) {
     this.name = "Wish";
     this.description = "Wish\nRestores 20% of maximum HP once this effect ends. Remove 1 stack at the end of each turn.";
-    this.icon = 'resources/sprites/effect_icons/wish.webp';
+    this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/wish.webp';
     this.stacks = stacks;
     this.effect = (pA, pD) => {
         this.stacks--;
@@ -11242,7 +11331,7 @@ function createHeldItem(item) {
 function BlackBelt() {
     this.name = "Black Belt";
     this.description = "Raises the power of fighting type moves by 20%";
-    this.img = 'resources/sprites/held_items/black_belt.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/black_belt.webp';
     this.area = "fighting";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "fighting"); };
@@ -11251,7 +11340,7 @@ function BlackBelt() {
 function BlackGlasses() {
     this.name = "Black Glasses";
     this.description = "Raises the power of dark type moves by 20%";
-    this.img = 'resources/sprites/held_items/black_glasses.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/black_glasses.webp';
     this.area = "dark";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "dark"); };
@@ -11260,7 +11349,7 @@ function BlackGlasses() {
 function Charcoal() {
     this.name = "Charcoal";
     this.description = "Raises the power of fire type moves by 20%";
-    this.img = 'resources/sprites/held_items/charcoal.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/charcoal.webp';
     this.area = "fire";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "fire"); };
@@ -11269,7 +11358,7 @@ function Charcoal() {
 function DragonFang() {
     this.name = "Dragon Fang";
     this.description = "Raises the power of dragon type moves by 20%";
-    this.img = 'resources/sprites/held_items/dragon_fang.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dragon_fang.webp';
     this.area = "dragon";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "dragon"); };
@@ -11278,7 +11367,7 @@ function DragonFang() {
 function HardStone() {
     this.name = "Hard Stone";
     this.description = "Raises the power of rock type moves by 20%";
-    this.img = 'resources/sprites/held_items/hard_stone.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/hard_stone.webp';
     this.area = "rock";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "rock"); };
@@ -11287,7 +11376,7 @@ function HardStone() {
 function Magnet() {
     this.name = "Magnet";
     this.description = "Raises the power of electric type moves by 20%";
-    this.img = 'resources/sprites/held_items/magnet.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/magnet.webp';
     this.area = "electric";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "electric"); };
@@ -11296,7 +11385,7 @@ function Magnet() {
 function MetalCoat() {
     this.name = "Metal Coat";
     this.description = "Raises the power of steel type moves by 20%";
-    this.img = 'resources/sprites/held_items/metal_coat.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/metal_coat.webp';
     this.area = "steel";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "steel"); };
@@ -11305,7 +11394,7 @@ function MetalCoat() {
 function MiracleSeed() {
     this.name = "Miracle Seed";
     this.description = "Raises the power of grass type moves by 20%";
-    this.img = 'resources/sprites/held_items/miracle_seed.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/miracle_seed.webp';
     this.area = "grass";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "grass"); };
@@ -11314,7 +11403,7 @@ function MiracleSeed() {
 function MysticWater() {
     this.name = "Mystic Water";
     this.description = "Raises the power of water type moves by 20%";
-    this.img = 'resources/sprites/held_items/mystic_water.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/mystic_water.webp';
     this.area = "water";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "water"); };
@@ -11323,7 +11412,7 @@ function MysticWater() {
 function NeverMeltIce() {
     this.name = "Never-Melt Ice";
     this.description = "Raises the power of ice type moves by 20%";
-    this.img = 'resources/sprites/held_items/never_melt_ice.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/never_melt_ice.webp';
     this.area = "ice";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "ice"); };
@@ -11332,7 +11421,7 @@ function NeverMeltIce() {
 function PoisonBarb() {
     this.name = "Poison Barb";
     this.description = "Raises the power of poison type moves by 20%";
-    this.img = 'resources/sprites/held_items/poison_barb.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/poison_barb.webp';
     this.area = "poison";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "poison"); };
@@ -11341,7 +11430,7 @@ function PoisonBarb() {
 function SharpBeak() {
     this.name = "Sharp Beak";
     this.description = "Raises the power of flying type moves by 20%";
-    this.img = 'resources/sprites/held_items/sharp_beak.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/sharp_beak.webp';
     this.area = "flying";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "flying"); };
@@ -11350,7 +11439,7 @@ function SharpBeak() {
 function SilkScarf() {
     this.name = "Silk Scarf";
     this.description = "Raises the power of normal type moves by 20%";
-    this.img = 'resources/sprites/held_items/silk_scarf.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/silk_scarf.webp';
     this.area = "normal";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "normal"); };
@@ -11359,7 +11448,7 @@ function SilkScarf() {
 function SilverPowder() {
     this.name = "Silver Powder";
     this.description = "Raises the power of bug type moves by 20%";
-    this.img = 'resources/sprites/held_items/silver_powder.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/silver_powder.webp';
     this.area = "bug";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "bug"); };
@@ -11368,7 +11457,7 @@ function SilverPowder() {
 function SoftSand() {
     this.name = "Soft Sand";
     this.description = "Raises the power of ground type moves by 20%";
-    this.img = 'resources/sprites/held_items/soft_sand.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/soft_sand.webp';
     this.area = "ground";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "ground"); };
@@ -11377,7 +11466,7 @@ function SoftSand() {
 function SpellTag() {
     this.name = "Spell Tag";
     this.description = "Raises the power of ghost type moves by 20%";
-    this.img = 'resources/sprites/held_items/spell_tag.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/spell_tag.webp';
     this.area = "ghost";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "ghost"); };
@@ -11386,7 +11475,7 @@ function SpellTag() {
 function TwistedSpoon() {
     this.name = "Twisted Spoon";
     this.description = "Raises the power of psychic type moves by 20%";
-    this.img = 'resources/sprites/held_items/twisted_spoon.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/twisted_spoon.webp';
     this.area = "psychic";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .2 * (move.type === "psychic"); };
@@ -11395,7 +11484,7 @@ function TwistedSpoon() {
 function DracoPlate() {
     this.name = "Draco Plate";
     this.description = "Creates a free random dragon type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/draco_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/draco_plate.webp';
     this.area = "dragon";
     this.init = true;
     this.effect = (p) => {
@@ -11413,7 +11502,7 @@ function DracoPlate() {
 function DreadPlate() {
     this.name = "Dread Plate";
     this.description = "Creates a free random dark type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/dread_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dread_plate.webp';
     this.area = "dark";
     this.init = true;
     this.effect = (p) => {
@@ -11431,7 +11520,7 @@ function DreadPlate() {
 function EarthPlate() {
     this.name = "Earth Plate";
     this.description = "Creates a free random ground type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/earth_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/earth_plate.webp';
     this.area = "ground";
     this.init = true;
     this.effect = (p) => {
@@ -11449,7 +11538,7 @@ function EarthPlate() {
 function FistPlate() {
     this.name = "Fist Plate";
     this.description = "Creates a free random fighting type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/fist_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fist_plate.webp';
     this.area = "fighting";
     this.init = true;
     this.effect = (p) => {
@@ -11467,7 +11556,7 @@ function FistPlate() {
 function FlamePlate() {
     this.name = "Flame Plate";
     this.description = "Creates a free random fire type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/flame_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/flame_plate.webp';
     this.area = "fire";
     this.init = true;
     this.effect = (p) => {
@@ -11485,7 +11574,7 @@ function FlamePlate() {
 function IciclePlate() {
     this.name = "Icicle Plate";
     this.description = "Creates a free random ice type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/icicle_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/icicle_plate.webp';
     this.area = "ice";
     this.init = true;
     this.effect = (p) => {
@@ -11503,7 +11592,7 @@ function IciclePlate() {
 function InsectPlate() {
     this.name = "Insect Plate";
     this.description = "Creates a free random bug type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/insect_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/insect_plate.webp';
     this.area = "bug";
     this.init = true;
     this.effect = (p) => {
@@ -11521,7 +11610,7 @@ function InsectPlate() {
 function IronPlate() {
     this.name = "Iron Plate";
     this.description = "Creates a free random steel type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/iron_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/iron_plate.webp';
     this.area = "steel";
     this.init = true;
     this.effect = (p) => {
@@ -11539,7 +11628,7 @@ function IronPlate() {
 function MeadowPlate() {
     this.name = "Meadow Plate";
     this.description = "Creates a free random grass type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/meadow_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/meadow_plate.webp';
     this.area = "grass";
     this.init = true;
     this.effect = (p) => {
@@ -11557,7 +11646,7 @@ function MeadowPlate() {
 function MindPlate() {
     this.name = "Mind Plate";
     this.description = "Creates a free random psychic type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/mind_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/mind_plate.webp';
     this.area = "psychic";
     this.init = true;
     this.effect = (p) => {
@@ -11575,7 +11664,7 @@ function MindPlate() {
 function PixiePlate() {
     this.name = "Pixie Plate";
     this.description = "Creates a free random fairy type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/pixie_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/pixie_plate.webp';
     this.area = "fairy";
     this.init = true;
     this.effect = (p) => {
@@ -11593,7 +11682,7 @@ function PixiePlate() {
 function SkyPlate() {
     this.name = "Sky Plate";
     this.description = "Creates a free random flying type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/sky_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/sky_plate.webp';
     this.area = "flying";
     this.init = true;
     this.effect = (p) => {
@@ -11611,7 +11700,7 @@ function SkyPlate() {
 function SplashPlate() {
     this.name = "Splash Plate";
     this.description = "Creates a free random water type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/splash_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/splash_plate.webp';
     this.area = "water";
     this.init = true;
     this.effect = (p) => {
@@ -11629,7 +11718,7 @@ function SplashPlate() {
 function SpookyPlate() {
     this.name = "Spooky Plate";
     this.description = "Creates a free random ghost type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/spooky_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/spooky_plate.webp';
     this.area = "ghost";
     this.init = true;
     this.effect = (p) => {
@@ -11647,7 +11736,7 @@ function SpookyPlate() {
 function StonePlate() {
     this.name = "Stone Plate";
     this.description = "Creates a free random rock type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/stone_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/stone_plate.webp';
     this.area = "rock";
     this.init = true;
     this.effect = (p) => {
@@ -11665,7 +11754,7 @@ function StonePlate() {
 function ToxicPlate() {
     this.name = "Toxic Plate";
     this.description = "Creates a free random poison type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/toxic_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/toxic_plate.webp';
     this.area = "poison";
     this.init = true;
     this.effect = (p) => {
@@ -11683,7 +11772,7 @@ function ToxicPlate() {
 function ZapPlate() {
     this.name = "Zap Plate";
     this.description = "Creates a free random electric type move with exhaust in the holder's hand at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/zap_plate.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/zap_plate.webp';
     this.area = "electric";
     this.init = true;
     this.effect = (p) => {
@@ -11701,7 +11790,7 @@ function ZapPlate() {
 function Leftovers() {
     this.name = "Leftovers";
     this.description = "Restores 20HP at the end of each turn.";
-    this.img = 'resources/sprites/held_items/leftovers.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/leftovers.webp';
     this.area = "";
     this.turn_end = true;
     this.effect = (p) => {
@@ -11712,7 +11801,7 @@ function Leftovers() {
 function ChoiceBand() {
     this.name = "Choice Band";
     this.description = "Discards all cards in hand after using a move. Doubles the damage of physical moves.";
-    this.img = 'resources/sprites/held_items/choice_band.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/choice_band.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => {
@@ -11727,7 +11816,7 @@ function ChoiceBand() {
 function ChoiceSpecs() {
     this.name = "Choice Specs";
     this.description = "Discards all cards in hand after using a move. Doubles the damage of special moves.";
-    this.img = 'resources/sprites/held_items/choice_specs.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/choice_specs.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => {
@@ -11742,7 +11831,7 @@ function ChoiceSpecs() {
 function ChoiceScarf() {
     this.name = "Choice Scarf";
     this.description = "Discards all cards in hand after using a move, then restores 1 energy.";
-    this.img = 'resources/sprites/held_items/choice_scarf.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/choice_scarf.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => {
@@ -11758,7 +11847,7 @@ function ChoiceScarf() {
 function RockyHelmet() {
     this.name = "Rocky Helmet";
     this.description = "Attackers making contact with the holder lose 10HP.";
-    this.img = 'resources/sprites/held_items/rocky_helmet.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rocky_helmet.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -11770,7 +11859,7 @@ function RockyHelmet() {
 function WeaknessPolicy() {
     this.name = "Weakness Policy";
     this.description = "The first super effective attack against the holder each battle increases its attack and special attack by one stage.";
-    this.img = 'resources/sprites/held_items/weakness_policy.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/weakness_policy.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -11790,7 +11879,7 @@ function WeaknessPolicy() {
 function SitrusBerry() {
     this.name = "Sitrus Berry";
     this.description = "Restores 15% of maximum HP the first time an attack brings the holder below 50% of maximum HP.";
-    this.img = 'resources/sprites/held_items/sitrus_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/sitrus_berry.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -11809,7 +11898,7 @@ function SitrusBerry() {
 function LifeOrb() {
     this.name = "Life Orb";
     this.description = "Increases damage by 30%, consumes 25HP with each damaging move.";
-    this.img = 'resources/sprites/held_items/life_orb.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/life_orb.webp';
     this.area = "boss";
     this.boost = true;
     this.effect = (move, p) => {
@@ -11822,7 +11911,7 @@ function LifeOrb() {
 function HelixFossil() {
     this.name = "Helix Fossil";
     this.description = "The fossil of a forgotten Pokémon.";
-    this.img = 'resources/sprites/held_items/helix_fossil.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/helix_fossil.webp';
     this.area = "rock";
     this.effect = (move, p) => { };
 }
@@ -11830,7 +11919,7 @@ function HelixFossil() {
 function AirBalloon() {
     this.name = "Air Balloon";
     this.description = "Holder begins the battle with 3 stacks of levitation.";
-    this.img = 'resources/sprites/held_items/air_balloon.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/air_balloon.webp';
     this.area = "flying";
     this.init = true;
     this.effect = (p) => { applyEffect("levitation", 3, p); };
@@ -11839,7 +11928,7 @@ function AirBalloon() {
 function CheriBerry() {
     this.name = "Cheri Berry";
     this.description = "Holder is immune to paralysis.";
-    this.img = 'resources/sprites/held_items/cheri_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/cheri_berry.webp';
     this.area = "electric";
     this.revenge = true;
     this.effectR = (move, pA, pD) => { removeEffect(pA, "Paralysis"); };
@@ -11848,7 +11937,7 @@ function CheriBerry() {
 function ChestoBerry() {
     this.name = "Chesto Berry";
     this.description = "Holder is immune to sleep.";
-    this.img = 'resources/sprites/held_items/chesto_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/chesto_berry.webp';
     this.area = "normal";
     this.revenge = true;
     this.effectR = (move, pA, pD) => { removeEffect(pA, "Sleep"); };
@@ -11857,7 +11946,7 @@ function ChestoBerry() {
 function MentalHerb() {
     this.name = "Mental Herb";
     this.description = "Holder is immune to taunt. Raises holder's attack and special attack by 1 stage when a Pokémon attempts to taunt it.";
-    this.img = 'resources/sprites/held_items/mental_herb.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/mental_herb.webp';
     this.area = "dark";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -11872,7 +11961,7 @@ function MentalHerb() {
 function MuscleBand() {
     this.name = "Muscle Band";
     this.description = "Increases physical damage by 5%.";
-    this.img = 'resources/sprites/held_items/muscle_band.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/muscle_band.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .05 * (move.cat === "physical"); };
@@ -11881,7 +11970,7 @@ function MuscleBand() {
 function WiseGlasses() {
     this.name = "Wise Glasses";
     this.description = "Increases special damage by 5%.";
-    this.img = 'resources/sprites/held_items/wise_glasses.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/wise_glasses.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .05 * (move.cat === "special"); };
@@ -11890,7 +11979,7 @@ function WiseGlasses() {
 function PechaBerry() {
     this.name = "Pecha Berry";
     this.description = "Holder is immune to poison.";
-    this.img = 'resources/sprites/held_items/pecha_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/pecha_berry.webp';
     this.area = "poison";
     this.revenge = true;
     this.effectR = (move, pA, pD) => { removeEffect(pA, "Poison"); };
@@ -11899,7 +11988,7 @@ function PechaBerry() {
 function PersimBerry() {
     this.name = "Persim Berry";
     this.description = "Holder is immune to confusion.";
-    this.img = 'resources/sprites/held_items/persim_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/persim_berry.webp';
     this.area = "psychic";
     this.revenge = true;
     this.effectR = (move, pA, pD) => { removeEffect(pA, "Confusion"); };
@@ -11908,7 +11997,7 @@ function PersimBerry() {
 function RawstBerry() {
     this.name = "Rawst Berry";
     this.description = "Holder is immune to burn.";
-    this.img = 'resources/sprites/held_items/rawst_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rawst_berry.webp';
     this.area = "fire";
     this.revenge = true;
     this.effectR = (move, pA, pD) => { removeEffect(pA, "Burn"); };
@@ -11917,7 +12006,7 @@ function RawstBerry() {
 function ShedShell() {
     this.name = "Shed Shell";
     this.description = "Holder is immune to trapping effects.";
-    this.img = 'resources/sprites/held_items/shed_shell.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/shed_shell.webp';
     this.area = "ground";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -11929,7 +12018,7 @@ function ShedShell() {
 function WhiteHerb() {
     this.name = "White Herb";
     this.description = "Holder's lowered stats are slowly restored at the end of each round.";
-    this.img = 'resources/sprites/held_items/white_herb.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/white_herb.webp';
     this.area = "boss";
     this.turn_end = true;
     this.effect = (p) => {
@@ -11949,7 +12038,7 @@ function WhiteHerb() {
 function DampRock() {
     this.name = "Damp Rock";
     this.description = "Causes the rain to fall for 3 turns at the beginning of a battle.";
-    this.img = 'resources/sprites/held_items/damp_rock.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/damp_rock.webp';
     this.area = "water";
     this.init = true;
     this.effect = (p) => { setWeather("rain", 3); }
@@ -11958,7 +12047,7 @@ function DampRock() {
 function HeatRock() {
     this.name = "Heat Rock";
     this.description = "Causes the sun to shine for 3 turns at the beginning of a battle.";
-    this.img = 'resources/sprites/held_items/heat_rock.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/heat_rock.webp';
     this.area = "fire";
     this.init = true;
     this.effect = (p) => { setWeather("sun", 3); }
@@ -11967,7 +12056,7 @@ function HeatRock() {
 function IcyRock() {
     this.name = "Icy Rock";
     this.description = "Causes the hail to fall for 3 turns at the beginning of a battle.";
-    this.img = 'resources/sprites/held_items/icy_rock.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/icy_rock.webp';
     this.area = "ice";
     this.init = true;
     this.effect = (p) => { setWeather("hail", 3); }
@@ -11976,7 +12065,7 @@ function IcyRock() {
 function SmoothRock() {
     this.name = "Smooth Rock";
     this.description = "Whips up a sandstorm for 3 turns at the beginning of a battle.";
-    this.img = 'resources/sprites/held_items/smooth_rock.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/smooth_rock.webp';
     this.area = "rock";
     this.init = true;
     this.effect = (p) => { setWeather("sandstorm", 3); }
@@ -11985,7 +12074,7 @@ function SmoothRock() {
 function EnigmaBerry() {
     this.name = "Enigma Berry";
     this.description = "Restores 15% of maximum HP the first time the holder is hit by a super effective move.";
-    this.img = 'resources/sprites/held_items/enigma_berry.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/enigma_berry.webp';
     this.area = "";
     this.revenge = true;
     this.consumed = false;
@@ -12004,7 +12093,7 @@ function EnigmaBerry() {
 function BottleCap() {
     this.name = "Bottle Cap";
     this.description = "Permanently grants a slight boost to a random holder's stat at the beginning of each battle.";
-    this.img = 'resources/sprites/held_items/bottle_cap.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/bottle_cap.webp';
     this.area = "";
     this.init = true;
     this.effect = (p) => {
@@ -12036,7 +12125,7 @@ function BottleCap() {
 function GoldBottleCap() {
     this.name = "Gold Bottle Cap";
     this.description = "Permanently grants a slight boost to all of the holder's stat at the beginning of each battle.";
-    this.img = 'resources/sprites/held_items/gold_bottle_cap.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/gold_bottle_cap.webp';
     this.area = "boss";
     this.init = true;
     this.effect = (p) => {
@@ -12053,7 +12142,7 @@ function GoldBottleCap() {
 function IronBall() {
     this.name = "Iron Ball";
     this.description = "Grounds holder, lowers its speed by 1 stage and raises its defense by 1 stage.";
-    this.img = 'resources/sprites/held_items/iron_ball.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/iron_ball.webp';
     this.area = "steel";
     this.init = true;
     this.effect = (p) => {
@@ -12066,7 +12155,7 @@ function IronBall() {
 function KingsRock() {
     this.name = "King's Rock";
     this.description = "Holder's attacks hitting multiple times apply 1 stack of fear to the target if it's not scared already.";
-    this.img = 'resources/sprites/held_items/kings_rock.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/kings_rock.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => {
@@ -12080,7 +12169,7 @@ function KingsRock() {
 function QuickClaw() {
     this.name = "Quick Claw";
     this.description = "Holder draws an extra card at the beginning of the turn.";
-    this.img = 'resources/sprites/held_items/quick_claw.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/quick_claw.webp';
     this.area = "";
     this.init = true;
     this.effect = (p) => { applyEffect("extra_draw", 1, p); }
@@ -12089,7 +12178,7 @@ function QuickClaw() {
 function TMXX() {
     this.name = "TM??";
     this.description = "Shuffles a Judgment move into the holder's draw pile at the beginning of the battle.";
-    this.img = 'resources/sprites/held_items/normal_tm.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/normal_tm.webp';
     this.area = "boss";
     this.init = true;
     this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new Judgment()); }
@@ -12098,7 +12187,7 @@ function TMXX() {
 function WideLens() {
     this.name = "Wide Lens";
     this.description = "Holder's attacks with a possibility to miss deal 25% extra damage.";
-    this.img = 'resources/sprites/held_items/wide_lens.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/wide_lens.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .25 * (move.fails != undefined); }
@@ -12107,7 +12196,7 @@ function WideLens() {
 function ScopeLens() {
     this.name = "Scope Lens";
     this.description = "Holder's critical hits deal 25% extra damage.";
-    this.img = 'resources/sprites/held_items/scope_lens.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/scope_lens.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .25 * (move.crit != undefined && move.crit); }
@@ -12116,7 +12205,7 @@ function ScopeLens() {
 function BigRoot() {
     this.name = "Big Root";
     this.description = "Holder's draining attacks deal 25% extra damage.";
-    this.img = 'resources/sprites/held_items/big_root.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/big_root.webp';
     this.area = "grass";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .25 * (move.recoil != undefined && move.recoil < 0); }
@@ -12125,7 +12214,7 @@ function BigRoot() {
 function BlunderPolicy() {
     this.name = "Blunder Policy";
     this.description = "Whenever the holder is hit by an attack with the possibility to fail, raises its speed by 2 stages.";
-    this.img = 'resources/sprites/held_items/weakness_policy.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/weakness_policy.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -12137,7 +12226,7 @@ function BlunderPolicy() {
 function DestinyKnot() {
     this.name = "Destiny Knot";
     this.description = "At the end of each turn, copies all of the holder's status conditions onto its opponent in limited amounts.";
-    this.img = 'resources/sprites/held_items/destiny_knot.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/destiny_knot.webp';
     this.area = "";
     this.turn_end = true;
     this.effect = (p) => {
@@ -12153,7 +12242,7 @@ function DestinyKnot() {
 function Revive() {
     this.name = "Revive";
     this.description = "The first time the holder faints, revives it with 30% HP. Single use.";
-    this.img = 'resources/sprites/held_items/revive.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/revive.webp';
     this.area = "";
     this.consumed = false;
     this.revenge = true;
@@ -12168,7 +12257,7 @@ function Revive() {
 function Pearl() {
     this.name = "Pearl";
     this.description = "Grants " + String.fromCharCode(08381) + "600 on pickup.";
-    this.img = 'resources/sprites/held_items/pearl.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/pearl.webp';
     this.area = "";
     this.pickup = true;
     this.effect = (p) => {
@@ -12180,7 +12269,7 @@ function Pearl() {
 function Potion() {
     this.name = "Potion";
     this.description = "Restores 50% of the holder's HP on pickup.";
-    this.img = 'resources/sprites/held_items/potion.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/potion.webp';
     this.area = "";
     this.pickup = true;
     this.effect = (p) => { dealDamage(.5 * p.maxhp, p); }
@@ -12189,7 +12278,7 @@ function Potion() {
 function AmuletCoin() {
     this.name = "Amulet Coin";
     this.description = "Gain " + String.fromCharCode(08381) + "75 each battle.";
-    this.img = 'resources/sprites/held_items/amulet_coin.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/amulet_coin.webp';
     this.area = "";
     this.init = true;
     this.effect = (p) => {
@@ -12201,7 +12290,7 @@ function AmuletCoin() {
 function OddKeystone() {
     this.name = "Odd Keystone";
     this.description = "An old stone holding a mysterious power. Voices can be heard from it.";
-    this.img = 'resources/sprites/held_items/odd_keystone.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/odd_keystone.webp';
     this.area = "ghost";
     this.energy = 0;
     this.boost = true;
