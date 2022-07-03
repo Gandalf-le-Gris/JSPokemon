@@ -26,7 +26,6 @@ function loadResources() {
                         progressText.innerHTML = Math.floor(progress) + "%";
                         if (progress == 100) {
                             text.innerHTML = "Click to continue";
-                            music = true;
                             filter.onclick = () => {
                                 fadeOutTransition(2);
                                 setTimeout(drawStartingMenu, 1000);
@@ -44,7 +43,6 @@ function loadResources() {
                         document.body.appendChild(img);
                         if (progress == 100) {
                             text.innerHTML = "Click to continue";
-                            music = true;
                             filter.onclick = () => {
                                 fadeOutTransition(2);
                                 setTimeout(drawStartingMenu, 1000);
@@ -180,6 +178,12 @@ function loadResources() {
     disclaimer.innerHTML = "Loading speed may depend on the network. Please ensure you have a good Internet connection if loading takes too long.<br/>© 2022 Pokémon. © 1995–2022 Nintendo/Creatures Inc./GAME FREAK inc. Pokémon, Pokémon character names, Nintendo Switch, Nintendo 3DS, Nintendo DS, Wii, Wii U, and WiiWare are trademarks of Nintendo.";
     filter.appendChild(disclaimer);
 
+    music = window.localStorage.getItem('music') != null ? JSON.parse(window.localStorage.getItem('music')) : true;
+    masterVolume = window.localStorage.getItem('masterVolume') != null ? JSON.parse(window.localStorage.getItem('masterVolume')) : 1;
+    musicVolume = window.localStorage.getItem('musicVolume') != null ? JSON.parse(window.localStorage.getItem('musicVolume')) : 1;
+    sfxVolume = window.localStorage.getItem('sfxVolume') != null ? JSON.parse(window.localStorage.getItem('sfxVolume')) : 1;
+    fastBattle = window.localStorage.getItem('fastBattle') != null ? JSON.parse(window.localStorage.getItem('fastBattle')) : false;
+
     loadAssets(imgs, true);
     loadAssets(sounds, false);
 }
@@ -237,6 +241,7 @@ function drawStartingMenu() {
             playMusic(ambientMusic, true);
             music = true;
         }
+        window.localStorage.setItem('music', JSON.stringify(music));
     });
     document.body.appendChild(soundButton);
     var soundImage = new Image();
@@ -381,6 +386,7 @@ function toggleEscapeScreen() {
                 music = true;
             }
             soundSwitchInput.checked = music;
+            window.localStorage.setItem('music', JSON.stringify(music));
         }
         soundSwitch.appendChild(soundSwitchInput);
         var soundSwitchSlider = document.createElement('span');
@@ -407,6 +413,7 @@ function toggleEscapeScreen() {
                 else
                     a.volume = baseVolume * masterVolume * sfxVolume;
             }
+            window.localStorage.setItem('masterVolume', JSON.stringify(masterVolume));
         }
         masterSoundSlider.appendChild(masterSoundInput);
         var masterSoundText = document.createElement('div');
@@ -428,6 +435,7 @@ function toggleEscapeScreen() {
                 if (a.loop)
                     a.volume = baseVolume * masterVolume * musicVolume;
             }
+            window.localStorage.setItem('musicVolume', JSON.stringify(musicVolume));
         }
         musicSoundSlider.appendChild(musicSoundInput);
         var musicSoundText = document.createElement('div');
@@ -449,6 +457,7 @@ function toggleEscapeScreen() {
                 if (!a.loop)
                     a.volume = baseVolume * masterVolume * sfxVolume;
             }
+            window.localStorage.setItem('sfxVolume', JSON.stringify(sfxVolume));
         }
         sfxSoundSlider.appendChild(sfxSoundInput);
         var sfxSoundText = document.createElement('div');
@@ -469,6 +478,7 @@ function toggleEscapeScreen() {
         fastBattleSwitchInput.onclick = () => {
             fastBattle = !fastBattle;
             fastBattleSwitchInput.checked = fastBattle;
+            window.localStorage.setItem('fastBattle', JSON.stringify(fastBattle));
         }
         fastBattleSwitch.appendChild(fastBattleSwitchInput);
         var fastBattleSwitchSlider = document.createElement('span');
@@ -9918,7 +9928,7 @@ function SuckerPunch() {
     this.cost = 1;
     this.fails = false;
     this.effect = function (move, pA, pD) {
-        this.fails = pD.discard.findIndex(e => e.cat !== "status") >= 0;
+        this.fails = pD.discard.findIndex(e => e.cat !== "status") < 0;
     };
     this.effect = function (move, pA, pD) { if (!this.fails) drawMove(pA, false); };
     this.description = "Deals " + this.bp + " base power damage to the opponent and draw a card. Fails unless target has an offensive move in its discard pile.";

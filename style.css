@@ -227,6 +227,7 @@ button.start:hover {
     grid-column: 1 / 3;
     background: green;
     width: 100%;
+    border-radius: 1vh;
 }
 
 .pokemon-name {
@@ -323,6 +324,7 @@ button.start:hover {
     background-color: lightslategrey;
     justify-self: center;
     vertical-align: middle;
+    border-radius: 1vh;
 }
 
 .selected-move {
@@ -470,7 +472,8 @@ button.start:hover {
 }
 
 .replay {
-    background: rgba(0, 0, 0, .6)
+    background: rgba(0, 0, 0, .6);
+    border-radius: 1.5vh;
 }
 
 .replay:hover {
@@ -538,6 +541,7 @@ button.start:hover {
     background-color: lightslategrey;
     justify-self: center;
     vertical-align: middle;
+    border-radius: 1vh;
 }
 
 .descriptor-name {
