@@ -19,23 +19,26 @@ function loadResources() {
         for (let imageUrl of imageUrlArray) {
             promiseArray.push(new Promise(resolve => {
                 const img = isImage ? new Image() : new Audio();
-                img.onload = resolve;
+                img.onload = () => {
+                    assetsLoaded++;
+                    console.log(assetsLoaded);
+                    resolve();
+                }
                 img.src = imageUrl;
                 imageArray.push(img);
             }));
         }
 
         await Promise.all(promiseArray);
-        console.log("All images loaded");
-        return imageArray;
+        return;
     }
 
     imgs = [];
     sounds = [];
 
-    imgs.push("resources/homescreen.jfif");
-    imgs.push("resources/teamscreen.webp");
-    imgs.push("resources/sprites/battle_backgrounds/plains.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/homescreen.jfif");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/teamscreen.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/battle_backgrounds/plains.png");
     for (let e of effectList) {
         imgs.push(createEffect(e, 0).icon);
     }
@@ -43,59 +46,60 @@ function loadResources() {
         imgs.push(createHeldItem(i).img);
     }
     for (let t of types) {
-        imgs.push("resources/sprites/map_icons/" + t + ".png");
-        imgs.push("resources/sprites/move_icons/types/" + t + ".webp");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/" + t + ".png");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/types/" + t + ".webp");
     }
-    imgs.push("resources/sprites/map_icons/boss.png");
-    imgs.push("resources/sprites/map_icons/boss.png");
-    imgs.push("resources/sprites/map_icons/pokemart.png");
-    imgs.push("resources/sprites/map_icons/pokemon_center.png");
-    imgs.push("resources/sprites/move_icons/category/physical.webp");
-    imgs.push("resources/sprites/move_icons/category/special.webp");
-    imgs.push("resources/sprites/move_icons/category/status.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/boss.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/boss.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/pokemart.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/map_icons/pokemon_center.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/physical.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/special.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/move_icons/category/status.webp");
     for (let poke of pokemonList) {
         var p = createPokemon(poke);
-        imgs.push(p.imgb);
-        imgs.push(p.imgf);
-        imgs.push("resources/sprites/pokemon_icons/" + p.id + ".png");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_icons/" + p.id + ".png");
         sounds.push(p.cry);
     }
     for (let poke of bossList) {
         var p = createPokemon(poke);
-        imgs.push(p.imgb);
-        imgs.push(p.imgf);
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
         sounds.push(p.cry);
     }
-    imgs.push("resources/sprites/ui_icons/buff.png");
-    imgs.push("resources/sprites/ui_icons/debuff.png");
-    imgs.push("resources/sprites/ui_icons/deck.png");
-    imgs.push("resources/sprites/ui_icons/discard.png");
-    imgs.push("resources/sprites/ui_icons/energy.png");
-    imgs.push("resources/sprites/ui_icons/mute.webp");
-    imgs.push("resources/sprites/ui_icons/random.webp");
-    imgs.push("resources/sprites/ui_icons/remove.png");
-    imgs.push("resources/sprites/ui_icons/sound.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/buff.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/debuff.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/deck.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/discard.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/energy.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/mute.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/random.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/remove.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sprites/ui_icons/sound.webp");
 
-    sounds.push("resources/sounds/musics/battle.mp3");
-    sounds.push("resources/sounds/musics/boss.mp3");
-    sounds.push("resources/sounds/musics/crossroads.mp3");
-    sounds.push("resources/sounds/musics/game_over.mp3");
-    sounds.push("resources/sounds/musics/pokemart.mp3");
-    sounds.push("resources/sounds/musics/pokemon_center.mp3");
-    sounds.push("resources/sounds/musics/run_complete.mp3");
-    sounds.push("resources/sounds/musics/title_screen.mp3");
-    sounds.push("resources/sounds/musics/victory.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/battle.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/boss.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/crossroads.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/game_over.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/pokemart.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/pokemon_center.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/run_complete.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/title_screen.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/musics/victory.mp3");
 
-    sounds.push("resources/sounds/sfx/button_click.mp3");
-    sounds.push("resources/sounds/sfx/healer.mp3");
-    sounds.push("resources/sounds/sfx/hit.mp3");
-    sounds.push("resources/sounds/sfx/pc.mp3");
-    sounds.push("resources/sounds/sfx/super_effective_hit.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/button_click.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/healer.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/hit.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/pc.mp3");
+    sounds.push("https://api.allorigins.win/raw?url=https://github.com/Gandalf-le-Gris/JSPokemon/tree/main/resources/sounds/sfx/super_effective_hit.mp3");
 
-    imgs = loadAssets(imgs, true);
-    sounds = loadAssets(sounds, false);
+    var assetsLoaded = 0;
+    var assetsTotal = imgs.length + sounds.length;
 
-    drawStartingMenu();
+    loadAssets(imgs, true);
+    loadAssets(sounds, false);
 }
 
 
@@ -151,7 +155,7 @@ function drawStartingMenu() {
     soundImage.className = "pixel-sprite";
     soundImage.src = "resources/sprites/ui_icons/mute.webp"
     soundButton.appendChild(soundImage);
-    var gArea = new gameArea('resources/homescreen.jfif', () => {});
+    var gArea = new gameArea("resources/homescreen.jfif", () => { });
     gArea.start();
 }
 
@@ -274,6 +278,7 @@ function toggleEscapeScreen() {
         var soundSwitchInput = document.createElement('input');
         soundSwitchInput.type = "checkbox";
         soundSwitchInput.checked = music;
+        soundImage = document.getElementById('soundImage');
         soundSwitchInput.onclick = () => {
             if (music) {
                 if (soundImage != undefined)
@@ -3861,7 +3866,7 @@ function Metagross() {
     this.discard = [];
     this.items = [];
     this.talent = "Clear body"
-    this.talentDesc = "Lowered stats are restored at the end of eah turn."
+    this.talentDesc = "Lowered stats are restored at the end of each turn."
     this.endTurn = function () {
         this.statchanges.attack = Math.max(0, this.statchanges.attack);
         this.statchanges.defense = Math.max(0, this.statchanges.defense);
@@ -5094,7 +5099,7 @@ function Diancie() {
     this.discard = [];
     this.items = [];
     this.talent = "Clear body"
-    this.talentDesc = "Lowered stats are restored at the end of eah turn."
+    this.talentDesc = "Lowered stats are restored at the end of each turn."
     this.endTurn = function () {
         this.statchanges.attack = Math.max(0, this.statchanges.attack);
         this.statchanges.defense = Math.max(0, this.statchanges.defense);
