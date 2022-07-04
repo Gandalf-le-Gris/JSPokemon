@@ -2467,6 +2467,7 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
+    opponent = new Unown();
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
@@ -3357,6 +3358,8 @@ function createPokemon(pokemon) {
             return new Whimsicott();
         case "ninetales_alola":
             return new AlolanNinetales();
+        case "unown":
+            return new Unown();
         default:
             return new MissingNo();
     }
@@ -4288,11 +4291,13 @@ function Ditto() {
     this.talentDesc = "Transforms into the opponent at the beginning of the battle, copying its stats, types and moves."
     this.init = function () {
         this.types = [].concat(opponent.types);
-        this.attack = opponent.attack;
-        this.defense = opponent.defense;
-        this.spattack = opponent.spattack;
-        this.spdefense = opponent.spdefense;
-        this.speed = opponent.speed;
+        n = opponent.hp + opponent.attack + opponent.defense + opponent.spattack + opponent.spdefense + opponent.speed;
+        ratio = 500 / n;
+        this.attack = Math.round(opponent.attack * ratio);
+        this.defense = Math.round(opponent.defense * ratio);
+        this.spattack = Math.round(opponent.spattack * ratio);
+        this.spdefense = Math.round(opponent.spdefense * ratio);
+        this.speed = Math.round(opponent.speed * ratio);
         this.imgb = opponent.imgb;
         this.moves = [].concat(opponent.moves);
         if (this === team[activePokemon])
@@ -5018,6 +5023,36 @@ function AlolanNinetales() {
     this.unlocked = hailStarted >= 10;
     this.hint = "Make the hail fall 10 times\n" + hailStarted + "/10";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/ninetales_alola.ogg"
+}
+
+
+
+function Unown() {
+    this.name = "Unown";
+    this.hp = 48;
+    this.attack = 72;
+    this.defense = 48;
+    this.spattack = 72;
+    this.spdefense = 48;
+    this.speed = 48;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["psychic"];
+    this.moves = [];
+    this.opponentMoves = [[]];
+    this.movepool = ["hidden_power"];
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/unown.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/unown.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Levitate";
+    this.talentDesc = "Levitates above the ground, granting ground type immunity."
+    this.init = function () { applyEffect("levitation", 99, this); }
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/unown.ogg"
 }
 
 
