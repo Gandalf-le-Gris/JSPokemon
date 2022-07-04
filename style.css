@@ -182,6 +182,32 @@ button.start:hover {
     height: auto;
 }
 
+.path-information {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: 'Copperplate Gothic';
+    text-align: left;
+    color: white;
+    font-size: 2.5vh;
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 2vh;
+}
+
+.path-information2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: 'Copperplate Gothic';
+    text-align: left;
+    color: white;
+    font-size: 2vh;
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 2vh;
+}
+
 .pokemon-displayer-left {
     display: grid;
     grid-template-rows: auto auto auto;
@@ -432,7 +458,7 @@ button.start:hover {
 }
 
 .switch-header:hover {
-    color:darkgoldenrod;
+    color: white;
 }
 
 .switch-pokemon {

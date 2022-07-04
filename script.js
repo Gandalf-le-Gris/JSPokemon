@@ -1059,6 +1059,35 @@ function mapSelection() {
     title.innerHTML = "Choose your path";
     titleSection.appendChild(title);
     pathSelector();
+
+    var information = document.createElement('div');
+    information.className = "path-information";
+    document.body.appendChild(information);
+    var balanceName = document.createElement('div');
+    balanceName.innerHTML = "Balance:";
+    balanceName.style.textAlign = "right";
+    information.appendChild(balanceName);
+    var balanceVal = document.createElement('div');
+    balanceVal.innerHTML = String.fromCharCode(08381) + money;
+    information.appendChild(balanceVal);
+
+    var information2 = document.createElement('div');
+    information2.className = "path-information2";
+    document.body.appendChild(information2);
+    for (let p of team) {
+        var name = document.createElement('div');
+        name.innerHTML = p.name + ":";
+        name.style.textAlign = "right";
+        information2.appendChild(name);
+        var hp = document.createElement('div');
+        hp.innerHTML = p.currenthp == 0 ? "fainted" : p.currenthp + "/" + p.maxhp;
+        if (p.currenthp <= .2 * p.maxhp)
+            hp.style.color = "red";
+        else if (p.currenthp <= .5 * p.maxhp)
+            hp.style.color = "yellow";
+        information2.appendChild(hp);
+    }
+    
 }
 
 function pathSelector() {
@@ -1871,6 +1900,8 @@ function initDeck(p) {
     p.draw = [];
     for (let m of p.moves) {
         var move = copyMove(m);
+        if (move.name === "Hidden Power")
+            move.type = types[Math.floor(Math.random() * types.length)];
         p.draw.push(move);
     }
     p.hand = [];
@@ -2066,7 +2097,7 @@ function useMove(move) {
 
         //bulletproof
         var name = move.name.toLowerCase();
-        var bulletproof = (name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") ||(player && opponent.talent === "Bulletproof"));
+        var bulletproof = (name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") || (player && opponent.talent === "Bulletproof"));
         cancelled = cancelled || bulletproof;
 
         var boostMul = 1;
@@ -2154,7 +2185,10 @@ function useMove(move) {
             team[activePokemon].effects[i].bEffect(move, team[activePokemon], opponent);
             drawEffects(true);
         }
-    }
+
+        refreshIconCounts();
+    } else
+        document.getElementById("movePreview").className = "preview-off";
 }
 
 function dealDamage(damage, p, move) {
@@ -2686,7 +2720,7 @@ function extraReward() {
             wrapper.className = "wrapper";
             this.reward1.appendChild(wrapper);
 
-            var item = getFromItemPool(i == ind);
+            var item = getFromItemPool(i == ind ? encounterType : undefined);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -2757,7 +2791,7 @@ function getFromMovepool(p) {
 function getFromItemPool(t) {
     var item;
     if (t) {
-        while (item == undefined || item.area !== encounterType)
+        while (item == undefined || item.area !== t)
             item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
     } else {
         while (item == undefined || item.area !== "")
@@ -2979,7 +3013,8 @@ function pokemartEncounter() {
             wrapper.className = "wrapper";
             this.reward1.appendChild(wrapper);
 
-            var item = getFromItemPool();
+            var t = Math.random() < .3 ? types[Math.floor(Math.random() * types.length)] : undefined;
+            var item = getFromItemPool(t);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -4404,7 +4439,7 @@ function Shuckle() {
     this.discard = [];
     this.items = [];
     this.talent = "Sturdy"
-    this.talentDesc = "This Pokémon cannot be knocked out unless at 1HP already."
+    this.talentDesc = "This Pokémon cannot be knocked out unless it is at 1HP already."
     this.unlocked = maxRound >= 20;
     this.hint = "???";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/shuckle.ogg"
@@ -4859,7 +4894,7 @@ function KommoO() {
     this.currenthp = 0;
     this.types = ["dragon", "fighting"];
     this.moves = [createMove("clangorous_soul"), createMove("clanging_scales"), createMove("boomburst"), createMove("close_combat"), createMove("dragon_claw"), createMove("drain_punch")];
-    this.movepool = ["aqua_tail", "aura_sphere", "autotomize", "belly_drum", "body_press", "boomburst", "breaking_swipe", "brick_break", "bulk_up", "bulldoze", "clanging_scales", "clangorous_soul", "close_combat", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_pulse", "dragon_tail", "drain_punch", "dual_chop", "earthquake", "flamethrower", "flash_cannon", "focus_blast", "focus_punch", "hyper_voice", "iron_tail", "low_kick", "outrage", "payback", "poison_jab", "reversal", "rock_slide", "scale_shot", "shadow_claw", "superpower", "x_scissor", "fire_punch", "ice_punch", "thunder_punch", "uproar", "water_pulse", "swhock_wave", "echoed_voice"];
+    this.movepool = ["aqua_tail", "aura_sphere", "autotomize", "belly_drum", "body_press", "boomburst", "breaking_swipe", "brick_break", "bulk_up", "bulldoze", "clanging_scales", "clangorous_soul", "close_combat", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_pulse", "dragon_tail", "drain_punch", "dual_chop", "earthquake", "flamethrower", "flash_cannon", "focus_blast", "focus_punch", "hyper_voice", "iron_tail", "low_kick", "outrage", "payback", "poison_jab", "reversal", "rock_slide", "scale_shot", "shadow_claw", "superpower", "x_scissor", "fire_punch", "ice_punch", "thunder_punch", "uproar", "water_pulse", "shock_wave", "echoed_voice"];
     this.opponentMoves =
         [[createMove("clangorous_soul"), createMove("clanging_scales"), createMove("clanging_scales"), createMove("boomburst"), createMove("focus_blast"), createMove("aura_sphere"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("dragon_pulse"), createMove("aura_sphere")],
         [createMove("bulk_up"), createMove("dragon_dance"), createMove("close_combat"), createMove("drain_punch"), createMove("brick_break"), createMove("dragon_claw"), createMove("dragon_tail"), createMove("dual_chop"), createMove("rock_slide"), createMove("poison_jab")]];
