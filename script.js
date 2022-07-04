@@ -2105,16 +2105,16 @@ function useMove(move) {
             drawEffects(!player);
         }
 
+        var pD = player ? opponent : team[activePokemon];
         //bulletproof
         var name = move.name.toLowerCase();
-        if ((name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") || (player && opponent.talent === "Bulletproof"))) {
+        if ((name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && (pD.talent === "Bulletproof")) {
             cancelled = true;
             message = "bulletproof";
             desc.innerHTML += pD.name + "'s Bulletproof activated!<br />";
         }
 
         //wonder guard
-        var pD = player ? opponent : team[activePokemon];
         if (pD.talent === "Wonder guard" && effectiveMultiplier(move, pD) <= 1 && move.cat !== "status") {
             cancelled = true;
             message = "wonder guard";
@@ -10216,7 +10216,7 @@ function StompingTantrum() {
     this.cat = "physical";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (doesBlock(pD)) boostStat(pA, "attack", 1); };
+    this.preEffect = function (move, pA, pD) { if (doesBlock(pD)) boostStat(pA, "attack", 1); };
     this.description = "Deals 70 base power damage to the opponent. Raises user's attack by one stage if target is blocking.";
 }
 
