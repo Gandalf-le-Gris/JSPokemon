@@ -70,6 +70,9 @@ function loadResources() {
     for (let i of heldItems) {
         imgs.push(createHeldItem(i).img);
     }
+    for (let i of specialItems) {
+        imgs.push(createHeldItem(i).img);
+    }
     for (let t of types) {
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/" + t + ".png");
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/" + t + ".webp");
@@ -1219,6 +1222,8 @@ battleFilter.className = "filter-clear";
 battleFilter.id = "battleFilter";
 
 function startEncounter(encounter) {
+    eventEncounter();
+    return;
     if (encounter === "pokemon_center") {
         pokemonCenterEncounter();
     } else if (encounter === "pokemart") {
@@ -1228,11 +1233,11 @@ function startEncounter(encounter) {
     }
 }
 
-function battleEncounter(encounter) {
+function battleEncounter(encounter, fixedPokemon) {
     pokemonCenterChance += .05;
     pokemartChance += .05;
 
-    opponent = createOpponent(encounter);
+    opponent = createOpponent(encounter, fixedPokemon);
     player = true;
     weather = undefined;
     terrain = undefined;
@@ -2482,15 +2487,19 @@ function shuffle(array) {
     }
 }
 
-function createOpponent(encounter) {
+function createOpponent(encounter, fixedOpponent) {
     var opponent;
-    if (area < 10) {
-        while (opponent == undefined || !contains(opponent.types, encounter)) {
-            opponent = createPokemon(opponentList[Math.floor(Math.random() * opponentList.length)]);
+
+    if (fixedOpponent == undefined)
+        if (area < 10) {
+            while (opponent == undefined || !contains(opponent.types, encounter)) {
+                opponent = createPokemon(opponentList[Math.floor(Math.random() * opponentList.length)]);
+            }
+        } else {
+            opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
         }
-    } else {
-        opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
-    }
+    else
+        opponent = createPokemon(fixedOpponent);
 
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
@@ -11530,6 +11539,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone"];
+specialItems = ["tm-1"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11683,6 +11693,8 @@ function createHeldItem(item) {
             return new AmuletCoin();
         case "odd_keystone":
             return new OddKeystone();
+        case "tm-1":
+            return new TMm1();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12671,6 +12683,237 @@ function OddKeystone() {
             this.energy -= 65;
         }
         if (pA.currenthp == 0) dealDamage(.3 * pA.maxhp, pA);
+    }
+}
+
+function TMm1() {
+    this.name = "TM-1";
+    this.description = "???";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/psychic_tm.webp';
+    this.area = "event";
+    this.init = true;
+    var move = new HiddenPower();
+    move.cost = 0;
+    this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, move); }
+}
+
+
+
+
+
+
+/* ------------------------------------------------------ */
+/* ----------------------- Events ----------------------- */
+/* ------------------------------------------------------ */
+
+function eventEncounter() {
+    pokemonCenterChance = 0;
+    pokemartChance += .05;
+
+    clearBody();
+    fadeInTransition();
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
+    gArea.start();
+
+    runEvent(createEvent());
+}
+
+function runEvent(event) {
+    var grid = document.createElement('div');
+    grid.className = "gameover-grid";
+    document.body.appendChild(grid);
+
+    var title = document.createElement('div');
+    title.className = "event-title";
+    title.innerHTML = event.description;
+    grid.appendChild(title);
+
+    var options = document.createElement('div');
+    options.className = "event-option-grid";
+    grid.appendChild(options);
+    for (let i = 1; i <= event.options.length; i++) {
+        var o = event.options[i-1];
+        var num = document.createElement('div');
+        num.innerHTML = i + ".";
+        num.style.textAlign = "right";
+        options.appendChild(num);
+
+        function optionDiv() {
+            this.div = document.createElement('div');
+            this.div.o = o;
+            this.div.className = "event-option";
+            this.div.innerHTML = o.text;
+            this.div.onclick = function () {
+                grid.innerHTML = "";
+
+                var title = document.createElement('div');
+                title.className = "event-title";
+                title.innerHTML = this.o.description;
+                grid.appendChild(title);
+
+                var click = document.createElement('div');
+                click.className = "event-title";
+                click.style.fontSize = "1.5vw";
+                click.innerHTML = "click to continue";
+                grid.appendChild(click);
+
+                var filter = document.createElement('div');
+                filter.className = "filter-clear";
+                filter.onclick = () => {
+                    grid.innerHTML = "";
+                    this.o.effect();
+                }
+                document.body.appendChild(filter);
+            }
+            options.appendChild(this.div);
+        }
+        new optionDiv();
+    }
+}
+
+function createReward(isItem, r1, r2, r3) {
+    var filter = document.createElement('div');
+    filter.className = "filter-clear";
+    document.body.appendChild(filter);
+
+    var grid = document.createElement('div');
+    grid.className = "reward-selector";
+    filter.appendChild(grid);
+
+    var title = document.createElement('div');
+    title.className = "centered-subtitle";
+    title.innerHTML = "Choose your reward";
+    grid.appendChild(title);
+
+    if (r3 == undefined)
+        r3 = r1;
+    if (r2 == undefined)
+        r2 = r1;
+    var rewards = [r1, r2, r3];
+
+    for (let i = 0; i < team.length; i++) {
+        function makeReward(i) {
+            var p = team[i];
+            this.reward1 = document.createElement('div');
+            this.reward1.className = "reward";
+
+            var sprite = new Image();
+            sprite.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
+            sprite.className = "reward-sprite";
+            this.reward1.appendChild(sprite);
+
+            var wrapper = document.createElement('div');
+            wrapper.className = "wrapper";
+            this.reward1.appendChild(wrapper);
+
+            var item = createHeldItem(rewards[i]);
+            var sprite1 = new Image();
+            sprite1.src = item.img;
+            sprite1.className = "reward-sprite";
+            wrapper.appendChild(sprite1);
+
+            var desc = document.createElement('div');
+            desc.className = "descriptor-name";
+            this.reward1.appendChild(desc);
+            var name = document.createElement('div');
+            name.innerHTML = item.name;
+            desc.appendChild(name);
+
+            var desc1 = document.createElement('div');
+            desc1.className = "descriptor";
+            this.reward1.appendChild(desc1);
+            var text = document.createElement('div');
+            text.innerHTML = item.description;
+            desc1.appendChild(text);
+
+            this.reward1.p = i;
+            this.reward1.item = item;
+            this.reward1.onclick = function () {
+                team[this.p].items.push(this.item);
+                if (music)
+                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+                if (this.item.pickup != undefined)
+                    this.item.effect(this.p);
+                nextEncounter();
+            };
+        }
+        grid.appendChild((new makeReward(i)).reward1);
+    }
+}
+
+function createEvent(event) {
+    event = event != undefined ? event : Math.floor(Math.random() * 1);
+    switch (event) {
+        case 0:
+            return new Event0();
+    }
+}
+
+function Event0() {
+    this.description = "You enter old ruins. The walls are covered in mysterious glyphs written in an ancient alphabet, that you cannot decipher. In front of you lie two paths.";
+    var reward = Math.random() < .5;
+    this.options = [];
+    this.options[0] = {
+        text: "Take the left path",
+        effect: () => {
+            if (!reward) {
+                fadeOutTransition(1);
+                setTimeout(() => { battleEncounter("", "unown") }, 1000);
+            } else {
+                function getRock() {
+                    switch (Math.floor(Math.random() * 4)) {
+                        case 0:
+                            return "heat_rock";
+                        case 1:
+                            return "damp_rock";
+                        case 2:
+                            return "icy_rock";
+                        case 3:
+                            return "smooth_rock";
+                        default:
+                    }
+                }
+                createReward(true, getRock(), getRock(), getRock());
+            }
+        },
+        description: reward ? "You find some strangely shaped rocks at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
+    }
+    this.options[1] = {
+        text: "Take the right path",
+        effect: () => {
+            if (!reward) {
+                fadeOutTransition(1);
+                setTimeout(() => { battleEncounter("", "unown") }, 1000);
+            } else {
+                function getRock() {
+                    switch (Math.floor(Math.random() * 4)) {
+                        case 0:
+                            return "heat_rock";
+                        case 1:
+                            return "damp_rock";
+                        case 2:
+                            return "icy_rock";
+                        case 3:
+                            return "smooth_rock";
+                        default:
+                    }
+                }
+                createReward(true, getRock(), getRock(), getRock());
+            }
+        },
+        description: reward ? "You find some strangely shaped rocks at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
+    }
+    this.options[2] = {
+        text: "Exit the cave",
+        effect: () => { nextEncounter(); }
+    }
+    var i = team.findIndex(e => contains(e.types, "psychic"));
+    if (i >= 0) {
+        this.options[3] = {
+            text: "Let " + team[i].name + " decipher the glyphs",
+            effect: () => { offerReward("tm-1"); },
+            description: "After reading the glyphs, " + team[i].name + " leads you to a third hidden passage. At the end of the tunnel, you find an old TM you don't recognize."
+        }
     }
 }
 

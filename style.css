@@ -913,6 +913,30 @@ button.launch-tuto:hover {
     overflow-y: auto;
 }
 
+.event-title {
+    font-size: 2.5vw;
+    color: #ffffff;
+    font-family: 'Copperplate Gothic';
+    text-align: center; 
+    width: 80vw;
+}
+
+.event-option:hover {
+    color: darkgoldenrod;
+}
+
+.event-option-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    row-gap: 3vh;
+    column-gap: 2vw;
+    font-size: 2vw;
+    color: #ffffff;
+    font-family: 'Copperplate Gothic';
+    color: white;
+    text-align: left;
+}
+
 
 
 /* The switch - the box around the slider */
