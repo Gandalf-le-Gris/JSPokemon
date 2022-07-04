@@ -1000,6 +1000,7 @@ function launchGame() {
     extraLoot = 0;
     pokemonCenterChance = 0;
     pokemartChance = 0;
+    eventChance = 0;
     flawless = true;
     team = [];
 
@@ -1165,6 +1166,11 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
+            } else if (Math.random() < eventChance || Math.random() < .9) {
+                image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/event.png';
+                image.style.filter = "invert()";
+                title.innerHTML = "special";
+                encounter = "event";
             } else {
                 type = types[Math.floor(Math.random() * 18)];
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/' + type + '.png';
@@ -1228,6 +1234,8 @@ function startEncounter(encounter) {
         pokemonCenterEncounter();
     } else if (encounter === "pokemart") {
         pokemartEncounter();
+    } else if (encounter === "event") {
+        eventEncounter();
     } else {
         battleEncounter(encounter);
     }
@@ -1236,6 +1244,7 @@ function startEncounter(encounter) {
 function battleEncounter(encounter, fixedPokemon) {
     pokemonCenterChance += .05;
     pokemartChance += .05;
+    eventChance += .08;
 
     opponent = createOpponent(encounter, fixedPokemon);
     player = true;
@@ -2850,6 +2859,7 @@ function getFromItemPool(t) {
 function pokemonCenterEncounter() {
     pokemonCenterChance = 0;
     pokemartChance += .05;
+    eventChance += .08;
 
     clearBody();
     fadeInTransition();
@@ -2907,6 +2917,7 @@ removePrice = 500;
 function pokemartEncounter() {
     pokemonCenterChance += .05;
     pokemartChance = 0;
+    eventChance += .08;
 
     clearBody();
     fadeInTransition();
@@ -12689,7 +12700,7 @@ function OddKeystone() {
 function TMm1() {
     this.name = "TM-1";
     this.description = "???";
-    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/psychic_tm.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/psychic-tm.webp';
     this.area = "event";
     this.init = true;
     var move = new HiddenPower();
@@ -12707,8 +12718,9 @@ function TMm1() {
 /* ------------------------------------------------------ */
 
 function eventEncounter() {
-    pokemonCenterChance = 0;
+    pokemonCenterChance += .05;
     pokemartChance += .05;
+    eventChance = 0;
 
     clearBody();
     fadeInTransition();
