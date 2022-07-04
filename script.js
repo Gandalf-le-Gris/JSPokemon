@@ -12756,6 +12756,8 @@ function runEvent(event) {
             this.div.className = "event-option";
             this.div.innerHTML = o.text;
             this.div.onclick = function () {
+                if (music)
+                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                 grid.innerHTML = "";
 
                 var title = document.createElement('div');
@@ -12772,6 +12774,8 @@ function runEvent(event) {
                 var filter = document.createElement('div');
                 filter.className = "filter-clear";
                 filter.onclick = () => {
+                    if (music)
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     grid.innerHTML = "";
                     this.o.effect();
                 }
@@ -12851,6 +12855,16 @@ function createReward(isItem, r1, r2, r3) {
         }
         grid.appendChild((new makeReward(i)).reward1);
     }
+
+    var skip = document.createElement('div');
+    skip.className = "centered-subtitle replay";
+    skip.innerHTML = "skip";
+    skip.onclick = () => {
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+        nextEncounter();
+    };
+    grid.appendChild(skip);
 }
 
 function createEvent(event) {
