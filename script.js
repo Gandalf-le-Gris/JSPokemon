@@ -1003,6 +1003,8 @@ function launchGame() {
     eventChance = 0;
     flawless = true;
     team = [];
+    guaranteedPokemonCenter = false;
+    guaranteedPokemart = false;
 
     for (let i = 0; i < pSelected.length; i++) {
         if (!pSelected[i].includes("random")) {
@@ -1158,11 +1160,13 @@ function pathSelector() {
             cell.appendChild(image);
             cell.appendChild(title);
             cell.className = "team-selector-element";
-            if (Math.random() < pokemonCenterChance && pokemonCenterChance > .15) {
+            if ((Math.random() < pokemonCenterChance && pokemonCenterChance > .15) || guaranteedPokemonCenter) {
+                guaranteedPokemonCenter = false;
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png';
                 title.innerHTML = "pokémon center";
                 encounter = "pokemon_center";
-            } else if (Math.random() < pokemartChance && pokemartChance > .15) {
+            } else if ((Math.random() < pokemartChance && pokemartChance > .15) || guaranteedPokemart) {
+                guaranteedPokemart = false;
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
@@ -1228,8 +1232,6 @@ battleFilter.className = "filter-clear";
 battleFilter.id = "battleFilter";
 
 function startEncounter(encounter) {
-    eventEncounter();
-    return;
     if (encounter === "pokemon_center") {
         pokemonCenterEncounter();
     } else if (encounter === "pokemart") {
@@ -12765,6 +12767,14 @@ function runEvent(event) {
                 title.innerHTML = this.o.description;
                 grid.appendChild(title);
 
+                if (this.o.subdescription != undefined) {
+                    var subtitle = document.createElement('div');
+                    subtitle.className = "event-title";
+                    subtitle.style.fontSize = "2vw";
+                    subtitle.innerHTML = this.o.subdescription;
+                    grid.appendChild(subtitle);
+                }
+
                 var click = document.createElement('div');
                 click.className = "event-title";
                 click.style.fontSize = "1.5vw";
@@ -12801,59 +12811,126 @@ function createReward(isItem, r1, r2, r3) {
     title.innerHTML = "Choose your reward";
     grid.appendChild(title);
 
-    if (r3 == undefined)
-        r3 = r1;
-    if (r2 == undefined)
-        r2 = r1;
-    var rewards = [r1, r2, r3];
+    var rewards;
+    if (r1 != undefined) {
+        if (r3 == undefined)
+            r3 = r1;
+        if (r2 == undefined)
+            r2 = r1;
+        rewards = [r1, r2, r3];
+    }
 
-    for (let i = 0; i < team.length; i++) {
-        function makeReward(i) {
-            var p = team[i];
-            this.reward1 = document.createElement('div');
-            this.reward1.className = "reward";
+    if (isItem) {
+        for (let i = 0; i < team.length; i++) {
+            function makeReward(i) {
+                var p = team[i];
+                this.reward1 = document.createElement('div');
+                this.reward1.className = "reward";
 
-            var sprite = new Image();
-            sprite.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
-            sprite.className = "reward-sprite";
-            this.reward1.appendChild(sprite);
+                var sprite = new Image();
+                sprite.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
+                sprite.className = "reward-sprite";
+                this.reward1.appendChild(sprite);
 
-            var wrapper = document.createElement('div');
-            wrapper.className = "wrapper";
-            this.reward1.appendChild(wrapper);
+                var wrapper = document.createElement('div');
+                wrapper.className = "wrapper";
+                this.reward1.appendChild(wrapper);
 
-            var item = createHeldItem(rewards[i]);
-            var sprite1 = new Image();
-            sprite1.src = item.img;
-            sprite1.className = "reward-sprite";
-            wrapper.appendChild(sprite1);
+                var item = createHeldItem(rewards[i]);
+                var sprite1 = new Image();
+                sprite1.src = item.img;
+                sprite1.className = "reward-sprite";
+                wrapper.appendChild(sprite1);
 
-            var desc = document.createElement('div');
-            desc.className = "descriptor-name";
-            this.reward1.appendChild(desc);
-            var name = document.createElement('div');
-            name.innerHTML = item.name;
-            desc.appendChild(name);
+                var desc = document.createElement('div');
+                desc.className = "descriptor-name";
+                this.reward1.appendChild(desc);
+                var name = document.createElement('div');
+                name.innerHTML = item.name;
+                desc.appendChild(name);
 
-            var desc1 = document.createElement('div');
-            desc1.className = "descriptor";
-            this.reward1.appendChild(desc1);
-            var text = document.createElement('div');
-            text.innerHTML = item.description;
-            desc1.appendChild(text);
+                var desc1 = document.createElement('div');
+                desc1.className = "descriptor";
+                this.reward1.appendChild(desc1);
+                var text = document.createElement('div');
+                text.innerHTML = item.description;
+                desc1.appendChild(text);
 
-            this.reward1.p = i;
-            this.reward1.item = item;
-            this.reward1.onclick = function () {
-                team[this.p].items.push(this.item);
-                if (music)
-                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                if (this.item.pickup != undefined)
-                    this.item.effect(this.p);
-                nextEncounter();
-            };
+                this.reward1.p = i;
+                this.reward1.item = item;
+                this.reward1.onclick = function () {
+                    team[this.p].items.push(this.item);
+                    if (music)
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+                    if (this.item.pickup != undefined)
+                        this.item.effect(this.p);
+                    nextEncounter();
+                };
+            }
+            grid.appendChild((new makeReward(i)).reward1);
         }
-        grid.appendChild((new makeReward(i)).reward1);
+    } else {
+        for (let i = 0; i < team.length; i++) {
+            function makeReward(i) {
+                var p = team[i];
+                this.reward1 = document.createElement('div');
+                this.reward1.className = "reward";
+                var sprite1 = new Image();
+                sprite1.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_icons/' + p.id + '.png';
+                sprite1.className = "reward-sprite";
+                this.reward1.appendChild(sprite1);
+
+                move1 = getFromMovepool(p);
+                function makeCard(move) {
+                    this.card = document.createElement('div');
+                    this.card.className = "static-move-card";
+
+                    var top = document.createElement('div');
+                    top.className = "move-top";
+                    this.card.appendChild(top);
+                    var bottom = document.createElement('div');
+                    bottom.className = "move-top";
+                    this.card.appendChild(bottom);
+
+                    var name = document.createElement('div');
+                    name.innerHTML = move.name;
+                    name.class = "move-name";
+                    top.appendChild(name);
+                    var cost = document.createElement('div');
+                    cost.innerHTML = move.cost;
+                    cost.className = "move-cost";
+                    top.appendChild(cost);
+
+                    var type = new Image();
+                    if (move.type !== "")
+                        type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
+                    type.className = "type-icon";
+                    bottom.appendChild(type);
+                    var cat = new Image();
+                    cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
+                    cat.className = "category-icon";
+                    bottom.appendChild(cat);
+                }
+                var card1 = new makeCard(move1);
+                this.reward1.appendChild(card1.card);
+                var desc1 = document.createElement('div');
+                desc1.className = "descriptor";
+                this.reward1.appendChild(desc1);
+                var text = document.createElement('div');
+                text.innerHTML = move1.description;
+                desc1.appendChild(text);
+
+                this.reward1.p = i;
+                this.reward1.move = move1;
+                this.reward1.onclick = function () {
+                    team[this.p].moves.push(this.move);
+                    if (music)
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+                    nextEncounter();
+                };
+            }
+            grid.appendChild((new makeReward(i)).reward1);
+        }
     }
 
     var skip = document.createElement('div');
@@ -12868,10 +12945,14 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 1);
+    event = event != undefined ? event : Math.floor(Math.random() * 3);
     switch (event) {
         case 0:
             return new Event0();
+        case 1:
+            return new Event1();
+        case 2:
+            return new Event2();
     }
 }
 
@@ -12879,7 +12960,7 @@ function Event0() {
     this.description = "You enter old ruins. The walls are covered in mysterious glyphs written in an ancient alphabet, that you cannot decipher. In front of you lie two paths.";
     var reward = Math.random() < .5;
     this.options = [];
-    this.options[0] = {
+    this.options.push({
         text: "Take the left path",
         effect: () => {
             if (!reward) {
@@ -12903,43 +12984,223 @@ function Event0() {
             }
         },
         description: reward ? "You find some strangely shaped rocks at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
-    }
-    this.options[1] = {
+    })
+    this.options.push({
         text: "Take the right path",
         effect: () => {
             if (!reward) {
                 fadeOutTransition(1);
                 setTimeout(() => { battleEncounter("", "unown") }, 1000);
             } else {
-                function getRock() {
-                    switch (Math.floor(Math.random() * 4)) {
-                        case 0:
-                            return "heat_rock";
-                        case 1:
-                            return "damp_rock";
-                        case 2:
-                            return "icy_rock";
-                        case 3:
-                            return "smooth_rock";
-                        default:
-                    }
+                function getPlate() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_plate'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
                 }
-                createReward(true, getRock(), getRock(), getRock());
+                createReward(true, getPlate(), getPlate(), getPlate());
             }
         },
-        description: reward ? "You find some strangely shaped rocks at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
-    }
-    this.options[2] = {
-        text: "Exit the cave",
-        effect: () => { nextEncounter(); }
+        description: reward ? "You find some ancient looking plates at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
+    })
+    var i = team.findIndex(e => contains(e.types, "fire"));
+    if (i >= 0) {
+        this.options.push({
+            text: "[Fire] Make " + team[i].name + " light up the tunnels",
+            effect: () => {
+                money += 750;
+                earnedMoney += 750;
+                nextEncounter();
+            },
+            description: "As " + team[i].name + " lights up the ruins with its flame, you spot a shiny gold nugget in a corner. You greedily shove it into your bag.",
+            subdescription: "You got " + String.fromCharCode(08381) + "750."
+        })
     }
     var i = team.findIndex(e => contains(e.types, "psychic"));
     if (i >= 0) {
-        this.options[3] = {
-            text: "Let " + team[i].name + " decipher the glyphs",
-            effect: () => { offerReward("tm-1"); },
+        this.options.push({
+            text: "[Psychic] Let " + team[i].name + " decipher the glyphs",
+            effect: () => { createReward(true, "tm-1"); },
             description: "After reading the glyphs, " + team[i].name + " leads you to a third hidden passage. At the end of the tunnel, you find an old TM you don't recognize."
+        })
+    }
+}
+
+function Event1() {
+    this.description = "An old man approaches you. He presents himself as a move tutor and offers to teach new moves to your Pokémon.";
+    this.options = [];
+    this.options.push({
+        text: "Accept his offer",
+        effect: () => { createReward(false); },
+        description: "The move tutor shows your Pokémon some new techniques."
+    })
+    this.options.push({
+        text: "Ask for directions",
+        effect: () => {
+            guaranteedPokemonCenter = true;
+            guaranteedPokemart = true;
+            nextEncounter();
+        },
+        description: "The man explains to you how to get to the nearest town.",
+        subdescription: "Next encounters will be a Pokémon Center and a Pokémart."
+    })
+    var i = team.findIndex(e => e.name === "Ditto");
+    if (i >= 0) {
+        this.options.push({
+            text: "[Ditto] Show your Ditto to the old man",
+            effect: () => {
+                money += 800;
+                earnedMoney += 800;
+                nextEncounter();
+            },
+            description: "The move tutor giggles in excitement as he examines your Ditto, before handing you a handful of Pokédollars as a thank you gift for letting him see such a fascinating Pokémon.",
+            subdescription: "You got " + String.fromCharCode(08381) + "800."
+        })
+    }
+    var i = undefined;
+    for (let p of team) {
+        for (let it of p.items) {
+            if (it.name === 'TMXX')
+                i = it;
         }
+    }
+    if (i != undefined) {
+        this.options.push({
+            text: "[TMXX] Ask him to duplicate the TM",
+            effect: () => { createReward(true, "tm_xx"); },
+            description: "The move tutor takes the TM and enters his shed. After some time, he comes back with a large smile on his face and hands you a copy of your TM.",
+        })
+    }
+    var i = undefined;
+    for (let p of team) {
+        for (let it of p.items) {
+            if (it.name === 'TM-1')
+                i = it;
+        }
+    }
+    if (i != undefined) {
+        this.options.push({
+            text: "[TM-1] Ask him to duplicate the TM",
+            effect: () => { createReward(true, "tm-1"); },
+            description: "The move tutor takes the TM and enters his shed. After some time, he comes back with a large smile on his face and hands you a copy of your TM.",
+        })
+    }
+}
+
+function Event2() {
+    this.description = "A drunk gambler is willing to bet some Pokédollars with you in a simple card game. This could be easy money.";
+    this.options = [];
+    var reward = Math.random() < .5;
+
+    var amuletCoin = false;
+    for (let p of team)
+        for (let i of p.items)
+            amuletCoin = amuletCoin || i.name === "Amulet Coin";
+    var dark = team.findIndex(e => contains(e.types, "dark"));
+    if (!amuletCoin && !(dark >= 0)) {
+        if (money >= 500) {
+            this.options.push({
+                text: "Bet " + String.fromCharCode(08381) + "500",
+                effect: () => {
+                    if (reward) {
+                        money += 500;
+                        earnedMoney += 500;
+                    } else {
+                        money -= 500;
+                    }
+                    nextEncounter();
+                },
+                description: reward ? "You won the game! The money is all yours." : "Sadly, you lost the game and your money.",
+                subdescription: reward ? "You got " + String.fromCharCode(08381) + "500." : "You lost " + String.fromCharCode(08381) + "500."
+            })
+        }
+        if (money >= 1000) {
+            this.options.push({
+                text: "Bet " + String.fromCharCode(08381) + "1000",
+                effect: () => {
+                    if (reward) {
+                        money += 1000;
+                        earnedMoney += 1000;
+                    } else {
+                        money -= 1000;
+                    }
+                    nextEncounter();
+                },
+                description: reward ? "You won the game! The money is all yours." : "Sadly, you lost the game and your money.",
+                subdescription: reward ? "You got " + String.fromCharCode(08381) + "1000." : "You lost " + String.fromCharCode(08381) + "1000."
+            })
+        }
+        if (money >= 2000) {
+            this.options.push({
+                text: "Bet " + String.fromCharCode(08381) + "2000",
+                effect: () => {
+                    if (reward) {
+                        money += 2000;
+                        earnedMoney += 2000;
+                    } else {
+                        money -= 2000;
+                    }
+                    nextEncounter();
+                },
+                description: reward ? "You won the game! The money is all yours." : "Sadly, you lost the game and your money.",
+                subdescription: reward ? "You got " + String.fromCharCode(08381) + "2000." : "You lost " + String.fromCharCode(08381) + "2000."
+            })
+        }
+    } else {
+        if (money >= 500) {
+            this.options.push({
+                text: dark >= 0 ? "[Dark] Bet " + String.fromCharCode(08381) + "500" : "[Amulet Coin] Bet " + String.fromCharCode(08381) + "500",
+                effect: () => {
+                    money += 500;
+                    earnedMoney += 500;
+                    nextEncounter();
+                },
+                description: dark >= 0 ? "After " + team[dark].name + " swaps the deck of cards with a prepared one, your victory is inevitable." : "The amulet coin brings you luck, and it is no surprise that you win your bet.",
+                subdescription: "You got " + String.fromCharCode(08381) + "500."
+            })
+        }
+        if (money >= 1000) {
+            this.options.push({
+                text: dark >= 0 ? "[Dark] Bet " + String.fromCharCode(08381) + "1000" : "[Amulet Coin] Bet " + String.fromCharCode(08381) + "1000",
+                effect: () => {
+                    money += 1000;
+                    earnedMoney += 1000;
+                    nextEncounter();
+                },
+                description: dark >= 0 ? "After " + team[dark].name + " swaps the deck of cards with a prepared one, your victory is inevitable." : "The amulet coin brings you luck, and it is no surprise that you win your bet.",
+                subdescription: "You got " + String.fromCharCode(08381) + "1000."
+            })
+        }
+        if (money >= 2000) {
+            this.options.push({
+                text: dark >= 0 ? "[Dark] Bet " + String.fromCharCode(08381) + "2000" : "[Amulet Coin] Bet " + String.fromCharCode(08381) + "2000",
+                effect: () => {
+                    money += 2000;
+                    earnedMoney += 2000;
+                    nextEncounter();
+                },
+                description: dark >= 0 ? "After " + team[dark].name + " swaps the deck of cards with a prepared one, your victory is inevitable." : "The amulet coin brings you luck, and it is no surprise that you win your bet.",
+                subdescription: "You got " + String.fromCharCode(08381) + "2000."
+            })
+        }
+    }
+    this.options.push({
+        text: "Refuse the bet and leave",
+        effect: () => { nextEncounter(); },
+        description: "You refuse the offer and resume your adventure.",
+    })
+    var i = team.findIndex(e => e.name === "Meowth");
+    if (i >= 0) {
+        this.options.push({
+            text: "[Meowth] Steal the gambling man",
+            effect: () => {
+                money += 500;
+                earnedMoney += 500;
+                nextEncounter();
+            },
+            description: "As you keep the man busy, your Meowth sneaks up behind him and steals whatever it can find in his pockets.",
+            subdescription: "You got " + String.fromCharCode(08381) + "500."
+        })
     }
 }
 
