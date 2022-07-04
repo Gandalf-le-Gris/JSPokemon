@@ -94,6 +94,12 @@ function loadResources() {
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
         sounds.push(p.cry);
     }
+    for (let poke of bossList) {
+        var p = createPokemon(poke);
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
+        imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
+        sounds.push(p.cry);
+    }
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif");
@@ -1195,6 +1201,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
+trainerList = ["unown", "shedinja"];
 
 energy = 5;
 maxEnergy = 5;
@@ -2101,6 +2108,11 @@ function useMove(move) {
         var bulletproof = (name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") || (player && opponent.talent === "Bulletproof"));
         cancelled = cancelled || bulletproof;
 
+        //wonder guard
+        var pD = player ? opponent : team[activePokemon];
+        if (pD.talent === "Wonder guard" && effectiveMultiplier(move, pD) <= 1)
+            cancelled = true;
+
         var boostMul = 1;
         //move effects
         var target;
@@ -2108,6 +2120,7 @@ function useMove(move) {
             target = doesBlock(opponent) && pDummy != undefined ? pDummy : opponent;
         else
             target = doesBlock(team[activePokemon]) && pDummy != undefined ? pDummy : team[activePokemon];
+
         if (!cancelled) {
             if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0)) {
                 if (move.effect != undefined)
@@ -2193,6 +2206,8 @@ function useMove(move) {
 }
 
 function dealDamage(damage, p, move) {
+    if (p.talent === "Wonder guard" && damage > 1)
+        damage = 1;
     if (p.currenthp > 0 && (p.currenthp == 1 || p.talent !== "Sturdy"))
         p.currenthp = Math.min(Math.max(0, Math.floor(p.currenthp - damage)), p.maxhp);
     else if (p.currenthp > 0)
@@ -2468,7 +2483,7 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
-    opponent = new Unown();
+    opponent = new Shedinja();
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
@@ -3361,6 +3376,8 @@ function createPokemon(pokemon) {
             return new AlolanNinetales();
         case "unown":
             return new Unown();
+        case "shedinja":
+            return new Shedinja();
         default:
             return new MissingNo();
     }
@@ -5054,6 +5071,33 @@ function Unown() {
     this.talentDesc = "Levitates above the ground, granting ground type immunity."
     this.init = function () { applyEffect("levitation", 99, this); }
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/unown.ogg"
+}
+
+function Shedinja() {
+    this.name = "Shedinja";
+    this.hp = 1;
+    this.attack = 90;
+    this.defense = 45;
+    this.spattack = 30;
+    this.spdefense = 30;
+    this.speed = 40;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["bug", "ghost"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("swords_dance"), createMove("screech"), createMove("sucker_punch"), createMove("feint_attack"), createMove("x_scissor"), createMove("bug_bite"), createMove("leech_life"), createMove("shadow_claw"), createMove("shadow_sneak"), createMove("swagger")]];
+    this.movepool = ["absorb", "agility", "bug_bite", "bug_buzz", "confuse_ray", "dig", "feint_attack", "fury_cutter", "hone_claws", "leech_life", "metal_claw", "night_slash", "phantom_force", "shadow_ball", "shadow_claw", "shadow_sneak", "sucker_punch", "x_scissor", "will_o_wisp", "swords_dance", "swagger", "string_shot", "spite", "slash", "screech"];
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/shedinja.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/shedinja.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Wonder guard";
+    this.talentDesc = "This Pokémon can only be damaged by super effective damage and indirect damage. Takes at most 1 damage per hit."
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/shedinja.ogg"
 }
 
 
