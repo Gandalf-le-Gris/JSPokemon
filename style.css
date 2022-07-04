@@ -350,13 +350,14 @@ button.start:hover {
     grid-template-columns: auto;
     grid-row-gap: 2vh;
     border: solid;
-    border-color: red;
-    color: red;
+    border-color: #dd0000;
+    color: #dd0000;
     font-size: 2.3vh;
     font-family: 'Copperplate Gothic';
     background-color: lightslategrey;
     justify-self: center;
     vertical-align: middle;
+    border-radius: 1vh;
 }
 
 .move-card:hover, .selected-move:hover {
@@ -405,11 +406,11 @@ button.start:hover {
     border-radius: 1vh;
 }
 
-.end-turn:hover {
-    color: red;
-    background-color: #ffd0d0;
-    font-size: 3.1vh;
-}
+    .end-turn:hover {
+        color: #dd0000;
+        background-color: #ffd0d0;
+        font-size: 3.1vh;
+    }
 
 .switch-headers {
     display: grid;
@@ -456,6 +457,8 @@ button.start:hover {
     font-size: 1.5vw;
     text-align: center;
     background: rgba(0, 0, 0, .4);
+    padding: .5vh;
+    border-radius: 1vh;
 }
 
 .fainted {
@@ -715,6 +718,7 @@ button.launch-tuto:hover {
     left: 50%;
     transform: translate(-50%, -90%);
     text-align: center;
+    border-radius: 1vh;
 }
 
 .filter-clear {
@@ -730,6 +734,26 @@ button.launch-tuto:hover {
 .blink {
     animation: blink-animation .2s steps(5, start) infinite;
     -webkit-animation: blink-animation .2s steps(5, start) infinite;
+}
+
+.blink-transform1 {
+    animation: fadeOut .1s;
+    -webkit-animation: fadeOut .1s;
+}
+
+.blink-transform2 {
+    animation: fadeOut .3s;
+    -webkit-animation: fadeOut .3s;
+}
+
+.unblink-transform1 {
+    animation: fadeDark .1s;
+    -webkit-animation: fadeDark .1s;
+}
+
+.unblink-transform2 {
+    animation: fadeDark .3s;
+    -webkit-animation: fadeDark .3s;
 }
 
 .damage-indicator {
@@ -1105,6 +1129,18 @@ input:checked + .slider:before {
 @-webkit-keyframes blink-animation {
     to {
         opacity: .5;
+    }
+}
+
+@keyframes full-blink-animation {
+    to {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes full-blink-animation {
+    to {
+        opacity: 0;
     }
 }
 

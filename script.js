@@ -1030,6 +1030,7 @@ function launchGame() {
 /* ------------------------------------------------------ */
 
 var types = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "flying", "ghost", "grass", "ground", "ice", "normal", "poison", "psychic", "rock", "steel", "water"]
+var typeColors = ["#BCDE76", "#A8A3B1", "#5FAEF5", "#F5DB91", "#EFA5EA", "#DC7896", "#FF9D55", "#9CB3E2", "#8B9BC9", "#8DCE89", "#E29972", "#91D9CE", "#BABFC5", "#C093D7", "#FC989D", "#CDC19C", "#9FBECA", "#87B3E2"]
 
 function mapSelection() {
     clearBody();
@@ -1232,6 +1233,7 @@ function battleEncounter(encounter) {
     pLeftView.id = "pLeftView";
     document.body.appendChild(pLeftView);
     leftHeader = document.createElement('div');
+    leftHeader.id = "leftHeader";
     leftHeader.className = "pokemon-header";
     pLeftView.appendChild(leftHeader);
     leftName = document.createElement('div');
@@ -1269,6 +1271,7 @@ function battleEncounter(encounter) {
     pRightView.id = "pRightView";
     document.body.appendChild(pRightView);
     rightHeader = document.createElement('div');
+    rightHeader.id = "rightHeader";
     rightHeader.className = "pokemon-header";
     pRightView.appendChild(rightHeader);
     rightName = document.createElement('div');
@@ -1392,6 +1395,7 @@ function battleEncounter(encounter) {
     switch2.appendChild(switchImage2);
 
     switchHeader1 = document.createElement('div');
+    switchHeader1.id = "switchHeader1";
     switchHeader1.className = "pokemon-header";
     switch1.appendChild(switchHeader1);
     switchName1 = document.createElement('div');
@@ -1412,6 +1416,7 @@ function battleEncounter(encounter) {
     switchHeader1.appendChild(switchHP1);
 
     switchHeader2 = document.createElement('div');
+    switchHeader2.id = "switchHeader2";
     switchHeader2.className = "pokemon-header";
     switch2.appendChild(switchHeader2);
     switchName2 = document.createElement('div');
@@ -1488,6 +1493,11 @@ function battleEncounter(encounter) {
 
     switch1.title = getMoveDescription(team[switchInd[0]]);
     switch2.title = getMoveDescription(team[switchInd[1]]);
+
+    for (let p of team) {
+        colorHeader(p);
+    }
+    colorHeader(opponent);
 
     if (music) {
         setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 1000);
@@ -1606,6 +1616,23 @@ function drawHand() {
     }
 
     refreshIconCounts();
+}
+
+function colorHeader(p) {
+    var header;
+    if (p === opponent)
+        header = document.getElementById("rightHeader");
+    else if (p === team[activePokemon])
+        header = document.getElementById("leftHeader");
+    else if (p === team[switchInd[0]])
+        header = document.getElementById("switchHeader1");
+    else
+        header = document.getElementById("switchHeader2");
+    var c1 = typeColors[types.findIndex(e => e === p.types[0])];
+    var c2 = p.types.length > 1 ? typeColors[types.findIndex(e => e === p.types[1])] : c1;
+    header.style.background = c1;
+    if (c2 !== c1)
+        header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 40%, " + c2 + " 60%, " + c2 + " 100%)";
 }
 
 function drawEffects(side) {
@@ -1766,41 +1793,56 @@ function switchPokemon(ind) {
         document.getElementById("movePreview").className = "preview-off";
         document.getElementById("leftSprite").className = "pokemon-sprite";
 
-        var n = activePokemon;
-        activePokemon = switchInd[ind];
-        switchInd[ind] = n;
+        document.getElementById("leftSprite").className += " blink-transform2";
+        setTimeout(() => {
+            var n = activePokemon;
+            activePokemon = switchInd[ind];
+            switchInd[ind] = n;
 
-        var pA = team[activePokemon];
-        var pS = team[n];
+            var pA = team[activePokemon];
+            var pS = team[n];
 
-        n = ind + 1;
-        document.getElementById("switchImage" + n).src = pS.imgf;
-        document.getElementById("switchName" + n).innerHTML = pS.name;
-        document.getElementById("switchHP" + n).value = pS.currenthp;
-        document.getElementById("switchHP" + n).max = pS.maxhp;
-        document.getElementById("switchHPText" + n).innerHTML = pS.currenthp + "/" + pS.maxhp;
-        document.getElementById("switch" + n).title = getMoveDescription(pS);
+            n = ind + 1;
+            document.getElementById("switchImage" + n).src = pS.imgf;
+            document.getElementById("switchName" + n).innerHTML = pS.name;
+            document.getElementById("switchHP" + n).value = pS.currenthp;
+            document.getElementById("switchHP" + n).max = pS.maxhp;
+            document.getElementById("switchHPText" + n).innerHTML = pS.currenthp + "/" + pS.maxhp;
+            document.getElementById("switch" + n).title = getMoveDescription(pS);
 
-        document.getElementById("leftSprite").src = pA.imgb;
-        document.getElementById("leftName").innerHTML = pA.name;
-        document.getElementById("leftHP").value = pA.currenthp;
-        document.getElementById("leftHP").max = pA.maxhp;
-        document.getElementById("leftHPText").innerHTML = pA.currenthp + "/" + pA.maxhp;
+            document.getElementById("leftSprite").src = pA.imgb;
+            document.getElementById("leftName").innerHTML = pA.name;
+            document.getElementById("leftHP").value = pA.currenthp;
+            document.getElementById("leftHP").max = pA.maxhp;
+            document.getElementById("leftHPText").innerHTML = pA.currenthp + "/" + pA.maxhp;
 
-        drawHand();
-        drawEffects(true);
-        drawStats(true);
-        if (pS.currenthp > 0)
-            switchesLeft--;
+            drawHand();
+            drawEffects(true);
+            drawStats(true);
+            if (pS.currenthp > 0)
+                switchesLeft--;
 
-        switchCastform(team[activePokemon]);
-        resizeSprites();
-        if (music)
-            setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 250);
+            switchCastform(team[activePokemon]);
+            resizeSprites();
+            if (music)
+                setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 250);
+
+            colorHeader(pA);
+            colorHeader(pS);
+            document.getElementById("leftSprite").classList.remove("blink-transform2");
+            document.getElementById("leftSprite").className += " unblink-transform2";
+        }, 300);
+        setTimeout(() => {
+            document.getElementById("leftSprite").classList.remove("unblink-transform2");
+        }, 600);
     } else if (switchesLeft == 0) {
         var preview = document.getElementById("movePreview");
         preview.className = "preview-on";
-        preview.innerHTML = "No switches left!"
+        preview.innerHTML = "No switches left!";
+    } else if (isTrapped(team[activePokemon])) {
+        var preview = document.getElementById("movePreview");
+        preview.className = "preview-on";
+        preview.innerHTML = team[activePokemon].name + " is trapped!";
     }
 }
 
@@ -2355,9 +2397,10 @@ function aiActions() {
         useMove(opponent.hand[i]);
         setTimeout(aiActions, 2000 - 1200 * fastBattle);
     } else {
-        if (team[activePokemon].currenthp == 0) {
+        if (team[activePokemon].currenthp == 0)
             desc.innerHTML += team[activePokemon].name + ' fainted!<br />Choose a new Pokémon to send out.<br />';
-        }
+        else
+            desc.className = "preview-off";
         endTurn();
     }
 }
@@ -3266,7 +3309,9 @@ function createPokemon(pokemon) {
         case "kommo-o":
             return new KommoO();
         case "nidoking":
-            return new Nidoking();
+            return new Nidoking(true);
+        case "nidoqueen":
+            return new Nidoking(false);
         case "whimsicott":
             return new Whimsicott();
         case "ninetales_alola":
@@ -3498,6 +3543,7 @@ function Cinderace() {
     this.init = function () { this.types = ["fire"]; }
     this.boost = function (move) {
         this.types = [move.type];
+        colorHeader(this);
         removeEffect(this, "Type changed");
         applyEffect("type_changed", 1, this, move.type);
         return .9;
@@ -3873,37 +3919,55 @@ function Aegislash() {
 function switchAegislash(p, shield) {
     if (p.name === "Aegislash") {
         if (shield && p.stance !== "shield") {
-            var temp = p.attack;
-            p.attack = p.defense;
-            p.defense = temp;
-            temp = p.spattack;
-            p.spattack = p.spdefense;
-            p.spdefense = temp;
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash.gif';
-            resizeSprites(true);
-            p.stance = "shield";
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
-            }
+            var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+            img.className += " blink-transform1";
+            setTimeout(() => {
+                var temp = p.attack;
+                p.attack = p.defense;
+                p.defense = temp;
+                temp = p.spattack;
+                p.spattack = p.spdefense;
+                p.spdefense = temp;
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+                resizeSprites(true);
+                p.stance = "shield";
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }, 100);
+            setTimeout(() => {
+                img.classList.remove("unblink-transform1");
+            }, 200);
         } else if (!shield && p.stance === "shield") {
-            var temp = p.attack;
-            p.attack = p.defense;
-            p.defense = temp;
-            temp = p.spattack;
-            p.spattack = p.spdefense;
-            p.spdefense = temp;
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
-            resizeSprites(true);
-            p.stance = "blade";
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
-            }
+            var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+            img.className += " blink-transform1";
+            setTimeout(() => {
+                var temp = p.attack;
+                p.attack = p.defense;
+                p.defense = temp;
+                temp = p.spattack;
+                p.spattack = p.spdefense;
+                p.spdefense = temp;
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
+                resizeSprites(true);
+                p.stance = "blade";
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }, 100);
+            setTimeout(() => {
+                img.classList.remove("unblink-transform1");
+            }, 200);
         }
     }
 }
@@ -4381,25 +4445,43 @@ function Mimikyu() {
 function switchMimikyu(p, disguise) {
     if (p.name === "Mimikyu") {
         if (disguise && !p.disguise) {
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
-            resizeSprites(true);
-            p.disguise = true;
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
-            }
+            var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+            img.className += " blink-transform1";
+            setTimeout(() => {
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+                resizeSprites(true);
+                p.disguise = true;
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }, 100);
+            setTimeout(() => {
+                img.classList.remove("unblink-transform1");
+            }, 200);
         } else if (!disguise && p.disguise) {
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
-            resizeSprites(true);
-            p.disguise = false;
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
-            }
+            var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+            img.className += " blink-transform1";
+            setTimeout(() => {
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
+                resizeSprites(true);
+                p.disguise = false;
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }, 100);
+            setTimeout(() => {
+                img.classList.remove("unblink-transform1");
+            }, 200);
         }
     }
 }
@@ -4496,48 +4578,58 @@ function Darmanitan() {
 
 function switchDarmanitan(p, zen) {
     if (p.name === "Darmanitan") {
-        if (zen && !p.zen) {
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
-            resizeSprites(true);
-            p.types = ["fire", "psychic"];
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+        img.className += " blink-transform1";
+        setTimeout(() => {
+            if (zen && !p.zen) {
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
+                resizeSprites(true);
+                p.types = ["fire", "psychic"];
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                p.attack *= 3 / 14;
+                p.defense *= 21 / 11;
+                p.spattack *= 14 / 3;
+                p.spdefense *= 21 / 11;
+                p.speed *= 11 / 19;
+                p.zen = true;
+            } else {
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+                resizeSprites(true);
+                p.types = ["fire"];
+                if (team[activePokemon] === p) {
+                    document.getElementById("leftSprite").src = p.imgb;
+                } else if (opponent === p) {
+                    document.getElementById("rightSprite").src = p.imgf;
+                }
+                p.attack *= 14 / 3;
+                p.defense *= 11 / 21;
+                p.spattack *= 3 / 14;
+                p.spdefense *= 11 / 21;
+                p.speed *= 19 / 11;
+                p.zen = false;
             }
-            p.attack *= 3 / 14;
-            p.defense *= 21 / 11;
-            p.spattack *= 14 / 3;
-            p.spdefense *= 21 / 11;
-            p.speed *= 11 / 19;
-            p.zen = true;
-        } else {
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
-            resizeSprites(true);
-            p.types = ["fire"];
-            if (team[activePokemon] === p) {
-                document.getElementById("leftSprite").src = p.imgb;
-            } else if (opponent === p) {
-                document.getElementById("rightSprite").src = p.imgf;
-            }
-            p.attack *= 14 / 3;
-            p.defense *= 11 / 21;
-            p.spattack *= 3 / 14;
-            p.spdefense *= 11 / 21;
-            p.speed *= 19 / 11;
-            p.zen = false;
-        }
-        var temp = [].concat(p.moves);
-        p.moves = [].concat(p.moves2);
-        p.moves2 = temp;
-        var temp = [].concat(p.movepool);
-        p.movepool = [].concat(p.movepool2);
-        p.movepool2 = temp;
+            var temp = [].concat(p.moves);
+            p.moves = [].concat(p.moves2);
+            p.moves2 = temp;
+            var temp = [].concat(p.movepool);
+            p.movepool = [].concat(p.movepool2);
+            p.movepool2 = temp;
 
-        initDeck(p);
-        drawMove(p, true);
+            colorHeader(p);
+            initDeck(p);
+            drawMove(p, true);
+            img.classList.remove("blink-transform1");
+            img.className += " unblink-transform1";
+        }, 100);
+        setTimeout(() => {
+            img.classList.remove("unblink-transform1");
+        }, 200);
     }
 }
 
@@ -4583,46 +4675,56 @@ function Rotom() {
 }
 
 function switchRotom(p, move) {
-    if (p.name === "Rotom" && !contains(p.types, move.type)) {
-        switch (move.type) {
-            case "ghost":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom.gif';
-                resizeSprites(true);
-                p.types = ["electric", "ghost"];
-                break;
-            case "flying":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
-                resizeSprites(true);
-                p.types = ["electric", "flying"];
-                break;
-            case "ice":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
-                resizeSprites(true);
-                p.types = ["electric", "ice"];
-                break;
-            case "fire":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
-                resizeSprites(true);
-                p.types = ["electric", "fire"];
-                break;
-            case "grass":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
-                resizeSprites(true);
-                p.types = ["electric", "grass"];
-                break;
-            case "water":
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
-                resizeSprites(true);
-                p.types = ["electric", "fire"];
-                break;
-            default:
-        }
+    if (p.name === "Rotom" && !contains(p.types, move.type) && (move.type === "ghost" || move.type === "water" || move.type === "ice" || move.type === "fire" || move.type === "grass" || move.type === "flying")) {
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+        img.className += " blink-transform1";
+        setTimeout(() => {
+            switch (move.type) {
+                case "ghost":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "ghost"];
+                    break;
+                case "flying":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "flying"];
+                    break;
+                case "ice":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "ice"];
+                    break;
+                case "fire":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "fire"];
+                    break;
+                case "grass":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "grass"];
+                    break;
+                case "water":
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
+                    resizeSprites(true);
+                    p.types = ["electric", "fire"];
+                    break;
+                default:
+            }
+            colorHeader(p);
+            img.classList.remove("blink-transform1");
+            img.className += " unblink-transform1";
+        }, 100);
+        setTimeout(() => {
+            img.classList.remove("unblink-transform1");
+        }, 200);
     }
 }
 
@@ -4663,35 +4765,72 @@ function Castform() {
 
 function switchCastform(p) {
     if (p.name === "Castform") {
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
-            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
-            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
-            resizeSprites(true);
-            p.types = ["normal"];
+            img.className += " blink-transform1";
+            setTimeout(() => {
+                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
+                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
+                resizeSprites(true);
+                p.types = ["normal"];
+                colorHeader(p);
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }, 100);
+            setTimeout(() => {
+                img.classList.remove("unblink-transform1");
+            }, 200);
         } else if (weather != undefined) {
             switch (weather.name) {
                 case "Sun":
                     if (!contains(p.types, "fire")) {
-                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
-                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
-                        resizeSprites(true);
-                        p.types = ["fire"];
+                        img.className += " blink-transform1";
+                        setTimeout(() => {
+                            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
+                            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
+                            resizeSprites(true);
+                            p.types = ["fire"];
+                            colorHeader(p);
+                            img.classList.remove("blink-transform1");
+                            img.className += " unblink-transform1";
+                        }, 100);
+                        setTimeout(() => {
+                            img.classList.remove("unblink-transform1");
+                        }, 200);
                     }
                     break;
                 case "Rain":
                     if (!contains(p.types, "water")) {
-                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
-                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
-                        resizeSprites(true);
-                        p.types = ["water"];
+                        img.className += " blink-transform1";
+                        setTimeout(() => {
+                            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
+                            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
+                            resizeSprites(true);
+                            p.types = ["water"];
+                            colorHeader(p);
+                            img.classList.remove("blink-transform1");
+                            img.className += " unblink-transform1";
+                        }, 100);
+                        setTimeout(() => {
+                            img.classList.remove("unblink-transform1");
+                        }, 200);
                     }
                     break;
                 case "Hail":
                     if (!contains(p.types, "ice")) {
-                        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
-                        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
-                        resizeSprites(true);
-                        p.types = ["ice"];
+                        img.className += " blink-transform1";
+                        setTimeout(() => {
+                            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
+                            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
+                            resizeSprites(true);
+                            p.types = ["ice"];
+                            colorHeader(p);
+                            img.classList.remove("blink-transform1");
+                            img.className += " unblink-transform1";
+                        }, 100);
+                        setTimeout(() => {
+                            img.classList.remove("unblink-transform1");
+                        }, 200);
                     }
                     break;
                 default:
@@ -4733,8 +4872,8 @@ function KommoO() {
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/kommo-o.ogg"
 }
 
-function Nidoking() {
-    this.gender = Math.floor(Math.random() * 2) == 0 ? true : false;
+function Nidoking(gender) {
+    this.gender = gender != undefined ? gender : Math.floor(Math.random() * 2) == 0 ? true : false;
     this.name = this.gender ? "Nidoking" : "Nidoqueen";
     this.id = this.gender ? "nidoking" : "nidoqueen";
     this.description = "A mixed bulky attacker with the ability to spread poison."
@@ -4869,6 +5008,7 @@ function Arceus() {
     this.init = function () { this.types = ["normal"]; }
     this.endTurn = function () {
         this.types = [types[Math.floor(Math.random() * types.length)]];
+        colorHeader(this);
         removeEffect(this, "Type changed");
         applyEffect("type_changed", 1, this, this.types[0]);
     }
@@ -4961,23 +5101,33 @@ function Hoopa() {
 
 function switchHoopa(p) {
     if (p.name === "Hoopa") {
-        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
-        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
-        resizeSprites(true);
-        p.types = ["psychic", "dark"];
-        if (team[activePokemon] === p) {
-            document.getElementById("leftSprite").src = p.imgb;
-        } else if (opponent === p) {
-            document.getElementById("rightSprite").src = p.imgf;
-        }
-        p.attack = Math.floor(p.attack * 16 / 11);
-        p.spattack = Math.floor(p.spattack * 17 / 15);
-        p.speed = Math.floor(p.speed * 8 / 7);
-        dealDamage(-.3 * p.maxhp, p);
-        p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+        img.className += " blink-transform1";
+        setTimeout(() => {
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
+            resizeSprites(true);
+            p.types = ["psychic", "dark"];
+            if (team[activePokemon] === p) {
+                document.getElementById("leftSprite").src = p.imgb;
+            } else if (opponent === p) {
+                document.getElementById("rightSprite").src = p.imgf;
+            }
+            p.attack = Math.floor(p.attack * 16 / 11);
+            p.spattack = Math.floor(p.spattack * 17 / 15);
+            p.speed = Math.floor(p.speed * 8 / 7);
+            dealDamage(-.3 * p.maxhp, p);
+            p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
 
-        initDeck(p);
-        drawMove(p, true);
+            colorHeader(p);
+            initDeck(p);
+            drawMove(p, true);
+            img.classList.remove("blink-transform1");
+            img.className += " unblink-transform1";
+        }, 100);
+        setTimeout(() => {
+            img.classList.remove("unblink-transform1");
+        }, 200);
     }
 }
 
@@ -5099,26 +5249,35 @@ function Giratina() {
 
 function switchGiratina(p) {
     if (p.name === "Giratina") {
-        p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
-        p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
-        if (team[activePokemon] === p) {
-            document.getElementById("leftSprite").src = p.imgb;
-        } else if (opponent === p) {
-            document.getElementById("rightSprite").src = p.imgf;
-        }
-        resizeSprites(true);
-        var temp = p.attack;
-        p.attack = p.defense;
-        p.defense = temp;
-        temp = p.spattack;
-        p.spattack = p.spdefense;
-        p.spdefense = temp;
-        this.revenge = function (move, pD) { };
-        applyEffect("levitation", 99, p);
-        p.talent = "Levitation"
-        p.talentDesc = "Levitates above the ground, granting ground type immunity."
-        dealDamage(-.1 * p.maxhp, p);
-        p.origin = true;
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+        img.className += " blink-transform1";
+        setTimeout(() => {
+            p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
+            p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
+            if (team[activePokemon] === p) {
+                document.getElementById("leftSprite").src = p.imgb;
+            } else if (opponent === p) {
+                document.getElementById("rightSprite").src = p.imgf;
+            }
+            resizeSprites(true);
+            var temp = p.attack;
+            p.attack = p.defense;
+            p.defense = temp;
+            temp = p.spattack;
+            p.spattack = p.spdefense;
+            p.spdefense = temp;
+            this.revenge = function (move, pD) { };
+            applyEffect("levitation", 99, p);
+            p.talent = "Levitation"
+            p.talentDesc = "Levitates above the ground, granting ground type immunity."
+            dealDamage(-.1 * p.maxhp, p);
+            p.origin = true;
+            img.classList.remove("blink-transform1");
+            img.className += " unblink-transform1";
+        }, 100);
+        setTimeout(() => {
+            img.classList.remove("unblink-transform1");
+        }, 200);
     }
 }
 
