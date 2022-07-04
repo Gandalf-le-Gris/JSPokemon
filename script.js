@@ -1303,6 +1303,12 @@ function battleEncounter(encounter) {
     rightStats.className = "effect-section";
     rightStats.id = "rightStats";
     pRightView.appendChild(rightStats);
+    pRightView.title = opponent.name + "\nTypes: ";
+    for (let type of opponent.types) {
+        var t = type.charAt(0).toUpperCase() + type.slice(1)
+        pRightView.title += t + " ";
+    }
+    pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
 
     resizeSprites(true);
 
