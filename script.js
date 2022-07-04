@@ -1203,7 +1203,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
-trainerList = ["unown", "shedinja"];
+trainerList = ["unown", "shedinja", "bidoof"];
 
 energy = 5;
 maxEnergy = 5;
@@ -2491,6 +2491,7 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
+
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
         opponent.maxhp = 5;
@@ -3389,6 +3390,8 @@ function createPokemon(pokemon) {
             return new Unown();
         case "shedinja":
             return new Shedinja();
+        case "bidoof":
+            return new Bidoof();
         default:
             return new MissingNo();
     }
@@ -5111,6 +5114,33 @@ function Shedinja() {
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/shedinja.ogg"
 }
 
+function Bidoof() {
+    this.name = "Bidoof";
+    this.hp = 59;
+    this.attack = 45;
+    this.defense = 40;
+    this.spattack = 35;
+    this.spdefense = 40;
+    this.speed = 31;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["normal"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("swords_dance"), createMove("tackle"), createMove("double_edge"), createMove("super_fang"), createMove("aqua_tail"), createMove("facade"), createMove("fury_swipes"), createMove("amnesia"), createMove("skull_bash"), createMove("quick_attack")]];
+    this.movepool = ["amnesia", "aqua_tail", "crunch", "dig", "curse", "double_edge", "facade", "fury_cutter", "fury_swipes", "headbutt", "iron_tail", "quick_attack", "rock_smash", "rollout", "skull_bash", "super_fang", "swords_dance", "tackle"];
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/bidoof.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/bidoof.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Simple";
+    this.talentDesc = "Double the stat changes received by this Pokémon."
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/bidoof.ogg"
+}
+
 
 
 function Arceus() {
@@ -5533,6 +5563,9 @@ function boostStat(p, stat, stages) {
         statRaised++;
     if (p === opponent && stages < 0)
         loweredStats++;
+
+    if (p.talent === "Simple")
+        stages *= 2;
     switch (stat) {
         case "attack":
             p.statchanges.attack = Math.min(6, Math.max(-6, p.statchanges.attack + stages));
@@ -6977,9 +7010,10 @@ function CloseCombat() {
     this.cat = "physical";
     this.bp = 110;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { };
+    this.lower = false;
+    this.effect = function (move, pA, pD) { this.lower = pA.currenthp < pD.currenthp; };
     this.postEffect = function (move, pA, pD) {
-        if (pA.currenthp < pD.currenthp) {
+        if (this.lower) {
             boostStat(pA, "defense", -1);
             boostStat(pA, "spdefense", -1);
         }
