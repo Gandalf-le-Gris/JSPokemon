@@ -335,14 +335,16 @@ sfxVolume = 1;
 
 function playMusic(src, repeat) {
     var music = document.getElementById(src);
-    music.volume = baseVolume * masterVolume;
-    if (repeat)
-        music.volume *= musicVolume;
-    else
-        music.volume *= sfxVolume;
-    music.currentTime = 0;
-    music.loop = repeat;
-    music.play();
+    if (music != undefined) {
+        music.volume = baseVolume * masterVolume;
+        if (repeat)
+            music.volume *= musicVolume;
+        else
+            music.volume *= sfxVolume;
+        music.currentTime = 0;
+        music.loop = repeat;
+        music.play();
+    }
 }
 
 function stopMusic() {
