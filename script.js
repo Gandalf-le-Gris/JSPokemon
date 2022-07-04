@@ -2105,13 +2105,19 @@ function useMove(move) {
 
         //bulletproof
         var name = move.name.toLowerCase();
-        var bulletproof = (name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") || (player && opponent.talent === "Bulletproof"));
-        cancelled = cancelled || bulletproof;
+        if ((name.includes("ball") || name.includes("focus blast") || name.includes("bullet seed") || name.includes("bomb") || name.includes("aura sphere") || name.includes("zap cannon")) && ((!player && team[activePokemon].talent === "Bulletproof") || (player && opponent.talent === "Bulletproof"))) {
+            cancelled = true;
+            message = "bulletproof";
+            desc.innerHTML += pD.name + "'s Bulletproof activated!<br />";
+        }
 
         //wonder guard
         var pD = player ? opponent : team[activePokemon];
-        if (pD.talent === "Wonder guard" && effectiveMultiplier(move, pD) <= 1)
+        if (pD.talent === "Wonder guard" && effectiveMultiplier(move, pD) <= 1 && move.cat !== "status") {
             cancelled = true;
+            message = "wonder guard";
+            desc.innerHTML += pD.name + "'s Wonder guard activated!<br />";
+        }
 
         var boostMul = 1;
         //move effects
@@ -2144,7 +2150,7 @@ function useMove(move) {
             blockedHits += 1;
         }
 
-        if ((bulletproof || move.fails) && message === "") {
+        if (move.fails && message === "") {
             desc.innerHTML += "But it failed!<br />";
         }
 
@@ -2483,8 +2489,11 @@ function createOpponent(encounter) {
     } else {
         opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
     }
-    opponent = new Shedinja();
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
+    if (opponent.talent === "Wonder guard") {
+        opponent.maxhp = 5;
+        opponent.currenthp = opponent.maxhp;
+    }
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
     if (area < 10) {
@@ -5075,7 +5084,7 @@ function Unown() {
 
 function Shedinja() {
     this.name = "Shedinja";
-    this.hp = 1;
+    this.hp = 100;
     this.attack = 90;
     this.defense = 45;
     this.spattack = 30;
@@ -5085,8 +5094,8 @@ function Shedinja() {
     this.currenthp = 0;
     this.types = ["bug", "ghost"];
     this.moves = [];
-    this.opponentMoves = [[createMove("swords_dance"), createMove("screech"), createMove("sucker_punch"), createMove("feint_attack"), createMove("x_scissor"), createMove("bug_bite"), createMove("leech_life"), createMove("shadow_claw"), createMove("shadow_sneak"), createMove("swagger")]];
-    this.movepool = ["absorb", "agility", "bug_bite", "bug_buzz", "confuse_ray", "dig", "feint_attack", "fury_cutter", "hone_claws", "leech_life", "metal_claw", "night_slash", "phantom_force", "shadow_ball", "shadow_claw", "shadow_sneak", "sucker_punch", "x_scissor", "will_o_wisp", "swords_dance", "swagger", "string_shot", "spite", "slash", "screech"];
+    this.opponentMoves = [[createMove("swords_dance"), createMove("screech"), createMove("sucker_punch"), createMove("feint_attack"), createMove("x_scissor"), createMove("bug_bite"), createMove("slash"), createMove("shadow_claw"), createMove("shadow_sneak"), createMove("swagger")]];
+    this.movepool = ["agility", "bug_bite", "confuse_ray", "dig", "feint_attack", "fury_cutter", "hone_claws", "metal_claw", "night_slash", "phantom_force", "shadow_claw", "shadow_sneak", "sucker_punch", "x_scissor", "will_o_wisp", "swords_dance", "swagger", "string_shot", "spite", "slash", "screech"];
     this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/shedinja.gif';
     this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/shedinja.gif';
     this.effects = [];
