@@ -1826,10 +1826,11 @@ function drawEnvironment() {
 function switchPokemon(ind) {
     if (team[switchInd[ind]].currenthp > 0 && (switchesLeft > 0 && !isTrapped(team[activePokemon]) || team[activePokemon].currenthp == 0)) {
         document.getElementById("movePreview").className = "preview-off";
-        document.getElementById("leftSprite").className = "pokemon-sprite";
 
-        document.getElementById("leftSprite").className += " blink-transform2";
+        if (team[activePokemon].currenthp > 0)
+            document.getElementById("leftSprite").className += " blink-transform2";
         setTimeout(() => {
+            document.getElementById("leftSprite").className = "pokemon-sprite";
             var n = activePokemon;
             activePokemon = switchInd[ind];
             switchInd[ind] = n;
