@@ -1170,7 +1170,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .9) {
+            } else if (Math.random() < eventChance) {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
                 title.innerHTML = "special";
