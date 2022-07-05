@@ -3417,6 +3417,8 @@ function createPokemon(pokemon) {
             return new Shedinja();
         case "bidoof":
             return new Bidoof();
+        case "spritomb":
+            return new Spiritomb();
         default:
             return new MissingNo();
     }
