@@ -2517,7 +2517,7 @@ function createOpponent(encounter, fixedOpponent) {
 
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
-        opponent.maxhp = 5;
+        opponent.maxhp = 10;
         opponent.currenthp = opponent.maxhp;
     }
 
@@ -11598,7 +11598,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell"];
-specialItems = ["tm-1", "aguav_berry"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11760,6 +11760,12 @@ function createHeldItem(item) {
             return new AguavBerry();
         case "shell_bell":
             return new ShellBell();
+        case "adamant_orb":
+            return new AdamantOrb();
+        case "lustrous_orb":
+            return new LustrousOrb();
+        case "griseous_orb":
+            return new GriseousOrb();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12337,7 +12343,7 @@ function AguavBerry() {
     this.name = "Aguav Berry";
     this.description = "Restores 25% of maximum HP the first time an attack brings the holder below 50% of maximum HP.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/aguav_berry.webp';
-    this.area = "";
+    this.area = "event";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
@@ -12803,6 +12809,33 @@ function ShellBell() {
     };
 }
 
+function AdamantOrb() {
+    this.name = "Adamant Orb";
+    this.description = "Raises the power of dragon and steel type moves by 15%";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/adamant_orb.webp';
+    this.area = "event";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .15 * (move.type === "dragon" || move.type === "steel"); };
+}
+
+function LustrousOrb() {
+    this.name = "Lustrous Orb";
+    this.description = "Raises the power of dragon and water type moves by 15%";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/lustrous_orb.webp';
+    this.area = "event";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .15 * (move.type === "dragon" || move.type === "water"); };
+}
+
+function GriseousOrb() {
+    this.name = "Griseous Orb";
+    this.description = "Raises the power of dragon and ghost type moves by 15%";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/griseous_orb.webp';
+    this.area = "event";
+    this.boost = true;
+    this.effect = (move, p) => { return 1 + .15 * (move.type === "dragon" || move.type === "ghost"); };
+}
+
 
 
 
@@ -13039,7 +13072,7 @@ function createReward(isItem, r1, r2, r3) {
 
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 5);
-    event = 3;
+    event = 5;
     switch (event) {
         case 0:
             return new Event0();
@@ -13051,6 +13084,8 @@ function createEvent(event) {
             return new Event3();
         case 4:
             return new Event4();
+        case 5:
+            return new Event5();
     }
 }
 
@@ -13365,7 +13400,7 @@ function Event3() {
 function Event4() {
     this.description = "You come across a inviting looking lush forest. You could use some rest, and start looking for some place to lay down.";
     this.options = [];
-    this.reward = Math.random() < .5;
+    var reward = Math.random() < .5;
     this.options.push({
         text: "Rest for a while",
         effect: () => {
@@ -13391,9 +13426,9 @@ function Event4() {
                         item = heldItems[Math.floor(Math.random() * heldItems.length)];
                     return item;
                 }
-                createReward(false, getBerry(), getBerry(), getBerry());
+                createReward(true, getBerry(), getBerry(), getBerry());
             } else
-                createReward(false, "aguav_berry");
+                createReward(true, "aguav_berry");
         },
         description: i < 0 ? "You look around you and quickly spot a small berry bush. You harvest a few of them for your Pokémon." : team[i].name + " leaves to find some berries. After some time, it returns with some fruits you had never seen before.",
     })
@@ -13404,10 +13439,64 @@ function Event4() {
             if (i < 0)
                 battleEncounter("bug", "shedinja");
             else
-                createReward(false, "shed_shell");
+                createReward(true, "shed_shell");
         },
         description: i < 0 ? "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. Suddenly, one of them starts moving and attacks you!" : "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. " + team[i].name + " looks insistantly at one of them, as if to show you it could be useful.",
     })
+}
+
+function Event5() {
+    this.description = "You encounter 3 statues representing the legendary Creation Trio of Sinnoh. Which one should receive your offering?";
+    this.options = [];
+    this.options.push({
+        text: "Ask for Dialga's blessing",
+        effect: () => {
+            area = Math.max(0, area - 3);
+            nextEncounter();
+        },
+        description: "After a while, you start feeling dizzy. The world around you starts spinning, and everything goes dark.",
+        subdescription: "You have travelled back in time."
+    })
+    this.options.push({
+        text: "Ask for Palkia's blessing",
+        effect: () => {
+            area = Math.min(8, area + 3);
+            nextEncounter();
+        },
+        description: "After a while, you start feeling dizzy. The world around you starts spinning, and everything goes dark.",
+        subdescription: "You have travelled forward in space."
+    })
+    this.options.push({
+        text: "Ask for Giratina's blessing",
+        effect: () => {
+            for (let i = 0; i < team.length; i++) {
+                var p = team[i];
+                var poke = createPokemon(pokemonList[Math.floor(Math.random() * pokemonList.length)]);
+                adjustBST(poke, 600, false);
+                poke.currenthp = Math.floor(p.currenthp / p.maxhp * poke.maxhp);
+                for (let j = 0; j < 3; j++)
+                    poke.moves.push(createMove(poke.movepool[Math.floor(Math.random() * poke.movepool.length)]));
+                for (let j = 0; j < p.items.length; j++)
+                    poke.items.push(createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]));
+                team[i] = poke;
+            }
+            nextEncounter();
+        },
+        description: "After a while, you start feeling dizzy. The world around you starts spinning, and everything goes dark.",
+        subdescription: "You have travelled through chaos."
+    })
+    var i = team.findIndex(e => contains(e.types, "dragon"));
+    if (i >= 0) {
+        this.options.push({
+            text: "[Dragon] Request the power of the three dragons",
+            effect: () => {
+                var rewards = ["adamant_orb", "lustrous_orb", "griseous_orb"];
+                shuffle(rewards);
+                createReward(true, rewards[0], rewards[1], rewards[2]);
+            },
+            description: "Joined by " + team[i].name + ", you close your eyes and beg the legendary dragons to grant you some of their power. After you open your eyes, three orbs have appeared in front of you.",
+        })
+    }
 }
 
 
