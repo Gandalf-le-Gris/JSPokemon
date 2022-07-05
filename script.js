@@ -1162,15 +1162,18 @@ function pathSelector() {
             cell.className = "team-selector-element";
             if ((Math.random() < pokemonCenterChance && pokemonCenterChance > .15) || guaranteedPokemonCenter) {
                 guaranteedPokemonCenter = false;
+                pokemonCenterChance = .15;
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png';
                 title.innerHTML = "pokémon center";
                 encounter = "pokemon_center";
             } else if ((Math.random() < pokemartChance && pokemartChance > .15) || guaranteedPokemart) {
                 guaranteedPokemart = false;
+                pokemartChance = .15;
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
             } else if (Math.random() < eventChance) {
+                eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
                 title.innerHTML = "special";
