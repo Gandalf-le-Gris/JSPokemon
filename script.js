@@ -61,7 +61,7 @@ function loadResources() {
     imgs = [];
     sounds = [];
 
-    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jfif");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jpg");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png");
     for (let e of effectList) {
@@ -258,7 +258,7 @@ function drawStartingMenu() {
     soundImage.className = "pixel-sprite";
     soundImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
     soundButton.appendChild(soundImage);
-    var gArea = new gameArea("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jfif", () => { });
+    var gArea = new gameArea("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jpg", () => { });
     gArea.start();
 }
 
@@ -1172,7 +1172,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance) {
+            } else if (Math.random() < eventChance || Math.random() < .95) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -5166,6 +5166,34 @@ function Bidoof() {
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/bidoof.ogg"
 }
 
+function Spiritomb() {
+    this.name = "Spiritomb";
+    this.hp = 50;
+    this.attack = 92;
+    this.defense = 108;
+    this.spattack = 92;
+    this.spdefense = 108;
+    this.speed = 35;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["ghost", "dark"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("nasty_plot"), createMove("calm_mind"), createMove("dark_pulse"), createMove("dark_pulse"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("hyper_beam"), createMove("feint_attack"), createMove("foul_play"), createMove("ominous_wind")]];
+    this.movepool = ["calm_mind", "confuse_ray", "curse", "dark_pulse", "feint_attack", "foul_play", "hyper_beam", "nasty_plot", "ominous_wind", "psychic", "rock_tomb", "shadow_ball", "shadow_sneak", "snarl", "sucker_punch", "swagger", "taunt", "will_o_wisp"];
+    this.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/spiritomb.gif';
+    this.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/spiritomb.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Pressure"
+    this.talentDesc = "Lowers opponent's energy by 1 when hit by a super effective move."
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) > 1) energy = Math.max(0, energy - 1); }
+    this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/spiritomb.ogg"
+}
+
 
 
 function Arceus() {
@@ -6378,6 +6406,8 @@ function createMove(move) {
             return new ZenHeadbutt();
         case "struggle":
             return new Struggle();
+        case "cursed":
+            return new Cursed();
         default:
             alert("Unknown move: " + move);
             return new Struggle();
@@ -10951,6 +10981,17 @@ function Recharge() {
     this.description = "Does nothing. Exhaust.";
 }
 
+function Cursed() {
+    this.name = "Cursed";
+    this.type = "ghost";
+    this.cat = "status";
+    this.bp = 0;
+    this.cost = 0;
+    this.exhaust = true;
+    this.effect = function (move, pA, pD) { };
+    this.description = "Does nothing. Exhaust.";
+}
+
 
 
 
@@ -12948,7 +12989,8 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 3);
+    event = event != undefined ? event : Math.floor(Math.random() * 4);
+    event = 3;
     switch (event) {
         case 0:
             return new Event0();
@@ -12956,6 +12998,8 @@ function createEvent(event) {
             return new Event1();
         case 2:
             return new Event2();
+        case 3:
+            return new Event3();
     }
 }
 
@@ -12993,7 +13037,7 @@ function Event0() {
         effect: () => {
             if (!reward) {
                 fadeOutTransition(1);
-                setTimeout(() => { battleEncounter("", "unown") }, 1000);
+                setTimeout(() => { battleEncounter("psychic", "unown") }, 1000);
             } else {
                 function getPlate() {
                     var item = heldItems[Math.floor(Math.random() * heldItems.length)];
@@ -13203,6 +13247,66 @@ function Event2() {
             },
             description: "As you keep the man busy, your Meowth sneaks up behind him and steals whatever it can find in his pockets.",
             subdescription: "You got " + String.fromCharCode(08381) + "500."
+        })
+    }
+}
+
+function Event3() {
+    this.description = "As you explore some underground tunnels nearby, you come across a large room built centuries ago. An old pillar with a strange keystone on top are the only decorations of this otherwise empty place. You hear the voices of spirits echoing around you, making you feel uneasy.";
+    this.options = [];
+    var i = team.findIndex(e => contains(e.types, "ghost"));
+    if (i < 0) {
+        this.options.push({
+            text: "Take the keystone",
+            effect: () => { battleEncounter("ghost", "spiritomb"); },
+            description: "You reach for the keystone, but before you can touch it, angry spirits start coming out of it. You made a mistake!"
+        })
+    } else {
+        this.options.push({
+            text: "[Ghost] Take the keystone",
+            effect: () => { createReward(true, "odd_keystone"); },
+            description: "You let " + team[i].name + " talk to the spirits. After some time, they allow you to take their keystone."
+        })
+    }
+    this.options.push({
+        text: "Examine the keystone",
+        effect: () => {
+            for (let p of team)
+                p.moves.push(new Cursed());
+            nextEncounter();
+        },
+        description: "You feel more and more unseasy as you approach the keystone. You didn't discover anything, but you have a bad feeling about this.",
+        subdescription: "You have been cursed."
+    })
+    var i = team.findIndex(e => contains(e.types, "fighting"));
+    if (i < 0) {
+        this.options.push({
+            text: "Destroy the pillar",
+            effect: () => {
+                battleEncounter("ghost", "spiritomb");
+            },
+            description: "You start striking the pillar with your whole strength, but before you can take it down, spirits sealed in the keystone attack you!",
+        })
+    } else {
+        this.options.push({
+            text: "[Fighting] Destroy the pillar",
+            effect: () => {
+                createReward(true, "hard_stone");
+            },
+            description: team[i].name + " lands a mighty blow on the pillar, which crumbles and crashes heavily in front of you. There is not much left to scavenge, if not a pretty looking rock that rolled over to your feet.",
+        })
+    }
+    var i = team.findIndex(e => contains(e.types, "fairy"));
+    if (i >= 0) {
+        this.options.push({
+            text: "[Fairy] Purify the keystone",
+            effect: () => {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .15 * p.maxhp));
+                nextEncounter();
+            },
+            description: team[i].name + " purifies the keystone. The voices of the spirits fade, and you decide to rest in the now peaceful room.",
+            subdescription: "Your Pokémon have been slightly healed."
         })
     }
 }
