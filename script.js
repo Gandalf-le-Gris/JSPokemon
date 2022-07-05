@@ -97,7 +97,7 @@ function loadResources() {
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
         sounds.push(p.cry);
     }
-    for (let poke of bossList) {
+    for (let poke of eventPokemonList) {
         var p = createPokemon(poke);
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
@@ -1219,7 +1219,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
-trainerList = ["unown", "shedinja", "bidoof"];
+eventPokemonList = ["unown", "shedinja", "bidoof", "spiritomb"];
 
 energy = 5;
 maxEnergy = 5;
