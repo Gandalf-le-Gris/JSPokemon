@@ -1172,7 +1172,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .95) {
+            } else if (Math.random() < eventChance) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -2537,22 +2537,27 @@ function createOpponent(encounter, fixedOpponent) {
 
 function nextEncounter() {
     saveProgress();
-    if (area == 10) {
-        if (world == 3) {
-            victoryScreen();
-            return;
-        } else {
-            for (let p of team) {
-                p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
-            }
-            area = 1;
-            world += 1;
-        }
-    } else {
-        area += 1;
-    }
+
     fadeOutTransition(1);
-    setTimeout(mapSelection, 1000);
+    if (team[0].currenthp == 0 && team[1].currenthp == 0 && team[2].currenthp == 0) {
+        setTimeout(gameOver, 1000);
+    } else {
+        if (area == 10) {
+            if (world == 3) {
+                victoryScreen();
+                return;
+            } else {
+                for (let p of team) {
+                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
+                }
+                area = 1;
+                world += 1;
+            }
+        } else {
+            area += 1;
+        }
+        setTimeout(mapSelection, 1000);
+    }
 }
 
 
@@ -12432,20 +12437,20 @@ function MentalHerb() {
 
 function MuscleBand() {
     this.name = "Muscle Band";
-    this.description = "Increases physical damage by 5%.";
+    this.description = "Increases physical damage by 10%.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/muscle_band.webp';
     this.area = "";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .05 * (move.cat === "physical"); };
+    this.effect = (move, p) => { return 1 + .1 * (move.cat === "physical"); };
 }
 
 function WiseGlasses() {
     this.name = "Wise Glasses";
-    this.description = "Increases special damage by 5%.";
+    this.description = "Increases special damage by 10%.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/wise_glasses.webp';
     this.area = "";
     this.boost = true;
-    this.effect = (move, p) => { return 1 + .05 * (move.cat === "special"); };
+    this.effect = (move, p) => { return 1 + .1 * (move.cat === "special"); };
 }
 
 function PechaBerry() {
@@ -12744,7 +12749,7 @@ function Potion() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/potion.webp';
     this.area = "";
     this.pickup = true;
-    this.effect = (p) => { dealDamage(.5 * p.maxhp, p); }
+    this.effect = (p) => { p.currenthp = Math.min(p.maxhp, p.currenthp + Math.floor(.5 * p.maxhp)); }
 }
 
 function AmuletCoin() {
@@ -13071,8 +13076,7 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 5);
-    event = 5;
+    event = event != undefined ? event : Math.floor(Math.random() * 8);
     switch (event) {
         case 0:
             return new Event0();
@@ -13086,6 +13090,10 @@ function createEvent(event) {
             return new Event4();
         case 5:
             return new Event5();
+        case 6:
+            return new Event6();
+        case 7:
+            return new Event7();
     }
 }
 
@@ -13136,25 +13144,25 @@ function Event0() {
         },
         description: reward ? "You find some ancient looking plates at the end of the tunnel. You decide to take one." : "You venture into the dark. After some time, you come across a hostile Pokémon!"
     })
-    var i = team.findIndex(e => contains(e.types, "fire"));
-    if (i >= 0) {
+    var fire = team.findIndex(e => contains(e.types, "fire"));
+    if (fire >= 0) {
         this.options.push({
-            text: "[Fire] Make " + team[i].name + " light up the tunnels",
+            text: "[Fire] Make " + team[fire].name + " light up the tunnels",
             effect: () => {
                 money += 750;
                 earnedMoney += 750;
                 nextEncounter();
             },
-            description: "As " + team[i].name + " lights up the ruins with its flame, you spot a shiny gold nugget in a corner. You greedily shove it into your bag.",
+            description: "As " + team[fire].name + " lights up the ruins with its flame, you spot a shiny gold nugget in a corner. You greedily shove it into your bag.",
             subdescription: "You got " + String.fromCharCode(08381) + "750."
         })
     }
-    var i = team.findIndex(e => contains(e.types, "psychic"));
-    if (i >= 0) {
+    var psychic = team.findIndex(e => contains(e.types, "psychic"));
+    if (psychic >= 0) {
         this.options.push({
-            text: "[Psychic] Let " + team[i].name + " decipher the glyphs",
+            text: "[Psychic] Let " + team[psychic].name + " decipher the glyphs",
             effect: () => { createReward(true, "tm-1"); },
-            description: "After reading the glyphs, " + team[i].name + " leads you to a third hidden passage. At the end of the tunnel, you find an old TM you don't recognize."
+            description: "After reading the glyphs, " + team[psychic].name + " leads you to a third hidden passage. At the end of the tunnel, you find an old TM you don't recognize."
         })
     }
 }
@@ -13177,8 +13185,8 @@ function Event1() {
         description: "The man explains to you how to get to the nearest town.",
         subdescription: "Next encounters will be a Pokémon Center and a Pokémart."
     })
-    var i = team.findIndex(e => e.name === "Ditto");
-    if (i >= 0) {
+    var ditto = team.findIndex(e => e.name === "Ditto");
+    if (ditto >= 0) {
         this.options.push({
             text: "[Ditto] Show your Ditto to the old man",
             effect: () => {
@@ -13190,28 +13198,28 @@ function Event1() {
             subdescription: "You got " + String.fromCharCode(08381) + "800."
         })
     }
-    var i = undefined;
+    var tmxx = undefined;
     for (let p of team) {
         for (let it of p.items) {
             if (it.name === 'TMXX')
-                i = it;
+                tmxx = it;
         }
     }
-    if (i != undefined) {
+    if (tmxx != undefined) {
         this.options.push({
             text: "[TMXX] Ask him to duplicate the TM",
             effect: () => { createReward(true, "tm_xx"); },
             description: "The move tutor takes the TM and enters his shed. After some time, he comes back with a large smile on his face and hands you a copy of your TM.",
         })
     }
-    var i = undefined;
+    var tmm1 = undefined;
     for (let p of team) {
         for (let it of p.items) {
             if (it.name === 'TM-1')
-                i = it;
+                tmm1 = it;
         }
     }
-    if (i != undefined) {
+    if (tmm1 != undefined) {
         this.options.push({
             text: "[TM-1] Ask him to duplicate the TM",
             effect: () => { createReward(true, "tm-1"); },
@@ -13322,8 +13330,8 @@ function Event2() {
         effect: () => { nextEncounter(); },
         description: "You refuse the offer and resume your adventure.",
     })
-    var i = team.findIndex(e => e.name === "Meowth");
-    if (i >= 0) {
+    var meowth = team.findIndex(e => e.name === "Meowth");
+    if (meowth >= 0) {
         this.options.push({
             text: "[Meowth] Steal the gambling man",
             effect: () => {
@@ -13340,8 +13348,8 @@ function Event2() {
 function Event3() {
     this.description = "As you explore some underground tunnels nearby, you come across a large room built centuries ago. An old pillar with a strange keystone on top are the only decorations of this otherwise empty place. You hear the voices of spirits echoing around you, making you feel uneasy.";
     this.options = [];
-    var i = team.findIndex(e => contains(e.types, "ghost"));
-    if (i < 0) {
+    var ghost = team.findIndex(e => contains(e.types, "ghost"));
+    if (ghost < 0) {
         this.options.push({
             text: "Take the keystone",
             effect: () => { battleEncounter("ghost", "spiritomb"); },
@@ -13351,7 +13359,7 @@ function Event3() {
         this.options.push({
             text: "[Ghost] Take the keystone",
             effect: () => { createReward(true, "odd_keystone"); },
-            description: "You let " + team[i].name + " talk to the spirits. After some time, they allow you to take their keystone."
+            description: "You let " + team[ghost].name + " talk to the spirits. After some time, they allow you to take their keystone."
         })
     }
     this.options.push({
@@ -13364,8 +13372,8 @@ function Event3() {
         description: "You feel more and more unseasy as you approach the keystone. You didn't discover anything, but you have a bad feeling about this.",
         subdescription: "You have been cursed."
     })
-    var i = team.findIndex(e => contains(e.types, "fighting"));
-    if (i < 0) {
+    var fighting = team.findIndex(e => contains(e.types, "fighting"));
+    if (fighting < 0) {
         this.options.push({
             text: "Destroy the pillar",
             effect: () => {
@@ -13379,11 +13387,11 @@ function Event3() {
             effect: () => {
                 createReward(true, "hard_stone");
             },
-            description: team[i].name + " lands a mighty blow on the pillar, which crumbles and crashes heavily in front of you. There is not much left to scavenge, if not a pretty looking rock that rolled over to your feet.",
+            description: team[fighting].name + " lands a mighty blow on the pillar, which crumbles and crashes heavily in front of you. There is not much left to scavenge, if not a pretty looking rock that rolled over to your feet.",
         })
     }
-    var i = team.findIndex(e => contains(e.types, "fairy"));
-    if (i >= 0) {
+    var fairy = team.findIndex(e => contains(e.types, "fairy"));
+    if (fairy >= 0) {
         this.options.push({
             text: "[Fairy] Purify the keystone",
             effect: () => {
@@ -13391,14 +13399,14 @@ function Event3() {
                     p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .15 * p.maxhp));
                 nextEncounter();
             },
-            description: team[i].name + " purifies the keystone. The voices of the spirits fade, and you decide to rest in the now peaceful room.",
+            description: team[fairy].name + " purifies the keystone. The voices of the spirits fade, and you decide to rest in the now peaceful room.",
             subdescription: "Your Pokémon have been slightly healed."
         })
     }
 }
 
 function Event4() {
-    this.description = "You come across a inviting looking lush forest. You could use some rest, and start looking for some place to lay down.";
+    this.description = "You come across an inviting looking lush forest. You could use some rest, and start looking for some place to lay down.";
     this.options = [];
     var reward = Math.random() < .5;
     this.options.push({
@@ -13415,9 +13423,9 @@ function Event4() {
         description: reward ? "You lie down in a peaceful glade and take a nap." : "As you were about to fall alseep, you realize you were on the territory of a wild Pokémon a little too late...",
         subdescription: reward ? "Your Pokémon have been slightly healed." : undefined
     })
-    var i = team.findIndex(e => contains(e.types, "grass"));
+    var grass = team.findIndex(e => contains(e.types, "grass"));
     this.options.push({
-        text: i < 0 ? "Harvest some berries" : "[Grass] Harvest some berries",
+        text: grass < 0 ? "Harvest some berries" : "[Grass] Harvest some berries",
         effect: () => {
             if (i < 0) {
                 function getBerry() {
@@ -13430,23 +13438,23 @@ function Event4() {
             } else
                 createReward(true, "aguav_berry");
         },
-        description: i < 0 ? "You look around you and quickly spot a small berry bush. You harvest a few of them for your Pokémon." : team[i].name + " leaves to find some berries. After some time, it returns with some fruits you had never seen before.",
+        description: grass < 0 ? "You look around you and quickly spot a small berry bush. You harvest a few of them for your Pokémon." : team[grass].name + " leaves to find some berries. After some time, it returns with some fruits you had never seen before.",
     })
-    var i = team.findIndex(e => contains(e.types, "bug"));
+    var bug = team.findIndex(e => contains(e.types, "bug"));
     this.options.push({
-        text: i < 0 ? "Venture deeper into the forest" : "[Bug] Venture deeper into the forest",
+        text: bug < 0 ? "Venture deeper into the forest" : "[Bug] Venture deeper into the forest",
         effect: () => {
-            if (i < 0)
+            if (bug < 0)
                 battleEncounter("bug", "shedinja");
             else
                 createReward(true, "shed_shell");
         },
-        description: i < 0 ? "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. Suddenly, one of them starts moving and attacks you!" : "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. " + team[i].name + " looks insistantly at one of them, as if to show you it could be useful.",
+        description: bug < 0 ? "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. Suddenly, one of them starts moving and attacks you!" : "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. " + team[bug].name + " looks insistantly at one of them, as if to show you it could be useful.",
     })
 }
 
 function Event5() {
-    this.description = "You encounter 3 statues representing the legendary Creation Trio of Sinnoh. Which one should receive your offering?";
+    this.description = "You encounter three statues representing the legendary Creation Trio of Sinnoh. Which one should receive your offering?";
     this.options = [];
     this.options.push({
         text: "Ask for Dialga's blessing",
@@ -13485,8 +13493,8 @@ function Event5() {
         description: "After a while, you start feeling dizzy. The world around you starts spinning, and everything goes dark.",
         subdescription: "You have travelled through chaos."
     })
-    var i = team.findIndex(e => contains(e.types, "dragon"));
-    if (i >= 0) {
+    var dragon = team.findIndex(e => contains(e.types, "dragon"));
+    if (dragon >= 0) {
         this.options.push({
             text: "[Dragon] Request the power of the three dragons",
             effect: () => {
@@ -13494,7 +13502,115 @@ function Event5() {
                 shuffle(rewards);
                 createReward(true, rewards[0], rewards[1], rewards[2]);
             },
-            description: "Joined by " + team[i].name + ", you close your eyes and beg the legendary dragons to grant you some of their power. After you open your eyes, three orbs have appeared in front of you.",
+            description: "Joined by " + team[dragon].name + ", you close your eyes and beg the legendary dragons to grant you some of their power. After you open your eyes, you notice three orbs in front of you that weren't there before.",
+        })
+    }
+}
+
+function Event6() {
+    this.description = "You find an entrance to the Underground. You decide to dive down in hope of useful treasure.";
+    this.options = [];
+    var reward = Math.random() < .5;
+    var ground = team.findIndex(e => contains(e.types, "ground"));
+    this.options.push({
+        text: ground < 0 ? "Dig for treasure" : "[Ground] Dig for treasure",
+        effect: () => {
+            if (ground >= 0 || reward) {
+                function getDiggingReward() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_plate') && !item.includes('_rock') && !item.includes('stone') && !item.includes('_fossil'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getDiggingReward(), getDiggingReward(), getDiggingReward());
+            } else {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .15 * p.maxhp));
+                nextEncounter();
+            }
+        },
+        description: ground < 0 && !reward ? "You start digging, but the tunnel is very unstable and ends up collapsing on you and your team." : (ground < 0 ? "You grab your tools and start digging. You quickly find interesting items and decide to extract one of them." : "With the help of " + team[ground].name + ", you extract useful items without endangering the tunnel's integrity."),
+        subdescription: ground < 0 && !reward ? "Your Pokémon have taken moderate damage." : undefined
+    })
+    this.options.push({
+        text: "Take abandonned tools",
+        effect: () => {
+            createReward(true, "rocky_helmet");
+        },
+        description: "You found an abandonned helmet nearby. You decide to take it, no one will miss it.",
+    })
+    var steel = team.findIndex(e => contains(e.types, "steel"));
+    if (steel >= 0) {
+        this.options.push({
+            text: "[Steel] Let " + team[steel].name + " recycle your tools",
+            effect: () => {
+                function getRecycleReward() {
+                    return Math.random() < .5 ? "metal_coat" : "iron_ball";
+                }
+                createReward(true, getRecycleReward(), getRecycleReward(), getRecycleReward());
+            },
+            description: "You wouldn't find anything with these old tools anyway, it's better to turn them into something more useful. Luckily, " + team[steel].name + " knows just how to do that.",
+        })
+    }
+    var fire = team.findIndex(e => contains(e.types, "fire"));
+    if (fire >= 0) {
+        this.options.push({
+            text: "[Fire] Ask " + team[fire].name + " to smelt some gold ore",
+            effect: () => {
+                money += 700;
+                earnedMoney += 700;
+                nextEncounter();
+            },
+            description: "You find gold ore in your surroundings. " + team[fire].name + " helps you smelt it. You should be able to sell it for a good price.",
+            subdescription: "You got " + String.fromCharCode(08381) + "700."
+        })
+    }
+}
+
+function Event7() {
+    this.description = "After a long walk, you see a Pokémon Center in the distance. Unfortunately, it seems empty and no one works there anymore.";
+    this.options = [];
+    var blissey = team.findIndex(e => e.name === "Blissey") >= 0;
+    this.options.push({
+        text: blissey ? "[Blissey] Use a healer" : "Use a healer",
+        effect: () => {
+            for (let p of team)
+                p.currenthp = Math.floor(Math.max(0, p.currenthp + (.1 + .2 * blissey) * p.maxhp));
+            nextEncounter();
+        },
+        description: blissey ? "Blissey shows you how to use the healers in the Pokémon Center. With its help, you manage to give your Pokémon some well-needed healing." : "You approach a seemingly functional healer and place your Pokéballs inside. Despite its bad shape, it still heals your party. Somewhat.",
+        subdescription: blissey ? "Your Pokémon have been moderately healed." : "Your Pokémon have been slightly healed."
+    })
+    this.options.push({
+        text: "Use a PC",
+        effect: () => {
+            createReward(true, "weakness_policy");
+        },
+        description: "You turn a PC on and browse the Internet. You end up finding some interesting information about your Pokémon's weaknesses.",
+    })
+    var poison = team.findIndex(e => contains(e.types, "poison"));
+    if (poison >= 0) {
+        this.options.push({
+            text: "[Poison] Ask " + team[poison].name + " to brew a potion",
+            effect: () => {
+                createReward(true, "potion");
+            },
+            description: "Lots of ingredients are waiting on the shelves. Surely " + team[poison].name + " will know how to turn them into something useful.",
+        })
+    }
+    var electric = team.findIndex(e => contains(e.types, "electric"));
+    if (electric >= 0) {
+        this.options.push({
+            text: "[Electric] Let " + team[electric].name + " drain the power of the Center",
+            effect: () => {
+                for (let p of team) {
+                    p.attack *= 1.05;
+                    p.spattack *= 1.05;
+                }
+                nextEncounter();
+            },
+            description: team[electric].name + " connects itself to the electrical grid and starts absorbing power. After a few seconds, it shares the accumulated energy with its teammates.",
+            subdescription: "Your Pokémon's attack and special attack have slighlty increased."
         })
     }
 }
