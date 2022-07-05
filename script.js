@@ -928,8 +928,8 @@ function damageCalculator(move, pA, pD) {
     var defMul = 1;
     if (move.cat === "physical") {
         if (crit) {
-            atkMul = Math.min(1, statsChangeMultiplier ** pA.statchanges.attack);
-            defMul = Math.max(1, statsChangeMultiplier ** pD.statchanges.defense);
+            atkMul = Math.max(1, statsChangeMultiplier ** pA.statchanges.attack);
+            defMul = Math.min(1, statsChangeMultiplier ** pD.statchanges.defense);
         } else {
             atkMul = statsChangeMultiplier ** pA.statchanges.attack;
             defMul = statsChangeMultiplier ** pD.statchanges.defense;
@@ -937,8 +937,8 @@ function damageCalculator(move, pA, pD) {
         baseDam = 22 * move.bp * pA.attack * atkMul / (50 * pD.defense * defMul);
     } else if (move.cat === "special") {
         if (crit) {
-            atkMul = Math.min(1, statsChangeMultiplier ** pA.statchanges.spattack);
-            defMul = Math.max(1, statsChangeMultiplier ** pD.statchanges.spdefense) + .5 * (weather != undefined && weather.name === "Sandstorm" && contains(pD.types, "rock"));
+            atkMul = Math.max(1, statsChangeMultiplier ** pA.statchanges.spattack);
+            defMul = Math.min(1, statsChangeMultiplier ** pD.statchanges.spdefense) + .5 * (weather != undefined && weather.name === "Sandstorm" && contains(pD.types, "rock"));
         } else {
             atkMul = statsChangeMultiplier ** pA.statchanges.spattack;
             defMul = statsChangeMultiplier ** pD.statchanges.spdefense;
@@ -2179,7 +2179,7 @@ function useMove(move) {
             var effMul = effectiveMultiplier(move, player ? opponent : team[activePokemon]);
             if (move.cat !== "status") {
                 if (move.crit && effMul > 0)
-                    desc.innerHTML += "Critical hit!<br />";
+                    desc.innerHTML += "It's a critical hit!<br />";
                 if (effMul > 1)
                     desc.innerHTML += "It's super effective!<br />";
                 else if (effMul == 0)
@@ -3417,7 +3417,7 @@ function createPokemon(pokemon) {
             return new Shedinja();
         case "bidoof":
             return new Bidoof();
-        case "spritomb":
+        case "spiritomb":
             return new Spiritomb();
         default:
             return new MissingNo();
@@ -11597,8 +11597,8 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "draco_plate", "dread_plate", "earth_plate", "fist_plate", "flame_plate", "icicle_plate", "insect_plate", "iron_plate", "meadow_plate", "mind_plate", "pixie_plate", "sky_plate", "splash_plate", "spooky_plate", "stone_plate", "toxic_plate", "zap_plate",
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
-    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone"];
-specialItems = ["tm-1"];
+    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell"];
+specialItems = ["tm-1", "aguav_berry"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11754,6 +11754,12 @@ function createHeldItem(item) {
             return new OddKeystone();
         case "tm-1":
             return new TMm1();
+        case "aspear_berry":
+            return new AspearBerry();
+        case "aguav_berry":
+            return new AguavBerry();
+        case "shell_bell":
+            return new ShellBell();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12327,6 +12333,25 @@ function SitrusBerry() {
     }
 }
 
+function AguavBerry() {
+    this.name = "Aguav Berry";
+    this.description = "Restores 25% of maximum HP the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/aguav_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            dealDamage(-pA.maxhp * .25, pA);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
 function LifeOrb() {
     this.name = "Life Orb";
     this.description = "Increases damage by 30%, consumes 25HP with each damaging move.";
@@ -12355,6 +12380,15 @@ function AirBalloon() {
     this.area = "flying";
     this.init = true;
     this.effect = (p) => { applyEffect("levitation", 3, p); };
+}
+
+function AspearBerry() {
+    this.name = "Aspear Berry";
+    this.description = "Holder is immune to frost.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/aspear_berry.webp';
+    this.area = "ice";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => { removeEffect(pA, "Freeze"); };
 }
 
 function CheriBerry() {
@@ -12756,6 +12790,19 @@ function TMm1() {
     this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, move); }
 }
 
+function ShellBell() {
+    this.name = "Shell Bell";
+    this.description = "Holder recovers 5HP every time it deals damage with an offensive move.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/shell_bell.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (move.bp > 0)
+            dealDamage(-5, p);
+        return;
+    };
+}
+
 
 
 
@@ -12991,7 +13038,7 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 4);
+    event = event != undefined ? event : Math.floor(Math.random() * 5);
     event = 3;
     switch (event) {
         case 0:
@@ -13002,6 +13049,8 @@ function createEvent(event) {
             return new Event2();
         case 3:
             return new Event3();
+        case 4:
+            return new Event4();
     }
 }
 
@@ -13311,6 +13360,54 @@ function Event3() {
             subdescription: "Your Pokémon have been slightly healed."
         })
     }
+}
+
+function Event4() {
+    this.description = "You come across a inviting looking lush forest. You could use some rest, and start looking for some place to lay down.";
+    this.options = [];
+    this.reward = Math.random() < .5;
+    this.options.push({
+        text: "Rest for a while",
+        effect: () => {
+            if (reward) {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .15 * p.maxhp));
+                nextEncounter();
+            } else {
+                battleEncounter(Math.random() < .5 ? "grass" : "bug");
+            }
+        },
+        description: reward ? "You lie down in a peaceful glade and take a nap." : "As you were about to fall alseep, you realize you were on the territory of a wild Pokémon a little too late...",
+        subdescription: reward ? "Your Pokémon have been slightly healed." : undefined
+    })
+    var i = team.findIndex(e => contains(e.types, "grass"));
+    this.options.push({
+        text: i < 0 ? "Harvest some berries" : "[Grass] Harvest some berries",
+        effect: () => {
+            if (i < 0) {
+                function getBerry() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_berry') || item.includes('aguav_berry'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(false, getBerry(), getBerry(), getBerry());
+            } else
+                createReward(false, "aguav_berry");
+        },
+        description: i < 0 ? "You look around you and quickly spot a small berry bush. You harvest a few of them for your Pokémon." : team[i].name + " leaves to find some berries. After some time, it returns with some fruits you had never seen before.",
+    })
+    var i = team.findIndex(e => contains(e.types, "bug"));
+    this.options.push({
+        text: i < 0 ? "Venture deeper into the forest" : "[Bug] Venture deeper into the forest",
+        effect: () => {
+            if (i < 0)
+                battleEncounter("bug", "shedinja");
+            else
+                createReward(false, "shed_shell");
+        },
+        description: i < 0 ? "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. Suddenly, one of them starts moving and attacks you!" : "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. " + team[i].name + " looks insistantly at one of them, as if to show you it could be useful.",
+    })
 }
 
 
