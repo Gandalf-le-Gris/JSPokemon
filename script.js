@@ -1275,7 +1275,7 @@ function battleEncounter(encounter, fixedPokemon) {
 
     clearBody();
     fadeInTransition();
-    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/forest.png', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/forest2.png', () => { });
     gArea.start();
 
     if (area < 10)
