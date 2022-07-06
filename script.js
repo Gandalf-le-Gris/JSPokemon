@@ -1172,7 +1172,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance) {
+            } else if (Math.random() < eventChance || Math.random() < .95) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -11603,7 +11603,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell"];
-specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11771,6 +11771,8 @@ function createHeldItem(item) {
             return new LustrousOrb();
         case "griseous_orb":
             return new GriseousOrb();
+        case "red_chain":
+            return new RedChain();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12798,6 +12800,7 @@ function TMm1() {
     this.init = true;
     var move = new HiddenPower();
     move.cost = 0;
+    move.name += "*";
     this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, move); }
 }
 
@@ -12839,6 +12842,15 @@ function GriseousOrb() {
     this.area = "event";
     this.boost = true;
     this.effect = (move, p) => { return 1 + .15 * (move.type === "dragon" || move.type === "ghost"); };
+}
+
+function RedChain() {
+    this.name = "Red Chain";
+    this.description = "Restores 100% of the holder's HP at the beginning of a boss battle.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/red_chain.webp';
+    this.area = "event";
+    this.init = true;
+    this.effect = (p) => { if (area == 10) p.currenthp = p.maxhp; };
 }
 
 
@@ -13076,7 +13088,8 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 8);
+    event = event != undefined ? event : Math.floor(Math.random() * 9);
+    event = 8;
     switch (event) {
         case 0:
             return new Event0();
@@ -13094,6 +13107,8 @@ function createEvent(event) {
             return new Event6();
         case 7:
             return new Event7();
+        case 8:
+            return new Event8();
     }
 }
 
@@ -13613,6 +13628,179 @@ function Event7() {
             subdescription: "Your Pokémon's attack and special attack have slighlty increased."
         })
     }
+}
+
+function Event8() {
+    this.description = "You finally come out of a large forest, only to realize the bridge you were about to cross has been destroyed. The current strong, and you don't see another passage nearby.";
+    this.options = [];
+    this.options.push({
+        text: "Go back on your steps",
+        effect: () => {
+            area = Math.max(0, area - 3);
+            nextEncounter();
+        },
+        description: "You are forced to go back into the forest to try to find another path to follow. This is going to take you some time.",
+        subdescription: "You have moved back."
+    })
+    var water = team.findIndex(e => contains(e.types, "water"));
+    this.options.push({
+        text: water < 0 ? "Try to swim" : "[Water] Try to swim",
+        effect: () => {
+            if (water < 0) {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .15 * p.maxhp));
+                nextEncounter();
+            } else
+                createReward(true, "bottle_cap");
+        },
+        description: water < 0 ? "You dive into the river, only to realize the current is too strong for you to swim. You struggle to stay afloat, but you eventually hit a rock and lose consciousness. When you wake up, you are on the other side of the river, but your whole body aches." : "You hop on " + team[water].name + "'back and start crossing the river safely. You spot a shiny item at the bottom of the river, and dive to grab it before reaching the other river bank.",
+        subdescription: water < 0 ? "Your Pokémon have lost some HP." : undefined
+    })
+    var ice = team.findIndex(e => contains(e.types, "ice"));
+    if (ice >= 0) {
+        this.options.push({
+            text: "[Ice] Make " + team[ice].name + " freeze the river",
+            effect: () => {
+                var move = new FreezeDry();
+                move.bp += 20;
+                move.name += "*";
+                team[ice].moves.push(move);
+                nextEncounter();
+            },
+            description: team[ice].name + " makes the temperature drop and the water in front of you starts to freeze. You soon have a new bridge to cross.",
+            subdescription: team[ice].name + " has learnt a new move."
+        })
+    }
+    var flying = team.findIndex(e => contains(e.types, "flying"));
+    if (flying >= 0) {
+        this.options.push({
+            text: "[Flying] Fly across the river on " + team[flying].name + "'s back",
+            effect: () => {
+                function getBerry() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_berry') || item.includes('aguav_berry'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getBerry(), getBerry(), getBerry());
+            },
+            description: team[flying].name + " lets you climb on its back and flies up in the air towards the other bank. From the air, you notice a large berry bush not too far away and decide to go pick up some fruits.",
+        })
+    }
+}
+
+function Event9() {
+    this.description = "You encounter three statues representing the legendary Lake Trio of Sinnoh. Below each of them lies an inscription, inviting you to attempt their trial.";
+    this.options = [];
+    var pList = pokemonList.concat(bossList);
+    var p1 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
+    var p2 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
+    function isStrong(p1, p2) {
+        var mul = 1;
+        for (let t1 of p1.types) {
+            for (let t2 of p2.types)
+                mul *= typetable[types.findIndex(e => e === t1)][types.findIndex(e => e === t2)];
+        }
+        return mul;
+    }
+    function winner(p1, p2) {
+        if (isStrong(p1, p2) && !isStrong(p2, p1))
+            return p1;
+        else if (!isStrong(p1, p2) && isStrong(p2, p1))
+            return p2;
+        else
+            return undefined;
+    }
+    while (winner(p1, p2) == undefined) {
+        p1 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
+        p2 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
+    }
+    this.options.push({
+        text: "Trial of knowledge",
+        effect: () => {
+            runEvent(new Event9a(p1, p2, winner(p1, p2)));
+        },
+        description: "You approach Uxie's statue and you close your eyes. You soon hear the Pokémon's voice inside your head.",
+    })
+    var healthy = true;
+    for (let p of team)
+        healthy = healthy && p.currenthp > .4 * p.maxhp;
+    this.options.push({
+        text: "Trial of emotion",
+        effect: () => {
+            if (healthy)
+                for (let p of team)
+                    p.maxhp = Math.floor(1.1 * p.maxhp);
+            else
+                for (let p of team) {
+                    p.maxhp = Math.floor(.9 * p.maxhp);
+                    p.currenthp = Math.min(p.currenthp, p.maxhp);
+                }
+            nextEncounter();
+        },
+        description: "You approach Mesprit's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (healthy ? "You are close to your Pokémon and take good care of them. You have earned my reward." : "You haven't shown enough empathy towards your Pokémon. You do not deserve their strength."),
+        subdescription: healthy ? "Your Pokémon's HP has increased." : "Your Pokémon's HP has decreased."
+    })
+    var revive = flawless;
+    for (let p of team)
+        revive = revive && p.currenthp > 0;
+    this.options.push({
+        text: "Trial of willpower",
+        effect: () => {
+            if (revive)
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp + .15 * p.maxhp));
+            else
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
+            nextEncounter();
+        },
+        description: "You approach Azelf's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (healthy ? "You have proven your resilience. You have earned my reward." : "You do not know difficulty. I will show you."),
+        subdescription: healthy ? "Your Pokémon have been healed." : "Your Pokémon have taken moderate damage."
+    })
+    var mew = team.findIndex(e => e.name === "Mew");
+    if (mew >= 0) {
+        this.options.push({
+            text: "[Mew] Request the blessing of the three beings",
+            effect: () => {
+                createReward(true, "red_chain");
+            },
+            description: "Mew approaches the statues and starts communicating with them. Suddenly, a ruby chain appears out of thin air in front of the Pokémon.",
+        })
+    }
+}
+
+function Event9a(p1, p2, winner) {
+    this.description = "Who would win if " + p1.name + " and " + p2.name + " were to battle?";
+    this.options = [];
+    this.options.push({
+        text: p1.name,
+        effect: () => {
+            if (p1 === winner)
+                createReward(false);
+            else {
+                for (let p of team)
+                    p.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+                nextEncounter();
+            }
+        },
+        description: (p1 === winner) ? "Good answer. You have earned my reward." : "Wrong answer! You are not worthy of your Pokémon's knowledge.",
+        subdescription: (p1 === winner) ? undefined : "Your Pokémon have lost some of their memories."
+    })
+    this.options.push({
+        text: p2.name,
+        effect: () => {
+            if (p2 === winner)
+                createReward(false);
+            else {
+                for (let p of team)
+                    p.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+                nextEncounter();
+            }
+        },
+        description: (p2 === winner) ? "Good answer. You have earned my reward." : "Wrong answer! You are not worthy of your Pokémon's knowledge.",
+        subdescription: (p2 === winner) ? undefined : "Your Pokémon have lost some of their memories."
+    })
 }
 
 
