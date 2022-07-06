@@ -1275,7 +1275,7 @@ function battleEncounter(encounter, fixedPokemon) {
 
     clearBody();
     fadeInTransition();
-    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png', () => { });
+    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/cave.webp', () => { });
     gArea.start();
 
     if (area < 10)
@@ -13104,7 +13104,7 @@ function createReward(isItem, r1, r2, r3) {
 
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 10);
-    event = 9;
+    event = 4;
     switch (event) {
         case 0:
             return new Event0();
@@ -13490,7 +13490,7 @@ function Event4() {
             effect: () => {
                 createReward(true, "everstone");
             },
-            description: team[rock].name + " leads you to an enormous, ordinary looking stone. However, after climbing it, you discover on top of it a smaller rock humming with undescribable energy.",
+            description: team[rock].name + " leads you to an enormous, ordinary looking stone. However, after climbing on it, you discover a smaller rock humming with undescribable energy.",
         })
     }
 }
