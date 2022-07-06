@@ -1976,8 +1976,10 @@ function drawMove(p, newHand) {
     if (p.currenthp > 0) {
         n = 1;
         if (newHand) {
-            p.discard = p.discard.concat(p.hand);
-            p.hand = [];
+            if (!hasEverstone(p)) {
+                p.discard = p.discard.concat(p.hand);
+                p.hand = [];
+            }
             n = 1 + Math.round(p.speed * statsChangeMultiplier ** p.statchanges.speed / 35);
             var i = p.effects.findIndex(e => e.name === "Extra Draw");
             if (i >= 0)
@@ -11602,7 +11604,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "draco_plate", "dread_plate", "earth_plate", "fist_plate", "flame_plate", "icicle_plate", "insect_plate", "iron_plate", "meadow_plate", "mind_plate", "pixie_plate", "sky_plate", "splash_plate", "spooky_plate", "stone_plate", "toxic_plate", "zap_plate",
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
-    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell"];
+    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone"];
 specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain"];
 
 function createHeldItem(item) {
@@ -11773,6 +11775,8 @@ function createHeldItem(item) {
             return new GriseousOrb();
         case "red_chain":
             return new RedChain();
+        case "everstone":
+            return new Everstone();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12853,6 +12857,17 @@ function RedChain() {
     this.effect = (p) => { if (area == 10) p.currenthp = p.maxhp; };
 }
 
+function Everstone() {
+    this.name = "Everstone";
+    this.description = "Moves are not discarded at the end of the turn.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/everstone.webp';
+    this.area = "rock";
+}
+
+function hasEverstone(p) {
+    return p.items.findIndex(e => e.name === "Everstone") >= 0;
+}
+
 
 
 
@@ -13088,8 +13103,8 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 9);
-    event = 8;
+    event = event != undefined ? event : Math.floor(Math.random() * 10);
+    event = 9;
     switch (event) {
         case 0:
             return new Event0();
@@ -13109,6 +13124,8 @@ function createEvent(event) {
             return new Event7();
         case 8:
             return new Event8();
+        case 9:
+            return new Event9();
     }
 }
 
@@ -13466,6 +13483,16 @@ function Event4() {
         },
         description: bug < 0 ? "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. Suddenly, one of them starts moving and attacks you!" : "You head deeper into the forest. At some point, you come across empty bug shells scattered everywhere around you. " + team[bug].name + " looks insistantly at one of them, as if to show you it could be useful.",
     })
+    var rock = team.findIndex(e => contains(e.types, "rock"));
+    if (rock >= 0) {
+        this.options.push({
+            text: "[Rock] Follow " + team[rock].name + " to a large boulder",
+            effect: () => {
+                createReward(true, "everstone");
+            },
+            description: team[rock].name + " leads you to an enormous, ordinary looking stone. However, after climbing it, you discover on top of it a smaller rock humming with undescribable energy.",
+        })
+    }
 }
 
 function Event5() {
@@ -13692,7 +13719,7 @@ function Event8() {
 function Event9() {
     this.description = "You encounter three statues representing the legendary Lake Trio of Sinnoh. Below each of them lies an inscription, inviting you to attempt their trial.";
     this.options = [];
-    var pList = pokemonList.concat(bossList);
+    var pList = pokemonList.concat(bossList).concat(eventPokemonList);
     var p1 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
     var p2 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
     function isStrong(p1, p2) {
@@ -13704,9 +13731,9 @@ function Event9() {
         return mul;
     }
     function winner(p1, p2) {
-        if (isStrong(p1, p2) && !isStrong(p2, p1))
+        if (isStrong(p1, p2) > 1 && isStrong(p2, p1) <= 1)
             return p1;
-        else if (!isStrong(p1, p2) && isStrong(p2, p1))
+        else if (isStrong(p1, p2) <= 1 && isStrong(p2, p1) > 1)
             return p2;
         else
             return undefined;
@@ -13738,10 +13765,10 @@ function Event9() {
                 }
             nextEncounter();
         },
-        description: "You approach Mesprit's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (healthy ? "You are close to your Pokémon and take good care of them. You have earned my reward." : "You haven't shown enough empathy towards your Pokémon. You do not deserve their strength."),
+        description: "You approach Mesprit's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (healthy ? "\"You are close to your Pokémon and take good care of them. You have earned my reward.\"" : "\"You haven't shown enough empathy towards your Pokémon. You do not deserve their strength.\""),
         subdescription: healthy ? "Your Pokémon's HP has increased." : "Your Pokémon's HP has decreased."
     })
-    var revive = flawless;
+    var revive = !flawless;
     for (let p of team)
         revive = revive && p.currenthp > 0;
     this.options.push({
@@ -13755,8 +13782,8 @@ function Event9() {
                     p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
             nextEncounter();
         },
-        description: "You approach Azelf's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (healthy ? "You have proven your resilience. You have earned my reward." : "You do not know difficulty. I will show you."),
-        subdescription: healthy ? "Your Pokémon have been healed." : "Your Pokémon have taken moderate damage."
+        description: "You approach Azelf's statue and you close your eyes. You soon hear the Pokémon's voice inside your head. " + (revive ? "\"You have proven your resilience. You have earned my reward.\"" : "\"You do not know difficulty. I will show you.\""),
+        subdescription: revive ? "Your Pokémon have been healed." : "Your Pokémon have taken moderate damage."
     })
     var mew = team.findIndex(e => e.name === "Mew");
     if (mew >= 0) {
@@ -13771,7 +13798,7 @@ function Event9() {
 }
 
 function Event9a(p1, p2, winner) {
-    this.description = "Who would win if " + p1.name + " and " + p2.name + " were to battle?";
+    this.description = "\"Who would win if " + p1.name + " and " + p2.name + " were to battle?\"";
     this.options = [];
     this.options.push({
         text: p1.name,
@@ -13780,11 +13807,11 @@ function Event9a(p1, p2, winner) {
                 createReward(false);
             else {
                 for (let p of team)
-                    p.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+                    p.moves.splice(Math.floor(Math.random() * p.moves.length), 1);
                 nextEncounter();
             }
         },
-        description: (p1 === winner) ? "Good answer. You have earned my reward." : "Wrong answer! You are not worthy of your Pokémon's knowledge.",
+        description: (p1 === winner) ? "\"Good answer. You have earned my reward.\"" : "\"Wrong answer! You are not worthy of your Pokémon's knowledge.\"",
         subdescription: (p1 === winner) ? undefined : "Your Pokémon have lost some of their memories."
     })
     this.options.push({
@@ -13794,7 +13821,7 @@ function Event9a(p1, p2, winner) {
                 createReward(false);
             else {
                 for (let p of team)
-                    p.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
+                    p.moves.splice(Math.floor(Math.random() * p.moves.length), 1);
                 nextEncounter();
             }
         },
