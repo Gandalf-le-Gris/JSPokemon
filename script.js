@@ -64,6 +64,10 @@ function loadResources() {
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jpg");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/forest.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/cave3.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/beach2.png");
+
     for (let e of effectList) {
         imgs.push(createEffect(e, 0).icon);
     }
@@ -77,6 +81,7 @@ function loadResources() {
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/" + t + ".png");
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/" + t + ".webp");
     }
+
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png");
@@ -84,6 +89,7 @@ function loadResources() {
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/physical.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/special.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/status.webp");
+
     for (let poke of pokemonList) {
         var p = createPokemon(poke);
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/" + poke + ".gif");
@@ -103,6 +109,7 @@ function loadResources() {
         imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/" + poke + ".gif");
         sounds.push(p.cry);
     }
+
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif");
@@ -1172,7 +1179,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .95) {
+            } else if (Math.random() < eventChance) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -1275,7 +1282,17 @@ function battleEncounter(encounter, fixedPokemon) {
 
     clearBody();
     fadeInTransition();
-    gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/beach2.png', () => { });
+
+    var backgrounds = [["https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/cave3.png", ["ground", "rock", "steel", "ghost", "dark"]],
+        ["https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/forest.png", ["grass", "bug", "poison", "fairy"]],
+        ["https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/beach2.png", ["water", "ice", "dragon", "flying"]],
+        ["https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/battle_backgrounds/plains.png", ["normal", "fire", "electric", "psychic", "fighting"]]];
+    var background;
+    for (let bg of backgrounds)
+            if (contains(bg[1], opponent.types[0]))
+                background = bg[0];
+
+    gArea = new gameArea(background, () => { });
     gArea.start();
 
     if (area < 10)
@@ -12817,7 +12834,7 @@ function ShellBell() {
     this.effect = (move, p) => {
         if (move.bp > 0)
             dealDamage(-5, p);
-        return;
+        return 1;
     };
 }
 
@@ -13104,7 +13121,6 @@ function createReward(isItem, r1, r2, r3) {
 
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 10);
-    event = 4;
     switch (event) {
         case 0:
             return new Event0();
