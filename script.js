@@ -300,41 +300,43 @@ const init = (e) => {
 
 document.addEventListener('DOMContentLoaded', init);
 
-function resizeSprites(both) {
-    var scale = .3 * document.body.getBoundingClientRect().height / 100;
-    var sprite = document.getElementById("leftSprite");
-    if (sprite != undefined) {
-        sprite.onload = () => {
-            var view = document.getElementById("pLeftView");
-            if (view != undefined) {
-                view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
-                view.style.top = .64 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
-            }
-            if (sprite.naturalHeight > 130)
-                sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
-            else
-                sprite.style.transform = "scale(1,1)";
-
-            if (both != undefined) {
-                scale = .25 * document.body.getBoundingClientRect().height / 100;
-                sprite = document.getElementById("rightSprite");
-                sprite.onload = () => {
-                    var view = document.getElementById("pRightView");
-                    if (view != undefined) {
-                        view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
-                        view.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
-                    }
-                    if (sprite.naturalHeight > 130)
-                        sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
-                    else
-                        sprite.style.transform = "scale(1,1)";
+function resizeSprites(left, right) {
+    if (left) {
+        var scale = .3 * document.body.getBoundingClientRect().height / 100;
+        var sprite = document.getElementById("leftSprite");
+        if (sprite != undefined) {
+            sprite.onload = () => {
+                var view = document.getElementById("pLeftView");
+                if (view != undefined) {
+                    view.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale + "px auto";
+                    view.style.top = .64 * document.body.getBoundingClientRect().height - Math.min(130, sprite.naturalHeight) * scale + "px";
                 }
-                if (sprite != undefined)
-                    sprite.src = opponent.imgf;
+                if (sprite.naturalHeight > 130)
+                    sprite.style.transform = "scale(" + sprite.naturalHeight / 130 + "," + sprite.naturalHeight / 130 + ")";
+                else
+                    sprite.style.transform = "scale(1,1)";
             }
+            if (sprite != undefined)
+                sprite.src = team[activePokemon].imgb;
         }
-        if (sprite != undefined)
-            sprite.src = team[activePokemon].imgb;
+    }
+
+    if (right) {
+        var scale2 = .25 * document.body.getBoundingClientRect().height / 100;
+        var sprite2 = document.getElementById("rightSprite");
+        sprite2.onload = () => {
+            var view2 = document.getElementById("pRightView");
+            if (view2 != undefined) {
+                view2.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale2 + "px auto";
+                view2.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite2.naturalHeight) * scale2 + "px";
+            }
+            if (sprite2.naturalHeight > 130)
+                sprite2.style.transform = "scale(" + sprite2.naturalHeight / 130 + "," + sprite2.naturalHeight / 130 + ")";
+            else
+                sprite2.style.transform = "scale(1,1)";
+        }
+        if (sprite2 != undefined)
+            sprite2.src = opponent.imgf;
     }
 }
 
@@ -1384,7 +1386,7 @@ function battleEncounter(encounter, fixedPokemon) {
     }
     pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
 
-    resizeSprites(true);
+    resizeSprites(true, true);
 
     actions = document.createElement('div');
     actions.className = "action-section";
@@ -1904,7 +1906,7 @@ function switchPokemon(ind) {
                 switchesLeft--;
 
             switchCastform(team[activePokemon]);
-            resizeSprites();
+            resizeSprites(true, false);
             if (music)
                 setTimeout(() => { playMusic(team[activePokemon].cry, false); }, 250);
 
@@ -4057,7 +4059,7 @@ function switchAegislash(p, shield) {
                 p.spdefense = temp;
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.stance = "shield";
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4082,7 +4084,7 @@ function switchAegislash(p, shield) {
                 p.spdefense = temp;
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.stance = "blade";
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4579,7 +4581,7 @@ function switchMimikyu(p, disguise) {
             setTimeout(() => {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.disguise = true;
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4598,7 +4600,7 @@ function switchMimikyu(p, disguise) {
             setTimeout(() => {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.disguise = false;
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4713,7 +4715,7 @@ function switchDarmanitan(p, zen) {
             if (zen && !p.zen) {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.types = ["fire", "psychic"];
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4729,7 +4731,7 @@ function switchDarmanitan(p, zen) {
             } else {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.types = ["fire"];
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
@@ -4812,37 +4814,37 @@ function switchRotom(p, move) {
                 case "ghost":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "ghost"];
                     break;
                 case "flying":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "flying"];
                     break;
                 case "ice":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "ice"];
                     break;
                 case "fire":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "fire"];
                     break;
                 case "grass":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "grass"];
                     break;
                 case "water":
                     p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
                     p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
-                    resizeSprites(true);
+                    resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["electric", "fire"];
                     break;
                 default:
@@ -4900,7 +4902,7 @@ function switchCastform(p) {
             setTimeout(() => {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
-                resizeSprites(true);
+                resizeSprites(p === team[activePokemon], p === opponent);
                 p.types = ["normal"];
                 colorHeader(p);
                 img.classList.remove("blink-transform1");
@@ -4917,7 +4919,7 @@ function switchCastform(p) {
                         setTimeout(() => {
                             p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
                             p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
-                            resizeSprites(true);
+                            resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["fire"];
                             colorHeader(p);
                             img.classList.remove("blink-transform1");
@@ -4934,7 +4936,7 @@ function switchCastform(p) {
                         setTimeout(() => {
                             p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
                             p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
-                            resizeSprites(true);
+                            resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["water"];
                             colorHeader(p);
                             img.classList.remove("blink-transform1");
@@ -4951,7 +4953,7 @@ function switchCastform(p) {
                         setTimeout(() => {
                             p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
                             p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
-                            resizeSprites(true);
+                            resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["ice"];
                             colorHeader(p);
                             img.classList.remove("blink-transform1");
@@ -5347,7 +5349,7 @@ function switchHoopa(p) {
         setTimeout(() => {
             p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
             p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
-            resizeSprites(true);
+            resizeSprites(p === team[activePokemon], p === opponent);
             p.types = ["psychic", "dark"];
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
@@ -5500,7 +5502,7 @@ function switchGiratina(p) {
             } else if (opponent === p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
-            resizeSprites(true);
+            resizeSprites(p === team[activePokemon], p === opponent);
             var temp = p.attack;
             p.attack = p.defense;
             p.defense = temp;
@@ -10152,7 +10154,7 @@ function Spark() {
     this.name = "Spark";
     this.type = "electric";
     this.cat = "physical";
-    this.bp = 65;
+    this.bp = 80;
     this.cost = 2;
     this.effect = function (move, pA, pD) { if (pA.hand.length >= 5) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis if the user's hand contains 5 or more cards.";
