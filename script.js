@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function resizeSprites(left, right) {
     if (left) {
+        console.log("left")
         var scale = .3 * document.body.getBoundingClientRect().height / 100;
         var sprite = document.getElementById("leftSprite");
         if (sprite != undefined) {
@@ -322,12 +323,13 @@ function resizeSprites(left, right) {
     }
 
     if (right) {
+        console.log("right")
         var scale2 = .25 * document.body.getBoundingClientRect().height / 100;
         var sprite2 = document.getElementById("rightSprite");
         sprite2.onload = () => {
             var view2 = document.getElementById("pRightView");
             if (view2 != undefined) {
-                view2.style.gridTemplateRows = "auto " + Math.min(130, sprite.naturalHeight) * scale2 + "px auto";
+                view2.style.gridTemplateRows = "auto " + Math.min(130, sprite2.naturalHeight) * scale2 + "px auto";
                 view2.style.top = .5 * document.body.getBoundingClientRect().height - Math.min(130, sprite2.naturalHeight) * scale2 + "px";
             }
             if (sprite2.naturalHeight > 130)
@@ -4629,7 +4631,7 @@ function Mamoswine() {
     this.speed = 80;
     this.maxhp = 0;
     this.currenthp = 0;
-    this.types = ["ground", "ice"];
+    this.types = ["ice", "ground"];
     this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("earthquake"), createMove("ancient_power"), createMove("bulldoze"), createMove("heavy_slam")];
     this.movepool = ["ice_shard", "earthquake", "ancient_power", "amnesia", "avalanche", "bite", "body_press", "bulldoze", "curse", "detect", "dig", "double_edge", "facade", "flail", "giga_impact", "hail", "headbutt", "heavy_slam", "ice_fang", "icicle_crash", "icicle_spear", "iron_head", "rock_blast", "rock_slide", "rock_tomb", "sandstorm", "sand_tomb", "stealth_rock", "stomping_tantrum", "stone_edge", "superpower", "thrash", "high_horsepower"];
     this.opponentMoves =
@@ -11624,7 +11626,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone"];
-specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11796,6 +11798,10 @@ function createHeldItem(item) {
             return new RedChain();
         case "everstone":
             return new Everstone();
+        case "rainbow_wing":
+            return new RainbowWing();
+        case "silver_wing":
+            return new SilverWing();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12887,6 +12893,37 @@ function hasEverstone(p) {
     return p.items.findIndex(e => e.name === "Everstone") >= 0;
 }
 
+function RainbowWing() {
+    this.name = "Rainbow Wing";
+    this.description = "The first time the holder faints, revives it with 50% HP. Single use. Can be given to a fainted Pokémon to revive it.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rainbow_wing.webp';
+    this.area = "event";
+    this.consumed = false;
+    this.revenge = true;
+    this.pickup = true;
+    this.effect = (p) => {
+        if (p.currenthp == 0) {
+            this.consumed = true;
+            p.currenthp = Math.floor(.5 * p.maxhp);
+        }
+    }
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp == 0 && !this.consumed) {
+            this.consumed = true;
+            dealDamage(.5 * pA.maxhp, pA);
+        }
+    }
+}
+
+function SilverWing() {
+    this.name = "Silver Wing";
+    this.description = "Prevents any weather change at the beginning of the battle.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/silver_wing.webp';
+    this.area = "event";
+    this.init = true;
+    this.effect = (p) => { setWeather("air_lock", 5); }
+}
+
 
 
 
@@ -13846,6 +13883,69 @@ function Event9a(p1, p2, winner) {
         description: (p2 === winner) ? "Good answer. You have earned my reward." : "Wrong answer! You are not worthy of your Pokémon's knowledge.",
         subdescription: (p2 === winner) ? undefined : "Your Pokémon have lost some of their memories."
     })
+}
+
+function Event10(p1, p2, winner) {
+    this.description = "You see a majestic tower in the distance. After getting closer, you also notice another burnt down tower close to it. The chime of bells resonates around them.";
+    this.options = [];
+    var difftypes = true;
+    for (let i = 0; i < team.length; i++)
+        for (let t of team[i].types)
+            for (let j = i + 1; j < team.length; j++)
+                difftypes = difftypes && !contains(team[j].types, t);
+    this.options.push({
+        text: difftypes ? "[Type variety] Enter Bell Tower" : "Enter bell tower",
+        effect: () => {
+            if (difftypes)
+                createReward(true, "rainbow_wing");
+            else
+                battleEncounter(Math.random() < 1 / 3 ? "fire" : (Math.random() < .5 ? "water" : "electric"));
+        },
+        description: difftypes ? "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, you notice a rainbow feather on the ground. You're certain it wasn't there before." : "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, a wild Pokémon you scared attacks you!.",
+    })
+    var fire = team.findIndex(e => contains(e.types, "fire"));
+    var water = team.findIndex(e => contains(e.types, "water"));
+    var electric = team.findIndex(e => contains(e.types, "electric"));
+    this.options.push({
+        text: fire < 0 ? (water < 0 ? (electric < 0 ? "Enter Burned Tower" : "[Electric] Enter Burned Tower") : "[Water] Enter Burned Tower") : "[Fire] Enter Burned Tower",
+        effect: () => {
+            if (fire >= 0 || water >= 0 || electric >= 0)
+                createReward(true, "silver_wing");
+            else
+                battleEncounter(Math.random() < 1 / 3 ? "fire" : (Math.random() < .5 ? "water" : "electric"));
+        },
+        description: fire < 0 && water < 0 && electric < 0 ? "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, a wild Pokémon you scared attacks you!." : "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, you notice a rainbow feather on the ground. You're certain it wasn't there before.",
+        subdescription: (p2 === winner) ? undefined : "Your Pokémon have lost some of their memories."
+    })
+    var kommoo = team.findIndex(e => e.name === "Kommo-o");
+    if (kommoo >= 0) {
+        this.options.push({
+            text: "[Kommo-o] Let Kommo-o sing along with the bells",
+            effect: () => {
+                for (let p of team) {
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp + .1 * p.maxhp));
+                    p.defense *= 1.05;
+                    p.spdefense *= 1.05;
+                }
+            },
+            description: "Kommo-o starts to sing in unison with the chime echoing around you. The beautiful melody inspires your team and soothes their wounds. Suddenly, you look up to the skies but nothing seems to be there. You would have sworn two giant birds had passed right over you.",
+            subdescription: "Your Pokémon have been slightly healed and their defenses have grown."
+        })
+    }
+    var eevee = team.findIndex(e => e.name === "Eevee");
+    if (eevee >= 0) {
+        this.options.push({
+            text: "[Eevee] Follow Eevee into the city nearby",
+            effect: () => {
+                var move = new ExtremeEvoboost();
+                move.cost -= 1;
+                move.name += "*";
+                team[eevee].moves.push(move);
+            },
+            description: "Eevee excitedly rushes towards some of its evolutions. They all look really happy to see each other.",
+            subdescription: "Eevee has learnt a new move."
+        })
+    }
 }
 
 
