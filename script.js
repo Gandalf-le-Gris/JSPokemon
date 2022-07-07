@@ -83,7 +83,7 @@ function loadResources() {
     }
 
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
-    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/boss.png");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemon_center.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/physical.webp");
@@ -13159,7 +13159,7 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 10);
+    event = event != undefined ? event : Math.floor(Math.random() * 11);
     switch (event) {
         case 0:
             return new Event0();
@@ -13181,6 +13181,8 @@ function createEvent(event) {
             return new Event8();
         case 9:
             return new Event9();
+        case 10:
+            return new Event10();
     }
 }
 
@@ -13672,7 +13674,7 @@ function Event7() {
         text: blissey ? "[Blissey] Use a healer" : "Use a healer",
         effect: () => {
             for (let p of team)
-                p.currenthp = Math.floor(Math.max(0, p.currenthp + (.1 + .2 * blissey) * p.maxhp));
+                p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + (.1 + .2 * blissey) * p.maxhp));
             nextEncounter();
         },
         description: blissey ? "Blissey shows you how to use the healers in the Pokémon Center. With its help, you manage to give your Pokémon some well-needed healing." : "You approach a seemingly functional healer and place your Pokéballs inside. Despite its bad shape, it still heals your party. Somewhat.",
@@ -13772,7 +13774,7 @@ function Event8() {
 }
 
 function Event9() {
-    this.description = "You encounter three statues representing the legendary Lake Trio of Sinnoh. Below each of them lies an inscription, inviting you to attempt their trial.";
+    this.description = "You encounter three statues representing the legendary Lake Guardians of Sinnoh. Below each of them lies an inscription, inviting you to attempt their trial.";
     this.options = [];
     var pList = pokemonList.concat(bossList).concat(eventPokemonList);
     var p1 = createPokemon(pList[Math.floor(Math.random() * pList.length)]);
@@ -13831,7 +13833,7 @@ function Event9() {
         effect: () => {
             if (revive)
                 for (let p of team)
-                    p.currenthp = Math.floor(Math.max(0, p.currenthp + .15 * p.maxhp));
+                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .15 * p.maxhp));
             else
                 for (let p of team)
                     p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
@@ -13885,7 +13887,7 @@ function Event9a(p1, p2, winner) {
     })
 }
 
-function Event10(p1, p2, winner) {
+function Event10() {
     this.description = "You see a majestic tower in the distance. After getting closer, you also notice another burnt down tower close to it. The chime of bells resonates around them.";
     this.options = [];
     var difftypes = true;
@@ -13914,7 +13916,7 @@ function Event10(p1, p2, winner) {
             else
                 battleEncounter(Math.random() < 1 / 3 ? "fire" : (Math.random() < .5 ? "water" : "electric"));
         },
-        description: fire < 0 && water < 0 && electric < 0 ? "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, a wild Pokémon you scared attacks you!." : "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, you notice a rainbow feather on the ground. You're certain it wasn't there before.",
+        description: fire < 0 && water < 0 && electric < 0 ? "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, a wild Pokémon you scared attacks you!." : "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, you notice a silver feather on the ground. You're certain it wasn't there before.",
         subdescription: (p2 === winner) ? undefined : "Your Pokémon have lost some of their memories."
     })
     var kommoo = team.findIndex(e => e.name === "Kommo-o");
@@ -13923,10 +13925,11 @@ function Event10(p1, p2, winner) {
             text: "[Kommo-o] Let Kommo-o sing along with the bells",
             effect: () => {
                 for (let p of team) {
-                    p.currenthp = Math.floor(Math.max(0, p.currenthp + .1 * p.maxhp));
+                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .1 * p.maxhp));
                     p.defense *= 1.05;
                     p.spdefense *= 1.05;
                 }
+                nextEncounter();
             },
             description: "Kommo-o starts to sing in unison with the chime echoing around you. The beautiful melody inspires your team and soothes their wounds. Suddenly, you look up to the skies but nothing seems to be there. You would have sworn two giant birds had passed right over you.",
             subdescription: "Your Pokémon have been slightly healed and their defenses have grown."
@@ -13941,6 +13944,7 @@ function Event10(p1, p2, winner) {
                 move.cost -= 1;
                 move.name += "*";
                 team[eevee].moves.push(move);
+                nextEncounter();
             },
             description: "Eevee excitedly rushes towards some of its evolutions. They all look really happy to see each other.",
             subdescription: "Eevee has learnt a new move."
