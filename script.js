@@ -1183,7 +1183,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance) {
+            } else if (Math.random() < eventChance || Math.random() < .95) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -11626,7 +11626,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone"];
-specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -12924,6 +12924,45 @@ function SilverWing() {
     this.effect = (p) => { setWeather("air_lock", 5); }
 }
 
+function GSBall() {
+    this.name = "GS Ball";
+    this.description = "Restores 5HP to the entire team every time the holder uses a status move.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/gs_ball.webp';
+    this.area = "event";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (move.cat === "status")
+            if (p === team[activePokemon])
+                for (let poke of team)
+                    dealDamage(5, poke);
+            else
+                dealDamage(5, opponent);
+        return 1;
+    }
+}
+
+function RevivalHerb() {
+    this.name = "Revival Herb";
+    this.description = "The first time the holder faints, revives it with 35% HP. Single use. Can be given to a fainted Pokémon to revive it.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/revival_herb.webp';
+    this.area = "event";
+    this.consumed = false;
+    this.revenge = true;
+    this.pickup = true;
+    this.effect = (p) => {
+        if (p.currenthp == 0) {
+            this.consumed = true;
+            p.currenthp = Math.floor(.35 * p.maxhp);
+        }
+    }
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp == 0 && !this.consumed) {
+            this.consumed = true;
+            dealDamage(.35 * pA.maxhp, pA);
+        }
+    }
+}
+
 
 
 
@@ -13159,7 +13198,8 @@ function createReward(isItem, r1, r2, r3) {
 }
 
 function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 11);
+    event = event != undefined ? event : Math.floor(Math.random() * 13);
+    event = 12;
     switch (event) {
         case 0:
             return new Event0();
@@ -13183,6 +13223,10 @@ function createEvent(event) {
             return new Event9();
         case 10:
             return new Event10();
+        case 11:
+            return new Event11();
+        case 12:
+            return new Event12();
     }
 }
 
@@ -13951,7 +13995,128 @@ function Event10() {
         })
     }
 }
+function Event11() {
+    this.description = "As you cross a seemingly endless snowy plateau, it suddenly starts hailing. You hastily look for a shelter, and head towards a mountain side.";
+    this.options = [];
+    this.options.push({
+        text: "Seek shelter in a small grotto",
+        effect: () => {
+            battleEncounter(Math.random() < .5 ? "rock" : "ground");
+        },
+        description: "You spot a small grotto in the distance in the moutain side, and start running for it. Unfortunately, the cave wasn't empty, and its inhabitant is not happy to see you."
+    })
+    this.options.push({
+        text: "Seek shelter in a derelict shed",
+        effect: () => {
+            area = Math.max(0, area - 1);
+            nextEncounter();
+        },
+        description: "You remember walking past an old shed not too long ago. You rush back to it and stay there until the hail stops. You lost some time, but you're safe.",
+        subdescription: "You have not advanced in your adventure."
+    })
+    var ice = team.findIndex(e => contains(e.types, "ice"));
+    this.options.push({
+        text: ice < 0 ? "Keep going in spite of the weather" : "[Ice] Keep going in spite of the weather",
+        effect: () => {
+            if (ice < 0) {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
+                nextEncounter();
+            } else
+                createReward(true, "never_melt_ice");
+        },
+        description: ice < 0 ? "You don't have time to lose. You keep going and endure the weather. Your Pokémon will have to deal with it." : team[ice].name + " seems to enjoy this weather. It happily intercepts the icicles falling on you and your team. This looks like a game to it. Eventually, your Pokémon has accumulated enough ice to make a small sculpture out of it.",
+        subdescription: ice < 0 ? "Your Pokémon have taken moderate damage." : undefined
+    })
+    var castform = team.findIndex(e => e.name === "Castform");
+    if (castform >= 0) {
+        this.options.push({
+            text: "[Castform] Ask Castform to change the weather",
+            effect: () => {
+                function getCloth() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_scarf') && !item.includes('_band'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getCloth(), getCloth(), getCloth());
+            },
+            description: "Castform doesn't seem bothered by the weather, but you ask it to get rid of the dark clouds nonetheless. A few seconds later, the sun begins to shine and hail has completely stopped. With the snow starting to melt, you spot a small piece of cloth lost on the ground.",
+        })
+    }
+    var ground = team.findIndex(e => contains(e.types, "ground"));
+    if (ground >= 0) {
+        this.options.push({
+            text: "[Ground] Make " + team[ground].name + " dig a tunnel",
+            effect: () => {
+                createReward(true, "miracle_seed");
+            },
+            description: "You tell " + team[ground].name + " to quickly dig a small tunnel for you and your team to hide in. Not only are you safe, but you also find an oversized seed radiating power and half buried in the dirt.",
+        })
+    }
+}
 
+function Event12() {
+    this.description = "You enter a gloomy forest, so dense that the light of the sun doesn't reach the ground. You enventually reach a small glade, where a wooden shrine stands alone.";
+    this.options = [];
+    var grass = team.findIndex(e => contains(e.types, "grass"));
+    this.options.push({
+        text: grass < 0 ? "Meditate" : "[Grass] Meditate",
+        effect: () => {
+            if (grass < 0) {
+                area = Math.max(0, area - 2);
+                nextEnounter();
+            } else
+                createReward(true, "gs_ball");
+        },
+        description: grass < 0 ? "You close your eyes and start to focus on the energy of the forest around you. After a while, you fall asleep in front of the shrine and a small green Pokémon appears to you in your dream, showing you some of your memories. When you wake up, you are no longer in the forest, it seems like you have travelled back in time." : "You close your eyes and start to focus on the energy of the forest around you. After a while, you fall asleep in front of the shrine and a small green Pokémon appears to you in your dream, showing you some of your memories. When you wake up, a gold and silver colored Pokéball lies in the grass in front of you.",
+        subdescription: grass < 0 ? "You have travelled back in time." : undefined
+    })
+    this.options.push({
+        text: "Look inside of the shrine",
+        effect: () => {
+            function getHerb() {
+                var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                while (!item.includes('_herb'))
+                    item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                return item;
+            }
+            createReward(true, getHerb(), getHerb(), getHerb());
+        },
+        description: "You look through an opening in the shrine and spot a few medicinal herbs inside of it. You reach for the leaves and grab a few, you could need them in the future.",
+    })
+    var pikachu = team.findIndex(e => e.name === "Pikachu");
+    if (pikachu >= 0) {
+        this.options.push({
+            text: "[Pikachu] Examine a bush nearby",
+            effect: () => {
+                createReward(true, "zap_plate");
+            },
+            description: "Your hear movement in a bush close to the shrine. Pikachu hastily runs around the bush to see what hides behind it. It immediately finds a poorly hidden Pichu holding a yellow stone slate. After talking to your Pokémon for some time, it gives it the plate and leaves into the dark forest.",
+        })
+    }
+    var poison = team.findIndex(e => contains(e.types, "poison"));
+    var reward = Math.random() < .5;
+    this.options.push({
+        text: poison < 0 ? "Eat the berries growing next to the shrine" : "[Poison] Eat the berries growing next to the shrine",
+        effect: () => {
+            if (poison < 0 && !reward)
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
+            else {
+                function getBerry() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_berry') || item.includes('aguav_berry'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getBerry(), getBerry(), getBerry()); 
+            }
+        },
+        description: poison < 0 && !reward ? "You and your Pokémon are starved from the journey. Those berries are a blessing and you start eating everything you can find. Unfortunately, not all of them were edible and you quickly regret your decision." : (poison < 0 ? "You and your Pokémon are starved from the journey. Those berries are a blessing and you start eating everything you can find. The berry bush is soon completely harvested, and you shove the few berries you couldn't eat in your bag." : "As you and your starved Pokémon were about to eat the entire batch of berries, " + team[poison].name + " points out some toxic fruits. Following its advice, you only eat a few safe berries and store some more in your bag."),
+        subdescription: poison < 0 && !reward ? "Your Pokémon have taken moderate damage." : undefined
+    })
+}
 
 
 
