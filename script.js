@@ -27,6 +27,11 @@ function loadResources() {
                         if (progress == 100) {
                             text.innerHTML = "Click to continue";
                             filter.onclick = () => {
+                                window.addEventListener('keydown', (e) => {
+                                    if (e.key === "Escape") {
+                                        toggleEscapeScreen();
+                                    }
+                                });
                                 fadeOutTransition(2);
                                 setTimeout(drawStartingMenu, 1000);
                             }
@@ -44,6 +49,11 @@ function loadResources() {
                         if (progress == 100) {
                             text.innerHTML = "Click to continue";
                             filter.onclick = () => {
+                                window.addEventListener('keydown', (e) => {
+                                    if (e.key === "Escape") {
+                                        toggleEscapeScreen();
+                                    }
+                                });
                                 fadeOutTransition(2);
                                 setTimeout(drawStartingMenu, 1000);
                             }
@@ -290,11 +300,6 @@ function startGame() {
 
 const init = (e) => {
     window.addEventListener('resize', resizeSprites);
-    window.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") {
-            toggleEscapeScreen();
-        }
-    });
     startGame();
 }
 
@@ -532,7 +537,7 @@ function fadeOutTransition(n) {
     var m;
     var audios = document.getElementsByTagName('audio');
     for (let a of audios) {
-        if (a.loop)
+        if (a.loop && !a.paused)
             m = a;
     }
     if (m != undefined) {
@@ -666,7 +671,7 @@ function unlockAll() {
     window.localStorage.setItem('survive1hp', JSON.stringify(1));
     window.localStorage.setItem('unlockedPokemon', JSON.stringify(10));
     window.localStorage.setItem('transforms', JSON.stringify(50));
-    window.localStorage.setItem('flawlessKO', JSON.stringify(1));
+    window.localStorage.setItem('flawlessKO', JSON.stringify(3));
     window.localStorage.setItem('area1loss', JSON.stringify(1));
     window.localStorage.setItem('maxRound', JSON.stringify(20));
     window.localStorage.setItem('pikachuVictory', JSON.stringify(1));
@@ -2270,6 +2275,10 @@ function useMove(move) {
 function dealDamage(damage, p, move, revive) {
     if (p.talent === "Wonder guard" && damage > 1)
         damage = 1;
+
+    if (damage > 0 || (damage < 0 && ((revive != undefined && revive) || p.currenthp > 0)))
+        moveAnimation(move, damage, p);
+
     if ((p.currenthp > 0 && (p.currenthp == 1 || p.talent !== "Sturdy")) || (damage < 0 && revive != undefined && revive))
         p.currenthp = Math.min(Math.max(0, Math.floor(p.currenthp - damage)), p.maxhp);
     else if (p.currenthp > 0)
@@ -2277,7 +2286,6 @@ function dealDamage(damage, p, move, revive) {
     refreshHealthBar(true);
     refreshHealthBar(false);
 
-    moveAnimation(move, damage, p);
     if (music && move != undefined && damage > 0) {
         if (effectiveMultiplier(move, p) > 1)
             playMusic("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/super_effective_hit.mp3", false);
@@ -2552,7 +2560,7 @@ function createOpponent(encounter, fixedOpponent) {
 
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
-        opponent.maxhp = 10;
+        opponent.maxhp = 3 + 2 * world;
         opponent.currenthp = opponent.maxhp;
     }
 
@@ -4490,7 +4498,7 @@ function Urshifu() {
     this.items = [];
     this.talent = "Unseen Fist";
     this.talentDesc = "This Pokémon's attacks ignore protections."
-    this.unlocked = flawlessKO >= 1;
+    this.unlocked = flawlessKO >= 3;
     this.hint = "???";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/urshifu.ogg"
 }
@@ -13090,7 +13098,7 @@ function SacredAsh() {
 function LumBerry() {
     this.name = "Lum Berry";
     this.description = "The first time each battle the holder is affected by a status condition, remove it.";
-    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/moomoo_milk.webp';
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/lum_berry.webp';
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
@@ -13118,7 +13126,7 @@ function NormalGem() {
     this.area = "normal";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "normal" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13134,7 +13142,7 @@ function GhostGem() {
     this.area = "ghost";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "ghost" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13150,7 +13158,7 @@ function FairyGem() {
     this.area = "fairy";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "fairy" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13166,7 +13174,7 @@ function SteelGem() {
     this.area = "steel";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "steel" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13182,7 +13190,7 @@ function PoisonGem() {
     this.area = "poison";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "poison" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13198,7 +13206,7 @@ function PsychicGem() {
     this.area = "psychic";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "psychic" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13214,7 +13222,7 @@ function DragonGem() {
     this.area = "dragon";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "dragon" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13230,7 +13238,7 @@ function RockGem() {
     this.area = "rock";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "rock" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13246,7 +13254,7 @@ function FightingGem() {
     this.area = "fighting";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "fighting" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13262,7 +13270,7 @@ function GroundGem() {
     this.area = "ground";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "ground" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13278,7 +13286,7 @@ function IceGem() {
     this.area = "ice";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "ice" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13294,7 +13302,7 @@ function WaterGem() {
     this.area = "water";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "water" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13310,7 +13318,7 @@ function ElectricGem() {
     this.area = "electric";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "electric" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13326,7 +13334,7 @@ function FlyingGem() {
     this.area = "flying";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "flying" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13342,7 +13350,7 @@ function GrassGem() {
     this.area = "grass";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "grass" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13358,7 +13366,7 @@ function FireGem() {
     this.area = "fire";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "fire" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13374,7 +13382,7 @@ function DarkGem() {
     this.area = "dark";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "dark" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13390,7 +13398,7 @@ function BugGem() {
     this.area = "bug";
     this.bonus = .3;
     this.boost = true;
-    this.effectR = (move, pA, pD) => {
+    this.effect = (move, p) => {
         if (move.type === "bug" && move.bp > 0) {
             this.bonus *= .95;
             return 1 + this.bonus;
@@ -13417,6 +13425,10 @@ function eventEncounter() {
     fadeInTransition();
     gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
+
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/crossroads.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
 
     runEvent(createEvent());
 }
@@ -13995,7 +14007,7 @@ function Event4() {
     this.options.push({
         text: grass < 0 ? "Harvest some berries" : "[Grass] Harvest some berries",
         effect: () => {
-            if (i < 0) {
+            if (grass < 0) {
                 function getBerry() {
                     var item = heldItems[Math.floor(Math.random() * heldItems.length)];
                     while (!item.includes('_berry') || item.includes('aguav_berry'))

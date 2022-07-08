@@ -38,6 +38,7 @@ button.start {
     font-family: 'Copperplate Gothic';
     background-color: transparent;
     border: none;
+    transition: font-size .3s, color .3s;
 }
 
 button.start:hover {
@@ -122,6 +123,7 @@ button.start:hover {
     grid-gap: 0px 0px;
     column-count: 1;
     text-align: center;
+    transition: color .2s;
 }
 
 .selected-cell {
@@ -134,6 +136,7 @@ button.start:hover {
     grid-gap: 0px 0px;
     column-count: 1;
     text-align: center;
+    transition: color .2s;
 }
 
 .not-unlocked {
@@ -257,17 +260,28 @@ button.start:hover {
 
 .pokemon-hp {
     grid-column: 1 / 3;
-    background-color: transparent;
+    background-color: lightgrey;
     width: 100%;
+    border-radius: 1.2vh;
+    border: none;
 }
 
     .pokemon-hp::-webkit-progress-bar {
         border-radius: 1.2vh;
+        transition: padding-left .8s;
+        padding-left: var(--value);
     }
 
     .pokemon-hp::-webkit-progress-value {
         border-radius: 1.2vh;
         background: green;
+        transition: width .8s;
+    }
+
+    .pokemon-hp::-moz-progress-bar {
+        border-radius: 1.2vh;
+        background: green;
+        transition: width .8s;
     }
 
 .pokemon-name {
@@ -370,6 +384,7 @@ button.start:hover {
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
+    transition: background-color .2s;
 }
 
 .selected-move {
@@ -386,6 +401,7 @@ button.start:hover {
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
+    transition: background-color .2s;
 }
 
 .move-card:hover, .selected-move:hover {
@@ -432,6 +448,7 @@ button.start:hover {
     border: solid;
     justify-self: right;
     border-radius: 1vh;
+    transition: color .2s, background-color .2s, font-size .2s;
 }
 
     .end-turn:hover {
@@ -457,6 +474,7 @@ button.start:hover {
     align-items: center;
     grid-auto-flow: column;
     height: 12vh;
+    transition: color .2s;
 }
 
 .switch-header:hover {
@@ -523,6 +541,7 @@ button.start:hover {
 .replay {
     background: rgba(0, 0, 0, .6);
     border-radius: 1.5vh;
+    transition: color .2s;
 }
 
 .replay:hover {
@@ -533,7 +552,7 @@ button.start:hover {
     position: absolute;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, .9);
+    background: rgba(0, 0, 0, .85);
     width: 100%;
     height: 100%;
     overflow-y: auto;
@@ -554,6 +573,8 @@ button.start:hover {
     display: grid;
     grid-auto-flow: column;
     grid-column-gap: .5vw;
+    border-radius: 1vh;
+    transition: background .3s;
 }
 
 .reward:hover {
@@ -707,6 +728,7 @@ button.start:hover {
     grid-auto-flow: column;
     grid-column-gap: .5vw;
     justify-self: center;
+    transition: color .2s;
 }
 
 .remove-button:hover {
@@ -742,6 +764,7 @@ button.launch-tuto {
     border: none;
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: gray;
+    transition: font-size .2s, color .2s, -webkit-text-stroke-color .2s;
 }
 
 button.launch-tuto:hover {
@@ -824,6 +847,7 @@ button.launch-tuto:hover {
     position: absolute;
     top: 3vh;
     left: 3vh;
+    transition: filter .2s;
 }
 
 .sound-button:hover {
@@ -896,6 +920,7 @@ button.launch-tuto:hover {
     grid-column: 1 / 3;
     font-size: 2.5vw;
     text-align: center;
+    transition: color .2s;
 }
 
 .settings-option:hover {
@@ -935,6 +960,7 @@ button.launch-tuto:hover {
     font-family: 'Copperplate Gothic';
     text-align: center; 
     width: 80vw;
+    transition: color .2s;
 }
 
 .event-option:hover {
@@ -1051,6 +1077,7 @@ input:checked + .slider:before {
     /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
     .sliderbar::-webkit-slider-thumb {
         -webkit-appearance: none; /* Override default look */
+        -moz-appearance: none;
         width: 1.6vw; /* Set a specific slider handle width */
         height: 1.6vw; /* Slider handle height */
         border-radius: 50%;
