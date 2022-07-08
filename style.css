@@ -211,7 +211,7 @@ button.start:hover {
 .pokemon-displayer-left {
     display: grid;
     grid-template-rows: auto auto auto;
-    grid-row-gap: 3vh;
+    grid-row-gap: 2vh;
     font-family: 'Copperplate Gothic';
     text-align: left;
     color: black;
@@ -232,7 +232,7 @@ button.start:hover {
 .pokemon-displayer-right {
     display: grid;
     grid-template-rows: auto auto auto;
-    grid-row-gap: 3vh;
+    grid-row-gap: 2vh;
     font-family: 'Copperplate Gothic';
     text-align: left;
     color: black;
@@ -282,6 +282,7 @@ button.start:hover {
 
 .effect-section {
     display: grid;
+    min-width: 15.6vw;
     grid-template-columns: 2vw 2vw 2vw 2vw 2vw 2vw 2vw;
     grid-column-gap: .2vw;
     grid-row-gap: .2vw;
@@ -294,6 +295,7 @@ button.start:hover {
     -webkit-text-stroke-color: black;
     text-align: right;
     border-radius: 1vh;
+    justify-content: center;
 }
 
 .effect-cell {
@@ -635,9 +637,23 @@ button.start:hover {
     align-items: center;
 }
 
+.wrapper-padded {
+    height: 100%;
+    width: 100%;
+    padding: 8%;
+    display: flex;
+    align-items: center;
+}
+
 .item-sprite {
     max-height: 5vh;
     width: auto;
+}
+
+.item-sprite-pokemon-displayer {
+    max-height: 2vw;
+    max-width: 2vw;
+    text-align: center;
 }
 
 .money-text {

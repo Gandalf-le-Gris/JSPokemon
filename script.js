@@ -302,7 +302,6 @@ document.addEventListener('DOMContentLoaded', init);
 
 function resizeSprites(left, right) {
     if (left) {
-        console.log("left")
         var scale = .3 * document.body.getBoundingClientRect().height / 100;
         var sprite = document.getElementById("leftSprite");
         if (sprite != undefined) {
@@ -323,7 +322,6 @@ function resizeSprites(left, right) {
     }
 
     if (right) {
-        console.log("right")
         var scale2 = .25 * document.body.getBoundingClientRect().height / 100;
         var sprite2 = document.getElementById("rightSprite");
         sprite2.onload = () => {
@@ -1183,7 +1181,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .95) {
+            } else if (Math.random() < eventChance) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -1381,6 +1379,20 @@ function battleEncounter(encounter, fixedPokemon) {
     rightStats.className = "effect-section";
     rightStats.id = "rightStats";
     pRightView.appendChild(rightStats);
+    rightItems = document.createElement('div');
+    rightItems.className = "effect-section";
+    rightItems.id = "rightItems";
+    pRightView.appendChild(rightItems);
+    for (let i of opponent.items) {
+        var wrapper = document.createElement('div');
+        wrapper.className = "wrapper-padded";
+        rightItems.appendChild(wrapper);
+        var pImage = new Image();
+        pImage.src = i.img;
+        pImage.className = "item-sprite-pokemon-displayer";
+        pImage.title = i.description;
+        wrapper.appendChild(pImage);
+    }
     pRightView.title = opponent.name + "\nTypes: ";
     for (let type of opponent.types) {
         var t = type.charAt(0).toUpperCase() + type.slice(1)
@@ -2255,10 +2267,10 @@ function useMove(move) {
         document.getElementById("movePreview").className = "preview-off";
 }
 
-function dealDamage(damage, p, move) {
+function dealDamage(damage, p, move, revive) {
     if (p.talent === "Wonder guard" && damage > 1)
         damage = 1;
-    if (p.currenthp > 0 && (p.currenthp == 1 || p.talent !== "Sturdy"))
+    if ((p.currenthp > 0 && (p.currenthp == 1 || p.talent !== "Sturdy")) || (damage < 0 && revive != undefined && revive))
         p.currenthp = Math.min(Math.max(0, Math.floor(p.currenthp - damage)), p.maxhp);
     else if (p.currenthp > 0)
         p.currenthp = Math.min(Math.max(1, Math.floor(p.currenthp - damage)), p.maxhp);
@@ -2290,7 +2302,7 @@ function dealDamage(damage, p, move) {
             specialDamageTaken += damage;
     } else if (damage > 0 && p === opponent) {
         damageDealt += damage;
-        if (move != undefined && move.type === "rock" && p.currenthp == 0)
+        if (move != undefined && move.type === "rock" && p.currenthp == 0 && contains(p.types, "ice"))
             rockIceKO++;
     }
     if (p === team[activePokemon])
@@ -2553,6 +2565,18 @@ function createOpponent(encounter, fixedOpponent) {
     }
     while (opponent.moves.length < 10) {
         opponent.moves.push(createMove(opponent.movepool[Math.floor(Math.random() * opponent.movepool.length)]));
+    }
+
+    for (let j = 0; j < Math.floor(world * Math.random() * 1.5) + (area == 10) + 1; j++) {
+        var i = heldItems[Math.floor(Math.random() * heldItems.length)];
+        var item = createHeldItem(i);
+        var areaPool = Math.random() < .3;
+        var areaBan = Math.random() < .5;
+        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
+            i = heldItems[Math.floor(Math.random() * heldItems.length)];
+            item = createHeldItem(i);
+        }
+        opponent.items.push(item);
     }
 
     return opponent;
@@ -11498,6 +11522,11 @@ function isTaunted(p) {
     return i >= 0 && p.effects[i].stacks > 0;
 }
 
+function isConfused(p) {
+    var i = p.effects.findIndex(e => e.name === "Confusion");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
 function isImmune(p, type) {
     var i = p.effects.findIndex(e => e.name === "Immunity (" + type + ")");
     return i >= 0 && p.effects[i].stacks > 0;
@@ -11625,7 +11654,8 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "draco_plate", "dread_plate", "earth_plate", "fist_plate", "flame_plate", "icicle_plate", "insect_plate", "iron_plate", "meadow_plate", "mind_plate", "pixie_plate", "sky_plate", "splash_plate", "spooky_plate", "stone_plate", "toxic_plate", "zap_plate",
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
-    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone"];
+    "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone", "lum_berry", "moomoo_milk", "sacred_ash", "bug_gem", "dark_gem", "grass_gem", "fire_gem", "water_gem", "ice_gem", "flying_gem", "normal_gem",
+    "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem"];
 specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
@@ -11802,6 +11832,52 @@ function createHeldItem(item) {
             return new RainbowWing();
         case "silver_wing":
             return new SilverWing();
+        case "gs_ball":
+            return new GSBall();
+        case "revival_herb":
+            return new RevivalHerb();
+        case "lum_berry":
+            return new LumBerry();
+        case "moomoo_milk":
+            return new MoomooMilk();
+        case "sacred_ash":
+            return new SacredAsh();
+        case "normal_gem":
+            return new NormalGem();
+        case "flying_gem":
+            return new FlyingGem();
+        case "dragon_gem":
+            return new DragonGem();
+        case "bug_gem":
+            return new BugGem();
+        case "grass_gem":
+            return new GrassGem();
+        case "electric_gem":
+            return new ElectricGem();
+        case "water_gem":
+            return new WaterGem();
+        case "ice_gem":
+            return new IceGem();
+        case "psychic_gem":
+            return new PsychicGem();
+        case "poison_gem":
+            return new PoisonGem();
+        case "ghost_gem":
+            return new GhostGem();
+        case "fighting_gem":
+            return new FightingGem();
+        case "rock_gem":
+            return new RockGem();
+        case "ground_gem":
+            return new GroundGem();
+        case "fairy_gem":
+            return new FairyGem();
+        case "dark_gem":
+            return new DarkGem();
+        case "steel_gem":
+            return new SteelGem();
+        case "fire_gem":
+            return new FireGem();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -12757,7 +12833,7 @@ function Revive() {
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp == 0 && !this.consumed) {
             this.consumed = true;
-            dealDamage(.3 * pA.maxhp, pA);
+            dealDamage(-.3 * pA.maxhp, pA, undefined, true);
         }
     }
 }
@@ -12817,7 +12893,6 @@ function OddKeystone() {
             dealDamage(108, pD);
             this.energy -= 65;
         }
-        if (pA.currenthp == 0) dealDamage(.3 * pA.maxhp, pA);
     }
 }
 
@@ -12910,7 +12985,7 @@ function RainbowWing() {
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp == 0 && !this.consumed) {
             this.consumed = true;
-            dealDamage(.5 * pA.maxhp, pA);
+            dealDamage(-.5 * pA.maxhp, pA, undefined, true);
         }
     }
 }
@@ -12932,11 +13007,13 @@ function GSBall() {
     this.boost = true;
     this.effect = (move, p) => {
         if (move.cat === "status")
-            if (p === team[activePokemon])
+            if (p === team[activePokemon]) {
                 for (let poke of team)
-                    dealDamage(5, poke);
-            else
-                dealDamage(5, opponent);
+                    dealDamage(-5, poke);
+                drawHealthBar(1);
+                drawHealthBar(2);
+            } else
+                dealDamage(-5, opponent);
         return 1;
     }
 }
@@ -12958,9 +13035,368 @@ function RevivalHerb() {
     this.effectR = (move, pA, pD) => {
         if (pA.currenthp == 0 && !this.consumed) {
             this.consumed = true;
-            dealDamage(.35 * pA.maxhp, pA);
+            dealDamage(-.35 * pA.maxhp, pA, undefined, true);
         }
     }
+}
+
+function MoomooMilk() {
+    this.name = "Moomoo Milk";
+    this.description = "Restores 25% of maximum HP the first time the holder falls below 15% of maximum HP.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/moomoo_milk.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .15 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            dealDamage(-pA.maxhp * .25, pA);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function SacredAsh() {
+    this.name = "Sacred Ash";
+    this.description = "The first time the holder faints, revives it with 30% HP and restores 10% of all of its teammates's HP. Single use. Can be given to a fainted Pokémon to revive it.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/sacred_ash.webp';
+    this.area = "event";
+    this.consumed = false;
+    this.revenge = true;
+    this.pickup = true;
+    this.effect = (p) => {
+        if (p.currenthp == 0) {
+            this.consumed = true;
+            p.currenthp = Math.floor(.3 * p.maxhp);
+            for (let poke of team)
+                if (p !== poke)
+                    poke.currenthp = Math.min(poke.maxhp, Math.round(poke.currenthp + .1 * poke.maxhp));
+        }
+    }
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp == 0 && !this.consumed) {
+            this.consumed = true;
+            dealDamage(-.3 * pA.maxhp, pA, undefined, true);
+            for (let poke of team)
+                if (pA !== poke)
+                    dealDamage(-.1 * poke.maxhp, poke, undefined, true);
+        }
+    }
+}
+
+function LumBerry() {
+    this.name = "Lum Berry";
+    this.description = "The first time each battle the holder is affected by a status condition, remove it.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/moomoo_milk.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (isAsleep(pA) || isBurned(pA) || isPoisoned(pA) || isParalyzed(pA) || isFrozen(pA) || isConfused(pA)) {
+            this.consumed = true;
+            removeEffect(pA, "Sleep");
+            removeEffect(pA, "Burn");
+            removeEffect(pA, "Poison");
+            removeEffect(pA, "Paralysis");
+            removeEffect(pA, "Freeze");
+            removeEffect(pA, "Confusion");
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function NormalGem() {
+    this.name = "Normal Gem";
+    this.description = "Increases the base power of damaging normal type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/normal_gem.webp';
+    this.area = "normal";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "normal" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function GhostGem() {
+    this.name = "Ghost Gem";
+    this.description = "Increases the base power of damaging ghost type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ghost_gem.webp';
+    this.area = "ghost";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "ghost" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function FairyGem() {
+    this.name = "Fairy Gem";
+    this.description = "Increases the base power of damaging fairy type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fairy_gem.webp';
+    this.area = "fairy";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "fairy" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function SteelGem() {
+    this.name = "Steel Gem";
+    this.description = "Increases the base power of damaging steel type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/steel_gem.webp';
+    this.area = "steel";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "steel" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function PoisonGem() {
+    this.name = "Poison Gem";
+    this.description = "Increases the base power of damaging poison type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/poison_gem.webp';
+    this.area = "poison";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "poison" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function PsychicGem() {
+    this.name = "Psychic Gem";
+    this.description = "Increases the base power of damaging psychic type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/psychic_gem.webp';
+    this.area = "psychic";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "psychic" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function DragonGem() {
+    this.name = "Dragon Gem";
+    this.description = "Increases the base power of damaging dragon type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dragon_gem.webp';
+    this.area = "dragon";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "dragon" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function RockGem() {
+    this.name = "Rock Gem";
+    this.description = "Increases the base power of damaging rock type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rock_gem.webp';
+    this.area = "rock";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "rock" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function FightingGem() {
+    this.name = "Fighting Gem";
+    this.description = "Increases the base power of damaging fighting type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fighting_gem.webp';
+    this.area = "fighting";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "fighting" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function GroundGem() {
+    this.name = "Ground Gem";
+    this.description = "Increases the base power of damaging ground type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ground_gem.webp';
+    this.area = "ground";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "ground" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function IceGem() {
+    this.name = "Ice Gem";
+    this.description = "Increases the base power of damaging ice type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ice_gem.webp';
+    this.area = "ice";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "ice" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function WaterGem() {
+    this.name = "Water Gem";
+    this.description = "Increases the base power of damaging water type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/water_gem.webp';
+    this.area = "water";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "water" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function ElectricGem() {
+    this.name = "Electric Gem";
+    this.description = "Increases the base power of damaging electric type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/electric_gem.webp';
+    this.area = "electric";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "electric" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function FlyingGem() {
+    this.name = "Flying Gem";
+    this.description = "Increases the base power of damaging flying type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/flying_gem.webp';
+    this.area = "flying";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "flying" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function GrassGem() {
+    this.name = "Grass Gem";
+    this.description = "Increases the base power of damaging grass type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/grass_gem.webp';
+    this.area = "grass";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "grass" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function FireGem() {
+    this.name = "Fire Gem";
+    this.description = "Increases the base power of damaging fire type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fire_gem.webp';
+    this.area = "fire";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "fire" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function DarkGem() {
+    this.name = "Dark Gem";
+    this.description = "Increases the base power of damaging dark type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dark_gem.webp';
+    this.area = "dark";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "dark" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
+}
+
+function BugGem() {
+    this.name = "Bug Gem";
+    this.description = "Increases the base power of damaging bug type moves. Bonus decreases permanently with each move of this type used.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/bug_gem.webp';
+    this.area = "bug";
+    this.bonus = .3;
+    this.boost = true;
+    this.effectR = (move, pA, pD) => {
+        if (move.type === "bug" && move.bp > 0) {
+            this.bonus *= .95;
+            return 1 + this.bonus;
+        } else
+            return 1;
+    };
 }
 
 
@@ -13199,7 +13635,6 @@ function createReward(isItem, r1, r2, r3) {
 
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 13);
-    event = 12;
     switch (event) {
         case 0:
             return new Event0();
@@ -14065,7 +14500,7 @@ function Event12() {
         effect: () => {
             if (grass < 0) {
                 area = Math.max(0, area - 2);
-                nextEnounter();
+                nextEncounter();
             } else
                 createReward(true, "gs_ball");
         },
@@ -14076,9 +14511,10 @@ function Event12() {
         text: "Look inside of the shrine",
         effect: () => {
             function getHerb() {
-                var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                var itemPool = heldItems.concat(specialItems);
+                var item = itemPool[Math.floor(Math.random() * itemPool.length)];
                 while (!item.includes('_herb'))
-                    item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    item = itemPool[Math.floor(Math.random() * itemPool.length)];
                 return item;
             }
             createReward(true, getHerb(), getHerb(), getHerb());
@@ -14100,10 +14536,11 @@ function Event12() {
     this.options.push({
         text: poison < 0 ? "Eat the berries growing next to the shrine" : "[Poison] Eat the berries growing next to the shrine",
         effect: () => {
-            if (poison < 0 && !reward)
+            if (poison < 0 && !reward) {
                 for (let p of team)
                     p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
-            else {
+                nextEncounter();
+            } else {
                 function getBerry() {
                     var item = heldItems[Math.floor(Math.random() * heldItems.length)];
                     while (!item.includes('_berry') || item.includes('aguav_berry'))
