@@ -1186,7 +1186,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance) {
+            } else if (Math.random() < eventChance || Math.random() < .95) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -1260,7 +1260,11 @@ function startEncounter(encounter) {
     }
 }
 
-function battleEncounter(encounter, fixedPokemon) {
+function battleEncounter(encounter, fixedPokemon, lootAmount) {
+    if (lootAmount == undefined)
+        loot = 0;
+    else
+        loot = lootAmount - 1;
     pokemonCenterChance += .05;
     pokemartChance += .05;
     eventChance += .08;
@@ -2575,7 +2579,7 @@ function createOpponent(encounter, fixedOpponent) {
         opponent.moves.push(createMove(opponent.movepool[Math.floor(Math.random() * opponent.movepool.length)]));
     }
 
-    for (let j = 0; j < Math.floor(world * Math.random() * 1.5) + (area == 10) + 1; j++) {
+    for (let j = 0; j < Math.floor(world * Math.random() * 1.5) + (encounter === "boss") + 1; j++) {
         var i = heldItems[Math.floor(Math.random() * heldItems.length)];
         var item = createHeldItem(i);
         var areaPool = Math.random() < .3;
@@ -2759,7 +2763,7 @@ function rewardScreen() {
                 team[this.p].moves.push(this.move);
                 if (music)
                     playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                if (Math.random() < extraLoot || tuto || area == 10) {
+                if (Math.random() < extraLoot || tuto || encounter === "boss") {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -2779,7 +2783,7 @@ function rewardScreen() {
         earnedMoney += 100;
         if (music)
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-        if (Math.random() < extraLoot || tuto || area == 10) {
+        if (Math.random() < extraLoot || tuto || encounter === "boss") {
             extraLoot = 0;
             extraReward();
         } else {
@@ -2860,7 +2864,11 @@ function extraReward() {
                     playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                 if (this.item.pickup != undefined)
                     this.item.effect(this.p);
-                nextEncounter();
+                if (loot > 0) {
+                    loot--;
+                    extraReward();
+                } else
+                    nextEncounter();
             };
         }
         grid.appendChild((new makeReward(i)).reward1);
@@ -11663,7 +11671,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone", "lum_berry", "moomoo_milk", "sacred_ash", "bug_gem", "dark_gem", "grass_gem", "fire_gem", "water_gem", "ice_gem", "flying_gem", "normal_gem",
-    "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem"];
+    "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale"];
 specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
@@ -11886,6 +11894,8 @@ function createHeldItem(item) {
             return new SteelGem();
         case "fire_gem":
             return new FireGem();
+        case "dragon_scale":
+            return new DragonScale();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -13407,6 +13417,17 @@ function BugGem() {
     };
 }
 
+function DragonScale() {
+    this.name = "Dragon Scale";
+    this.description = "If the holder is dragon type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dragon_scale.webp';
+    this.area = "dragon";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "dragon");
+    };
+}
+
 
 
 
@@ -13498,7 +13519,7 @@ function runEvent(event) {
     }
 }
 
-function createReward(isItem, r1, r2, r3) {
+function createReward(isItem, r1, r2, r3, stay) {
     var filter = document.createElement('div');
     filter.className = "filter-clear";
     document.body.appendChild(filter);
@@ -13565,7 +13586,10 @@ function createReward(isItem, r1, r2, r3) {
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     if (this.item.pickup != undefined)
                         this.item.effect(this.p);
-                    nextEncounter();
+                    if (stay == undefined || !stay)
+                        nextEncounter();
+                    else
+                        document.body.removeChild(filter);
                 };
             }
             grid.appendChild((new makeReward(i)).reward1);
@@ -13627,7 +13651,10 @@ function createReward(isItem, r1, r2, r3) {
                     team[this.p].moves.push(this.move);
                     if (music)
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                    nextEncounter();
+                    if (stay == undefined || !stay)
+                        nextEncounter();
+                    else
+                        document.body.removeChild(filter);
                 };
             }
             grid.appendChild((new makeReward(i)).reward1);
@@ -13647,6 +13674,7 @@ function createReward(isItem, r1, r2, r3) {
 
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 13);
+    event = 13;
     switch (event) {
         case 0:
             return new Event0();
@@ -13674,6 +13702,8 @@ function createEvent(event) {
             return new Event11();
         case 12:
             return new Event12();
+        case 13:
+            return new Event13();
     }
 }
 
@@ -14564,6 +14594,122 @@ function Event12() {
         },
         description: poison < 0 && !reward ? "You and your Pokémon are starved from the journey. Those berries are a blessing and you start eating everything you can find. Unfortunately, not all of them were edible and you quickly regret your decision." : (poison < 0 ? "You and your Pokémon are starved from the journey. Those berries are a blessing and you start eating everything you can find. The berry bush is soon completely harvested, and you shove the few berries you couldn't eat in your bag." : "As you and your starved Pokémon were about to eat the entire batch of berries, " + team[poison].name + " points out some toxic fruits. Following its advice, you only eat a few safe berries and store some more in your bag."),
         subdescription: poison < 0 && !reward ? "Your Pokémon have taken moderate damage." : undefined
+    })
+}
+
+function Event13() {
+    this.description = "After crossing a tunnel linking both sides of a small mountain, you stumble upon a gigantic tower built by an ancient people. You decide to give it a closer look and walk towards the entrance.";
+    this.options = [];
+    this.options.push({
+        text: "Enter the tower",
+        effect: () => {
+            runEvent(new Event13a());
+        },
+        description: "Such a large and old tower has to contain bountiful loot. You decide to explore it to see what exactly it has to offer.",
+    })
+    this.options.push({
+        text: "Search the surroundings",
+        effect: () => {
+            createReward(true, "dragon_fang");
+        },
+        description: "The tower is quite intimidating and it is most likely much safer to keep out. Who knows what kinds of Pokémon roam inside. Behind the structure, an old dragon skeleton lies untouched. You snatch a fang and leave before anyone notices you.",
+    })
+    var flying = team.findIndex(e => contains(e.types, "flying"));
+    if (flying >= 0) {
+        this.options.push({
+            text: "[Flying] Fly to the top of the tower",
+            effect: () => {
+                runEvent(new Event13c());
+            },
+            description: "You don't feel like entering such a gloomy tower and hop on " + team[flying].name + "'s back. It flies straight up to the top of the tower and drops you off there. What secrets hide within those walls will remain a mystery.",
+        })
+    }
+}
+
+function Event13a() {
+    this.description = "As soon as you step inside of the tower, you realize the floor is heavily damaged and you will need to be very careful not to fall through the cracked stones. Despite the darkness, you spot stairs to the next floor and entrances to two other rooms.";
+    this.options = [];
+    var reward = Math.random() < .4;
+    this.options.push({
+        text: "Climb the stairs",
+        effect: () => {
+            if (!reward)
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
+            runEvent(new Event13b());
+        },
+        description: "You head straight to the stairs. You'd rather not know what lies in the other rooms." + (reward ? "" : " Unfortunately, you don't notice a cracked tile in time, and you fall through the floor. You manage to get back out and finally reach the stairs, but definitely hurt yourself in your fall."),
+    })
+    this.options.push({
+        text: "Enter the room to the right",
+        effect: () => {
+            runEvent(new Event13a());
+        },
+        description: "The room is completely empty. You step back before the floor crumbles under your feet.",
+    })
+    this.options.push({
+        text: "Enter the room to the left",
+        effect: () => {
+            createReward(true, "dragon_scale", "dragon_scale", "dragon_scale", true);
+            runEvent(new Event13a());
+        },
+        description: "You only spot a small scale covered by the dust in a corner. You're not sure what it is, but you grab it nonetheless before heading back.",
+    })
+}
+
+function Event13b() {
+    this.description = "After climbing dozens and dozens of steps, you finally reach the gate to the top of the tower. Unfortunately, the path is blocked by an impenetrable barrier. On the walls are engraved silhouettes of ancient Pokémon in a raging battle, only interrupted by the intervention of a slender dragon.";
+    this.options = [];
+    this.options.push({
+        text: "Try to destroy the barrier",
+        effect: () => {
+            for (let p of team)
+                p.currenthp = Math.floor(Math.max(0, p.currenthp - .2 * p.maxhp));
+            runEvent(new Event13b());
+        },
+        description: "You tell your Pokémon to gather their strength and strike the barrier as hard as they can. However, the attack doesn't harm it at all. On the contrary, it is deflected and redirected right back at you...",
+        subdescription: "Your Pokémon have taken substantial damage."
+    })
+    var dragon = team.finedIndex(e => contains(e.types, "dragon"));
+    var dragonscale = -1;
+    if (dragon < 0)
+        for (let i = 0; i < team.length; i++)
+            if (team[i].items.findIndex(e => e.name === "Dragon Scale") >= 0)
+                dragonscale = i;
+    if (dragon >= 0 || dragonscale >= 0) {
+        this.options.push({
+            text: (dragonscale < 0 ? "[Dragon]" : "[Dragon Scale]") + " Walk through the barrier",
+            effect: () => {
+                runEvent(new Event13c());
+            },
+            description: "Full of confidence, you simply walk towards the barrier. To your surprise, you go right through it and reach the top of the tower effortlessly.",
+        })
+    }
+    this.options.push({
+        text: "Go back downstairs",
+        effect: () => {
+            runEvent(new Event13a());
+        },
+        description: "You don't see how you could possibly get past that barrier. Maybe the answer lies in the lower floors of the tower.",
+    })
+}
+
+function Event13c() {
+    this.description = "You have reached the apex of the tower. Here, only an ancient dragon slumbers in the middle of the platform. You know it would be a formidable foe if it were to awaken.";
+    this.options = [];
+    this.options.push({
+        text: "Challenge the dragon",
+        effect: () => {
+            battleEncounter("boss", "rayquaza", 3);
+        },
+        description: "You gather your courage and wake up the dragon. It soars into the air, deeply displeased, and looks at you in anger. This will be a fierce battle, but if you emerge victorious, your reward should be worthwhile.",
+    })
+    this.options.push({
+        text: "Flee",
+        effect: () => {
+            nextEncounter();
+        },
+        description: "You're no fool. You flee while you can before the dragon wakes up and obliterates you.",
     })
 }
 
