@@ -302,13 +302,14 @@ function drawStartingMenu() {
     var bookButton = document.createElement('div');
     bookButton.className = "starting-menu-option";
     bookButton.addEventListener('click', () => {
-        toggleEscapeScreen();
+        fadeOutTransition(1);
+        setTimeout(drawPokedex, 1000);
     });
     options.appendChild(bookButton);
     var bookImage = new Image();
     bookImage.id = "bookImage";
     bookImage.className = "pixel-sprite";
-    bookImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/book.webp"
+    bookImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/pokeball.webp"
     bookButton.appendChild(bookImage);
 
     var gArea = new gameArea("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jpg", () => { });
@@ -1275,7 +1276,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie"];
-eventPokemonList = ["unown", "shedinja", "bidoof", "spiritomb"];
+eventPokemonList = ["unown", "shedinja", "spiritomb"]; //"bidoof"
 
 energy = 5;
 maxEnergy = 5;
@@ -14832,3 +14833,137 @@ function drawBattleExplanations() {
 }
 
 
+
+
+
+
+/* ----------------------------------------------------- */
+/* ---------------------- Pokedex ---------------------- */
+/* ----------------------------------------------------- */
+
+function drawPokedex() {
+    clearBody();
+    fadeInTransition();
+    var gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
+    gArea.start();
+
+    ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3";
+    if (music)
+        playMusic(ambientMusic, true);
+
+    var grid = document.createElement('div');
+    grid.className = "gameover-grid";
+    grid.id = "pokedex-grid";
+    document.body.appendChild(grid);
+
+    var title = document.createElement('div');
+    title.className = "centered-title";
+    title.innerHTML = "Pokédex";
+    grid.appendChild(title);
+
+    var pokemon = document.createElement('div');
+    pokemon.className = "centered-subtitle pokedex-option";
+    pokemon.innerHTML = "Pokémon";
+    pokemon.onclick = () => {
+        drawPokedexPokemon();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+    }
+    grid.appendChild(pokemon);
+
+    var moves = document.createElement('div');
+    moves.className = "centered-subtitle pokedex-option";
+    moves.innerHTML = "Moves";
+    moves.onclick = () => {
+        drawPokedexPokemon();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+    }
+    grid.appendChild(moves);
+
+    var items = document.createElement('div');
+    items.className = "centered-subtitle pokedex-option";
+    items.innerHTML = "Items";
+    items.onclick = () => {
+        drawPokedexPokemon();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+    }
+    grid.appendChild(items);
+
+    var back = document.createElement('div');
+    back.className = "centered-subtitle replay";
+    back.innerHTML = "Back";
+    back.onclick = () => {
+        fadeOutTransition(1);
+        setTimeout(drawStartingMenu, 1000);
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+    }
+    grid.appendChild(back);
+}
+
+function drawPokedexPokemon() {
+    document.body.removeChild(document.getElementById("pokedex-grid"));
+
+    var filter = document.createElement('div');
+    filter.className = "filter-clear";
+    document.body.appendChild(filter);
+
+    var mainGrid = document.createElement('div');
+    mainGrid.className = "pokedex-main-grid";
+    filter.appendChild(mainGrid);
+
+    var title = document.createElement('div');
+    title.className = "centered-title";
+    title.innerHTML = "Pokémon";
+    mainGrid.appendChild(title);
+
+    var grid = document.createElement('div');
+    grid.className = "pokedex-grid";
+    mainGrid.appendChild(grid);
+
+    function createPokemonTile(p) {
+        this.cell = document.createElement('div');
+        this.cell.className = "dual-column-grid";
+        this.cell.p = createPokemon(p);
+
+        var wrapper = document.createElement('div');
+        wrapper.className = "wrapper-padded";
+        this.cell.appendChild(wrapper);
+        var pImage = new Image();
+        pImage.src = this.cell.p.imgf;
+        pImage.className = "pokedex-sprite-displayer";
+        wrapper.appendChild(pImage);
+
+        var name = document.createElement('div');
+        name.className = "descriptor-name";
+        name.innerHTML = this.cell.p.name;
+        this.cell.appendChild(name);
+    }
+
+    var pokeList = pokemonList.concat(eventPokemonList).concat(bossList);
+    var sortedPokeList = pokeList.sort(function (a, b) {
+        var nameA = a.toLowerCase();
+        var nameB = b.toLowerCase();
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+        return 0;
+    });
+    for (let p of sortedPokeList)
+        grid.appendChild((new createPokemonTile(p)).cell);
+
+    var backButton = document.createElement('div');
+    backButton.className = "starting-menu-option top-left";
+    backButton.addEventListener('click', () => {
+        drawPokedex();
+    });
+    filter.appendChild(backButton);
+    var backImage = new Image();
+    backImage.id = "backImage";
+    backImage.className = "pixel-sprite";
+    backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
+    backButton.appendChild(backImage);
+}
