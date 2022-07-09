@@ -286,6 +286,31 @@ function drawStartingMenu() {
     soundImage.className = "pixel-sprite";
     soundImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
     soundButton.appendChild(soundImage);
+
+    var settingsButton = document.createElement('div');
+    settingsButton.className = "starting-menu-option";
+    settingsButton.addEventListener('click', () => {
+        toggleEscapeScreen();
+    });
+    options.appendChild(settingsButton);
+    var settingsImage = new Image();
+    settingsImage.id = "settingsImage";
+    settingsImage.className = "pixel-sprite";
+    settingsImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/settings.webp"
+    settingsButton.appendChild(settingsImage);
+
+    var bookButton = document.createElement('div');
+    bookButton.className = "starting-menu-option";
+    bookButton.addEventListener('click', () => {
+        toggleEscapeScreen();
+    });
+    options.appendChild(bookButton);
+    var bookImage = new Image();
+    bookImage.id = "bookImage";
+    bookImage.className = "pixel-sprite";
+    bookImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/book.webp"
+    bookButton.appendChild(bookImage);
+
     var gArea = new gameArea("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/homescreen.jpg", () => { });
     gArea.start();
 }
@@ -628,6 +653,9 @@ function loadProgress() {
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
     }
+    encounteredPokemon = window.localStorage.getItem('encounteredPokemon') != null ? JSON.parse(window.localStorage.getItem('encounteredPokemon')) : [];
+    foundItems = window.localStorage.getItem('foundItems') != null ? JSON.parse(window.localStorage.getItem('foundItems')) : [];
+    foundMoves = window.localStorage.getItem('foundMoves') != null ? JSON.parse(window.localStorage.getItem('foundMoves')) : [];
 }
 
 function saveProgress() {
@@ -661,6 +689,9 @@ function saveProgress() {
     window.localStorage.setItem('poisonApplied', JSON.stringify(poisonApplied));
     window.localStorage.setItem('loweredStats', JSON.stringify(loweredStats));
     window.localStorage.setItem('hailStarted', JSON.stringify(hailStarted));
+    window.localStorage.setItem('encounteredPokemon', JSON.stringify(encounteredPokemon));
+    window.localStorage.setItem('foundItems', JSON.stringify(foundItems));
+    window.localStorage.setItem('foundMoves', JSON.stringify(foundMoves));
 }
 
 function unlockAll() {

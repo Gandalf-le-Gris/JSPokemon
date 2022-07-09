@@ -855,12 +855,12 @@ button.launch-tuto:hover {
 .starting-menu-option {
     transition: filter .2s;
     width: 100%;
-    height: 100%;
+    height: 8vh;
 }
 
-.starting-menu-option:hover {
-    filter: invert()
-}
+    .starting-menu-option:hover {
+        filter: invert(.6);
+    }
 
 .fade-dark1 {
     position: absolute;
