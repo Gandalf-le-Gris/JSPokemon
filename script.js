@@ -160,6 +160,7 @@ function loadResources() {
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/random.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/remove.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/settings.webp");
 
     sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/battle.mp3");
     sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/boss.mp3");
@@ -198,6 +199,11 @@ function loadResources() {
     text.innerHTML = "Loading assets...";
     text.style.fontSize = "3vw";
     grid.appendChild(text);
+
+    var advice = document.createElement('div');
+    advice.className = "advice";
+    advice.innerHTML = "This game is better played in fullscreen mode (F11).<br/>You can access settings anytime with Escape."
+    filter.appendChild(advice);
 
     var disclaimer = document.createElement('div');
     disclaimer.className = "disclaimer";
@@ -255,8 +261,13 @@ function drawStartingMenu() {
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     document.body.appendChild(tutoButton);
+
+    var options = document.createElement('div');
+    options.className = "starting-menu-options";
+    document.body.appendChild(options);
+
     var soundButton = document.createElement('div');
-    soundButton.className = "sound-button";
+    soundButton.className = "starting-menu-option";
     soundButton.addEventListener('click', () => {
         if (music) {
             soundImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/mute.webp"
@@ -269,7 +280,7 @@ function drawStartingMenu() {
         }
         window.localStorage.setItem('music', JSON.stringify(music));
     });
-    document.body.appendChild(soundButton);
+    options.appendChild(soundButton);
     var soundImage = new Image();
     soundImage.id = "soundImage";
     soundImage.className = "pixel-sprite";
@@ -1186,7 +1197,7 @@ function pathSelector() {
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .95) {
+            } else if (Math.random() < eventChance) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -2584,7 +2595,7 @@ function createOpponent(encounter, fixedOpponent) {
         var item = createHeldItem(i);
         var areaPool = Math.random() < .3;
         var areaBan = Math.random() < .5;
-        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
+        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || i.includes("sacred_ash") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
             i = heldItems[Math.floor(Math.random() * heldItems.length)];
             item = createHeldItem(i);
         }
@@ -2597,25 +2608,27 @@ function createOpponent(encounter, fixedOpponent) {
 function nextEncounter() {
     saveProgress();
 
-    fadeOutTransition(1);
-    if (team[0].currenthp == 0 && team[1].currenthp == 0 && team[2].currenthp == 0) {
-        setTimeout(gameOver, 1000);
-    } else {
-        if (area == 10) {
-            if (world == 3) {
-                victoryScreen();
-                return;
-            } else {
-                for (let p of team) {
-                    p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
-                }
-                area = 1;
-                world += 1;
-            }
+    if (!checkGameOver()) {
+        fadeOutTransition(1);
+        if (team[0].currenthp == 0 && team[1].currenthp == 0 && team[2].currenthp == 0) {
+            setTimeout(gameOver, 1000);
         } else {
-            area += 1;
+            if (area == 10) {
+                if (world == 3) {
+                    victoryScreen();
+                    return;
+                } else {
+                    for (let p of team) {
+                        p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
+                    }
+                    area = 1;
+                    world += 1;
+                }
+            } else {
+                area += 1;
+            }
+            setTimeout(mapSelection, 1000);
         }
-        setTimeout(mapSelection, 1000);
     }
 }
 
@@ -2763,7 +2776,7 @@ function rewardScreen() {
                 team[this.p].moves.push(this.move);
                 if (music)
                     playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                if (Math.random() < extraLoot || tuto || encounter === "boss") {
+                if (Math.random() < extraLoot || tuto || encounterType === "boss") {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -2783,7 +2796,7 @@ function rewardScreen() {
         earnedMoney += 100;
         if (music)
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-        if (Math.random() < extraLoot || tuto || encounter === "boss") {
+        if (Math.random() < extraLoot || tuto || encounterType === "boss") {
             extraLoot = 0;
             extraReward();
         } else {
@@ -13455,71 +13468,73 @@ function eventEncounter() {
 }
 
 function runEvent(event) {
-    var grid = document.createElement('div');
-    grid.className = "gameover-grid";
-    document.body.appendChild(grid);
+    if (!checkGameOver()) {
+        var grid = document.createElement('div');
+        grid.className = "gameover-grid";
+        document.body.appendChild(grid);
 
-    var title = document.createElement('div');
-    title.className = "event-title";
-    title.innerHTML = event.description;
-    grid.appendChild(title);
+        var title = document.createElement('div');
+        title.className = "event-title";
+        title.innerHTML = event.description;
+        grid.appendChild(title);
 
-    var options = document.createElement('div');
-    options.className = "event-option-grid";
-    grid.appendChild(options);
-    for (let i = 1; i <= event.options.length; i++) {
-        var o = event.options[i-1];
-        var num = document.createElement('div');
-        num.innerHTML = i + ".";
-        num.style.textAlign = "right";
-        options.appendChild(num);
+        var options = document.createElement('div');
+        options.className = "event-option-grid";
+        grid.appendChild(options);
+        for (let i = 1; i <= event.options.length; i++) {
+            var o = event.options[i - 1];
+            var num = document.createElement('div');
+            num.innerHTML = i + ".";
+            num.style.textAlign = "right";
+            options.appendChild(num);
 
-        function optionDiv() {
-            this.div = document.createElement('div');
-            this.div.o = o;
-            this.div.className = "event-option";
-            this.div.innerHTML = o.text;
-            this.div.onclick = function () {
-                if (music)
-                    playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                grid.innerHTML = "";
-
-                var title = document.createElement('div');
-                title.className = "event-title";
-                title.innerHTML = this.o.description;
-                grid.appendChild(title);
-
-                if (this.o.subdescription != undefined) {
-                    var subtitle = document.createElement('div');
-                    subtitle.className = "event-title";
-                    subtitle.style.fontSize = "2vw";
-                    subtitle.innerHTML = this.o.subdescription;
-                    grid.appendChild(subtitle);
-                }
-
-                var click = document.createElement('div');
-                click.className = "event-title";
-                click.style.fontSize = "1.5vw";
-                click.innerHTML = "click to continue";
-                grid.appendChild(click);
-
-                var filter = document.createElement('div');
-                filter.className = "filter-clear";
-                filter.onclick = () => {
+            function optionDiv() {
+                this.div = document.createElement('div');
+                this.div.o = o;
+                this.div.className = "event-option";
+                this.div.innerHTML = o.text;
+                this.div.onclick = function () {
                     if (music)
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     grid.innerHTML = "";
-                    this.o.effect();
+
+                    var title = document.createElement('div');
+                    title.className = "event-title";
+                    title.innerHTML = this.o.description;
+                    grid.appendChild(title);
+
+                    if (this.o.subdescription != undefined) {
+                        var subtitle = document.createElement('div');
+                        subtitle.className = "event-title";
+                        subtitle.style.fontSize = "2vw";
+                        subtitle.innerHTML = this.o.subdescription;
+                        grid.appendChild(subtitle);
+                    }
+
+                    var click = document.createElement('div');
+                    click.className = "event-title";
+                    click.style.fontSize = "1.5vw";
+                    click.innerHTML = "click to continue";
+                    grid.appendChild(click);
+
+                    var filter = document.createElement('div');
+                    filter.className = "filter-clear";
+                    filter.onclick = () => {
+                        if (music)
+                            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+                        grid.innerHTML = "";
+                        this.o.effect();
+                    }
+                    document.body.appendChild(filter);
                 }
-                document.body.appendChild(filter);
+                options.appendChild(this.div);
             }
-            options.appendChild(this.div);
+            new optionDiv();
         }
-        new optionDiv();
     }
 }
 
-function createReward(isItem, r1, r2, r3, stay) {
+function createReward(isItem, r1, r2, r3, next) {
     var filter = document.createElement('div');
     filter.className = "filter-clear";
     document.body.appendChild(filter);
@@ -13586,10 +13601,12 @@ function createReward(isItem, r1, r2, r3, stay) {
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
                     if (this.item.pickup != undefined)
                         this.item.effect(this.p);
-                    if (stay == undefined || !stay)
+                    if (next == undefined)
                         nextEncounter();
-                    else
+                    else {
                         document.body.removeChild(filter);
+                        runEvent(next);
+                    }
                 };
             }
             grid.appendChild((new makeReward(i)).reward1);
@@ -13651,10 +13668,12 @@ function createReward(isItem, r1, r2, r3, stay) {
                     team[this.p].moves.push(this.move);
                     if (music)
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
-                    if (stay == undefined || !stay)
+                    if (next == undefined)
                         nextEncounter();
-                    else
+                    else {
                         document.body.removeChild(filter);
+                        runEvent(next);
+                    }
                 };
             }
             grid.appendChild((new makeReward(i)).reward1);
@@ -13672,9 +13691,17 @@ function createReward(isItem, r1, r2, r3, stay) {
     grid.appendChild(skip);
 }
 
+function checkGameOver() {
+    if (team[0].currenthp == 0 && team[1].currenthp == 0 && team[2].currenthp == 0) {
+        fadeOutTransition(2);
+        setTimeout(gameOver, 2000);
+        return true;
+    } else
+        return false;
+}
+
 function createEvent(event) {
     event = event != undefined ? event : Math.floor(Math.random() * 13);
-    event = 13;
     switch (event) {
         case 0:
             return new Event0();
@@ -14603,7 +14630,7 @@ function Event13() {
     this.options.push({
         text: "Enter the tower",
         effect: () => {
-            runEvent(new Event13a());
+            runEvent(new Event13a(true));
         },
         description: "Such a large and old tower has to contain bountiful loot. You decide to explore it to see what exactly it has to offer.",
     })
@@ -14626,7 +14653,7 @@ function Event13() {
     }
 }
 
-function Event13a() {
+function Event13a(scale) {
     this.description = "As soon as you step inside of the tower, you realize the floor is heavily damaged and you will need to be very careful not to fall through the cracked stones. Despite the darkness, you spot stairs to the next floor and entrances to two other rooms.";
     this.options = [];
     var reward = Math.random() < .4;
@@ -14636,28 +14663,31 @@ function Event13a() {
             if (!reward)
                 for (let p of team)
                     p.currenthp = Math.floor(Math.max(0, p.currenthp - .1 * p.maxhp));
-            runEvent(new Event13b());
+            runEvent(new Event13b(scale));
         },
         description: "You head straight to the stairs. You'd rather not know what lies in the other rooms." + (reward ? "" : " Unfortunately, you don't notice a cracked tile in time, and you fall through the floor. You manage to get back out and finally reach the stairs, but definitely hurt yourself in your fall."),
+        subdescription: reward ? undefined : "Your Pokémon have taken moderate damage."
     })
     this.options.push({
         text: "Enter the room to the right",
         effect: () => {
-            runEvent(new Event13a());
+            runEvent(new Event13a(scale));
         },
         description: "The room is completely empty. You step back before the floor crumbles under your feet.",
     })
     this.options.push({
         text: "Enter the room to the left",
         effect: () => {
-            createReward(true, "dragon_scale", "dragon_scale", "dragon_scale", true);
-            runEvent(new Event13a());
+            if (scale)
+                createReward(true, "dragon_scale", "dragon_scale", "dragon_scale", new Event13a(false));
+            else
+                runEvent(new Event13a(false));
         },
-        description: "You only spot a small scale covered by the dust in a corner. You're not sure what it is, but you grab it nonetheless before heading back.",
+        description: scale ? "You only spot a small scale covered by the dust in a corner. You're not sure what it is, but you grab it nonetheless before heading back." : "The room is completely empty.You step back before the floor crumbles under your feet.",
     })
 }
 
-function Event13b() {
+function Event13b(scale) {
     this.description = "After climbing dozens and dozens of steps, you finally reach the gate to the top of the tower. Unfortunately, the path is blocked by an impenetrable barrier. On the walls are engraved silhouettes of ancient Pokémon in a raging battle, only interrupted by the intervention of a slender dragon.";
     this.options = [];
     this.options.push({
@@ -14665,12 +14695,12 @@ function Event13b() {
         effect: () => {
             for (let p of team)
                 p.currenthp = Math.floor(Math.max(0, p.currenthp - .2 * p.maxhp));
-            runEvent(new Event13b());
+            runEvent(new Event13b(scale));
         },
         description: "You tell your Pokémon to gather their strength and strike the barrier as hard as they can. However, the attack doesn't harm it at all. On the contrary, it is deflected and redirected right back at you...",
         subdescription: "Your Pokémon have taken substantial damage."
     })
-    var dragon = team.finedIndex(e => contains(e.types, "dragon"));
+    var dragon = team.findIndex(e => contains(e.types, "dragon"));
     var dragonscale = -1;
     if (dragon < 0)
         for (let i = 0; i < team.length; i++)
@@ -14688,7 +14718,7 @@ function Event13b() {
     this.options.push({
         text: "Go back downstairs",
         effect: () => {
-            runEvent(new Event13a());
+            runEvent(new Event13a(scale));
         },
         description: "You don't see how you could possibly get past that barrier. Maybe the answer lies in the lower floors of the tower.",
     })

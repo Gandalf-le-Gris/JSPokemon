@@ -841,16 +841,24 @@ button.launch-tuto:hover {
     text-align: center;
 }
 
-.sound-button {
+.starting-menu-options {
     height: 8vh;
     width: auto;
     position: absolute;
     top: 3vh;
     left: 3vh;
-    transition: filter .2s;
+    display: grid;
+    grid-auto-flow: column;
+    grid-column-gap: 1vh;
 }
 
-.sound-button:hover {
+.starting-menu-option {
+    transition: filter .2s;
+    width: 100%;
+    height: 100%;
+}
+
+.starting-menu-option:hover {
     filter: invert()
 }
 
@@ -960,6 +968,9 @@ button.launch-tuto:hover {
     font-family: 'Copperplate Gothic';
     text-align: center; 
     width: 80vw;
+}
+
+.event-option {
     transition: color .2s;
 }
 
@@ -1122,6 +1133,18 @@ input:checked + .slider:before {
     transform: translateX(-50%);
     color: white;
     font-size: 1.5vh;
+    font-family: 'Copperplate Gothic';
+    text-align: center;
+}
+
+.advice {
+    width: 100%;
+    position: absolute;
+    bottom: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 3vh;
     font-family: 'Copperplate Gothic';
     text-align: center;
 }
