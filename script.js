@@ -161,6 +161,8 @@ function loadResources() {
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/remove.png");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/sound.webp");
     imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/settings.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/pokeball.webp");
+    imgs.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp");
 
     sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/battle.mp3");
     sounds.push("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/boss.mp3");
@@ -426,6 +428,7 @@ function toggleEscapeScreen() {
 
         var settingsOptionsGrid = document.createElement('div');
         settingsOptionsGrid.className = "dual-column-grid";
+        settingsOptionsGrid.style.lineHeight = "4vw";
         grid.appendChild(settingsOptionsGrid);
 
         var soundSwitch = document.createElement('label');
@@ -657,6 +660,9 @@ function loadProgress() {
     encounteredPokemon = window.localStorage.getItem('encounteredPokemon') != null ? JSON.parse(window.localStorage.getItem('encounteredPokemon')) : [];
     foundItems = window.localStorage.getItem('foundItems') != null ? JSON.parse(window.localStorage.getItem('foundItems')) : [];
     foundMoves = window.localStorage.getItem('foundMoves') != null ? JSON.parse(window.localStorage.getItem('foundMoves')) : [];
+    for (let p of pokemonList)
+        if (createPokemon(p).unlocked && !contains(encounteredPokemon, p))
+            encounteredPokemon.push(p);
 }
 
 function saveProgress() {
@@ -1087,6 +1093,12 @@ function launchGame() {
             team[i] = pokemon;
         }
     }
+
+    for (let p of team)
+        for (let m of p.moves)
+            for (let m2 of movesList)
+                if (createMove(m2).name === m.name && !contains(foundMoves, m2))
+                    foundMoves.push(m2);
 
     mapSelection();
 }
@@ -2593,17 +2605,21 @@ function shuffle(array) {
 
 function createOpponent(encounter, fixedOpponent) {
     var opponent;
-
+    var opponentN = fixedOpponent;
     if (fixedOpponent == undefined)
         if (area < 10) {
             while (opponent == undefined || !contains(opponent.types, encounter)) {
-                opponent = createPokemon(opponentList[Math.floor(Math.random() * opponentList.length)]);
+                opponentN = opponentList[Math.floor(Math.random() * opponentList.length)];
+                opponent = createPokemon(opponentN);
             }
         } else {
-            opponent = createPokemon(bossList[Math.floor(Math.random() * bossList.length)]);
+            opponentN = bossList[Math.floor(Math.random() * bossList.length)];
+            opponent = createPokemon(opponentN);
         }
     else
         opponent = createPokemon(fixedOpponent);
+    if (!contains(encounteredPokemon, opponentN))
+        encounteredPokemon.push(opponentN);
 
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
@@ -2762,7 +2778,8 @@ function rewardScreen() {
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
-            move1 = getFromMovepool(p);
+            moveN = getFromMovepool(p);
+            move1 = createMove(moveN);
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
@@ -2804,7 +2821,10 @@ function rewardScreen() {
 
             this.reward1.p = i;
             this.reward1.move = move1;
+            this.reward1.mName = moveN;
             this.reward1.onclick = function () {
+                if (!contains(foundMoves, this.mName))
+                    foundMoves.push(this.mName);
                 team[this.p].moves.push(this.move);
                 if (music)
                     playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
@@ -2881,7 +2901,8 @@ function extraReward() {
             wrapper.className = "wrapper";
             this.reward1.appendChild(wrapper);
 
-            var item = getFromItemPool(i == ind ? encounterType : undefined);
+            var itemN = getFromItemPool(i == ind ? encounterType : undefined);
+            var item = createHeldItem(itemN);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -2903,7 +2924,10 @@ function extraReward() {
 
             this.reward1.p = i;
             this.reward1.item = item;
+            this.reward1.itemN = itemN;
             this.reward1.onclick = function () {
+                if (!contains(foundItems, this.itemN))
+                    foundItems.push(this.itemN);
                 team[this.p].items.push(this.item);
                 if (music)
                     playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
@@ -2950,19 +2974,24 @@ function extraReward() {
 }
 
 function getFromMovepool(p) {
-    return createMove(p.movepool[Math.floor(Math.random() * p.movepool.length)]);
+    return p.movepool[Math.floor(Math.random() * p.movepool.length)];
 }
 
 function getFromItemPool(t) {
     var item;
+    var itemN;
     if (t) {
-        while (item == undefined || item.area !== t)
-            item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
+        while (item == undefined || item.area !== t) {
+            itemN = heldItems[Math.floor(Math.random() * heldItems.length)];
+            item = createHeldItem(itemN);
+        }
     } else {
-        while (item == undefined || item.area !== "")
-            item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
+        while (item == undefined || item.area !== "") {
+            itemN = heldItems[Math.floor(Math.random() * heldItems.length)];
+            item = createHeldItem(itemN);
+        }
     }
-    return item;
+    return itemN;
 }
 
 
@@ -3093,7 +3122,8 @@ function pokemartEncounter() {
             sprite1.className = "reward-sprite";
             this.reward1.appendChild(sprite1);
 
-            move1 = getFromMovepool(p);
+            moveN = getFromMovepool(p);
+            move1 = createMove(moveN);
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
@@ -3135,10 +3165,13 @@ function pokemartEncounter() {
 
             this.reward1.p = i;
             this.reward1.move = move1;
+            this.reward.mName = moveN;
             this.reward1.priceTag = this.priceTag;
             this.reward1.article = this.article;
             this.reward1.onclick = function () {
                 if (money >= movePrice && this.priceTag.innerHTML !== "sold") {
+                    if (!contains(foundMoves, this.mName))
+                        foundMoves.push(this.mName);
                     team[this.p].moves.push(this.move);
                     money -= movePrice;
                     if (music)
@@ -3181,7 +3214,8 @@ function pokemartEncounter() {
             this.reward1.appendChild(wrapper);
 
             var t = Math.random() < .3 ? types[Math.floor(Math.random() * types.length)] : undefined;
-            var item = getFromItemPool(t);
+            var itemN = getFromItemPool(t);
+            var item = createHeldItem(itemN);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -3203,10 +3237,13 @@ function pokemartEncounter() {
 
             this.reward1.p = i;
             this.reward1.item = item;
+            this.reward1.itemN = itemN;
             this.reward1.priceTag = this.priceTag;
             this.reward1.article = this.article;
             this.reward1.onclick = function () {
                 if (money >= itemPrice && this.priceTag.innerHTML !== "sold") {
+                    if (!contains(foundItems, this.itemN))
+                        foundItems.push(this.itemN);
                     team[this.p].items.push(this.item);
                     money -= itemPrice;
                     if (music)
@@ -13176,7 +13213,7 @@ function LumBerry() {
 
 function NormalGem() {
     this.name = "Normal Gem";
-    this.description = "Increases the base power of damaging normal type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging normal type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/normal_gem.webp';
     this.area = "normal";
     this.bonus = .3;
@@ -13192,7 +13229,7 @@ function NormalGem() {
 
 function GhostGem() {
     this.name = "Ghost Gem";
-    this.description = "Increases the base power of damaging ghost type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging ghost type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ghost_gem.webp';
     this.area = "ghost";
     this.bonus = .3;
@@ -13208,7 +13245,7 @@ function GhostGem() {
 
 function FairyGem() {
     this.name = "Fairy Gem";
-    this.description = "Increases the base power of damaging fairy type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging fairy type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fairy_gem.webp';
     this.area = "fairy";
     this.bonus = .3;
@@ -13224,7 +13261,7 @@ function FairyGem() {
 
 function SteelGem() {
     this.name = "Steel Gem";
-    this.description = "Increases the base power of damaging steel type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging steel type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/steel_gem.webp';
     this.area = "steel";
     this.bonus = .3;
@@ -13240,7 +13277,7 @@ function SteelGem() {
 
 function PoisonGem() {
     this.name = "Poison Gem";
-    this.description = "Increases the base power of damaging poison type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging poison type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/poison_gem.webp';
     this.area = "poison";
     this.bonus = .3;
@@ -13256,7 +13293,7 @@ function PoisonGem() {
 
 function PsychicGem() {
     this.name = "Psychic Gem";
-    this.description = "Increases the base power of damaging psychic type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging psychic type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/psychic_gem.webp';
     this.area = "psychic";
     this.bonus = .3;
@@ -13272,7 +13309,7 @@ function PsychicGem() {
 
 function DragonGem() {
     this.name = "Dragon Gem";
-    this.description = "Increases the base power of damaging dragon type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging dragon type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dragon_gem.webp';
     this.area = "dragon";
     this.bonus = .3;
@@ -13288,7 +13325,7 @@ function DragonGem() {
 
 function RockGem() {
     this.name = "Rock Gem";
-    this.description = "Increases the base power of damaging rock type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging rock type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rock_gem.webp';
     this.area = "rock";
     this.bonus = .3;
@@ -13304,7 +13341,7 @@ function RockGem() {
 
 function FightingGem() {
     this.name = "Fighting Gem";
-    this.description = "Increases the base power of damaging fighting type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging fighting type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fighting_gem.webp';
     this.area = "fighting";
     this.bonus = .3;
@@ -13320,7 +13357,7 @@ function FightingGem() {
 
 function GroundGem() {
     this.name = "Ground Gem";
-    this.description = "Increases the base power of damaging ground type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging ground type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ground_gem.webp';
     this.area = "ground";
     this.bonus = .3;
@@ -13336,7 +13373,7 @@ function GroundGem() {
 
 function IceGem() {
     this.name = "Ice Gem";
-    this.description = "Increases the base power of damaging ice type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging ice type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ice_gem.webp';
     this.area = "ice";
     this.bonus = .3;
@@ -13352,7 +13389,7 @@ function IceGem() {
 
 function WaterGem() {
     this.name = "Water Gem";
-    this.description = "Increases the base power of damaging water type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging water type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/water_gem.webp';
     this.area = "water";
     this.bonus = .3;
@@ -13368,7 +13405,7 @@ function WaterGem() {
 
 function ElectricGem() {
     this.name = "Electric Gem";
-    this.description = "Increases the base power of damaging electric type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging electric type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/electric_gem.webp';
     this.area = "electric";
     this.bonus = .3;
@@ -13384,7 +13421,7 @@ function ElectricGem() {
 
 function FlyingGem() {
     this.name = "Flying Gem";
-    this.description = "Increases the base power of damaging flying type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging flying type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/flying_gem.webp';
     this.area = "flying";
     this.bonus = .3;
@@ -13400,7 +13437,7 @@ function FlyingGem() {
 
 function GrassGem() {
     this.name = "Grass Gem";
-    this.description = "Increases the base power of damaging grass type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging grass type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/grass_gem.webp';
     this.area = "grass";
     this.bonus = .3;
@@ -13416,7 +13453,7 @@ function GrassGem() {
 
 function FireGem() {
     this.name = "Fire Gem";
-    this.description = "Increases the base power of damaging fire type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging fire type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fire_gem.webp';
     this.area = "fire";
     this.bonus = .3;
@@ -13432,7 +13469,7 @@ function FireGem() {
 
 function DarkGem() {
     this.name = "Dark Gem";
-    this.description = "Increases the base power of damaging dark type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging dark type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dark_gem.webp';
     this.area = "dark";
     this.bonus = .3;
@@ -13448,7 +13485,7 @@ function DarkGem() {
 
 function BugGem() {
     this.name = "Bug Gem";
-    this.description = "Increases the base power of damaging bug type moves. Bonus decreases permanently with each move of this type used.";
+    this.description = "Increases the base power of damaging bug type moves. Bonus decreases permanently with each used move of this type.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/bug_gem.webp';
     this.area = "bug";
     this.bonus = .3;
@@ -13605,6 +13642,7 @@ function createReward(isItem, r1, r2, r3, next) {
                 wrapper.className = "wrapper";
                 this.reward1.appendChild(wrapper);
 
+                var itemN = rewards[i];
                 var item = createHeldItem(rewards[i]);
                 var sprite1 = new Image();
                 sprite1.src = item.img;
@@ -13627,7 +13665,10 @@ function createReward(isItem, r1, r2, r3, next) {
 
                 this.reward1.p = i;
                 this.reward1.item = item;
+                this.reward1.itemN = itemN;
                 this.reward1.onclick = function () {
+                    if (!contains(foundItems, this.itemN))
+                        foundItems.push(this.itemN);
                     team[this.p].items.push(this.item);
                     if (music)
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
@@ -13654,7 +13695,8 @@ function createReward(isItem, r1, r2, r3, next) {
                 sprite1.className = "reward-sprite";
                 this.reward1.appendChild(sprite1);
 
-                move1 = getFromMovepool(p);
+                moveN = getFromMovepool(p);
+                move1 = createMove(moveN);
                 function makeCard(move) {
                     this.card = document.createElement('div');
                     this.card.className = "static-move-card";
@@ -13696,7 +13738,10 @@ function createReward(isItem, r1, r2, r3, next) {
 
                 this.reward1.p = i;
                 this.reward1.move = move1;
+                this.reward1.mName = moveN;
                 this.reward1.onclick = function () {
+                    if (!contains(foundMoves, this.mName))
+                        foundMoves.push(this.mName);
                     team[this.p].moves.push(this.move);
                     if (music)
                         playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
@@ -14875,7 +14920,7 @@ function drawPokedex() {
     moves.className = "centered-subtitle pokedex-option";
     moves.innerHTML = "Moves";
     moves.onclick = () => {
-        drawPokedexPokemon();
+        drawPokedexMoves();
         if (music)
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
@@ -14885,7 +14930,7 @@ function drawPokedex() {
     items.className = "centered-subtitle pokedex-option";
     items.innerHTML = "Items";
     items.onclick = () => {
-        drawPokedexPokemon();
+        drawPokedexItems();
         if (music)
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
@@ -14901,9 +14946,240 @@ function drawPokedex() {
             playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     }
     grid.appendChild(back);
+
+    /*var progress = document.createElement('div');
+    progress.className = "top-right";
+    var maxM = movesList.length;
+    var progM = foundMoves.length / maxM;
+    var maxP = pokemonList.length + eventPokemonList.length + bossList.length;
+    var progP = encounteredPokemon.length / maxP;
+    var maxI = heldItems.length + specialItems.length;
+    var progI = foundItems.length / maxI;
+    var prog = Math.floor((progP + progM + progI) / 3 * 1000) / 10;
+    progress.innerHTML = prog + "%";
+    document.body.appendChild(progress);*/
 }
 
 function drawPokedexPokemon() {
+    fadeInTransition();
+
+    if (document.getElementById("pokedex-pokemon-filter") == undefined) {
+        document.body.removeChild(document.getElementById("pokedex-grid"));
+
+        var filter = document.createElement('div');
+        filter.className = "filter-clear";
+        filter.id = "pokedex-pokemon-filter";
+        document.body.appendChild(filter);
+
+        var mainGrid = document.createElement('div');
+        mainGrid.className = "pokedex-main-grid";
+        filter.appendChild(mainGrid);
+
+        var title = document.createElement('div');
+        title.className = "centered-title";
+        title.innerHTML = "Pokémon";
+        mainGrid.appendChild(title);
+
+        var grid = document.createElement('div');
+        grid.className = "pokedex-grid";
+        mainGrid.appendChild(grid);
+
+        function createPokemonTile(p, disc) {
+            this.cell = document.createElement('div');
+            this.cell.className = "dual-column-grid";
+            if (disc)
+                this.cell.className += " hover-darkgoldenrod";
+            this.cell.p = createPokemon(p);
+
+            var wrapper = document.createElement('div');
+            wrapper.className = "wrapper-padded";
+            this.cell.appendChild(wrapper);
+            var pImage = new Image();
+            pImage.src = this.cell.p.imgf;
+            pImage.className = "pokedex-sprite-displayer";
+            if (!disc)
+                pImage.style.filter = "brightness(0)";
+            wrapper.appendChild(pImage);
+
+            var name = document.createElement('div');
+            name.className = "descriptor-name";
+            name.innerHTML = disc ? this.cell.p.name : "?????";
+            name.style.textAlign = "right";
+            this.cell.appendChild(name);
+
+            this.cell.disc = disc;
+            this.cell.onclick = function () {
+                if (this.disc)
+                    drawPokedexPokemonEntry(this.p);
+            }
+        }
+
+        var pokeList = pokemonList.concat(eventPokemonList).concat(bossList);
+        var sortedPokeList = pokeList.sort(function (a, b) {
+            var nameA = a.toLowerCase();
+            var nameB = b.toLowerCase();
+            if (nameA < nameB)
+                return -1;
+            if (nameA > nameB)
+                return 1;
+            return 0;
+        });
+        for (let p of sortedPokeList)
+            grid.appendChild((new createPokemonTile(p, contains(encounteredPokemon, p))).cell);
+
+        var backButton = document.createElement('div');
+        backButton.className = "top-left";
+        backButton.addEventListener('click', () => {
+            drawPokedex();
+        });
+        filter.appendChild(backButton);
+        var backImage = new Image();
+        backImage.id = "backImage";
+        backImage.className = "pixel-sprite";
+        backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
+        backButton.appendChild(backImage);
+
+        var progress = document.createElement('div');
+        progress.className = "top-right";
+        var max = pokemonList.length + eventPokemonList.length + bossList.length;
+        var prog = Math.floor(encounteredPokemon.length / max * 1000) / 10;
+        progress.innerHTML = prog + "%";
+        filter.appendChild(progress);
+    } else
+        document.getElementById("pokedex-pokemon-filter").style.visibility = "visible";
+}
+
+function drawPokedexPokemonEntry(p) {
+    fadeInTransition();
+    document.getElementById("pokedex-pokemon-filter").style.visibility = "hidden";
+
+    var filter = document.createElement('div');
+    filter.className = "filter-clear";
+    document.body.appendChild(filter);
+
+    var mainGrid = document.createElement('div');
+    mainGrid.className = "pokedex-main-grid";
+    filter.appendChild(mainGrid);
+
+    var title = document.createElement('div');
+    title.className = "centered-title";
+    title.innerHTML = p.name;
+    mainGrid.appendChild(title);
+
+    var grid = document.createElement('div');
+    grid.className = "dual-column-grid";
+    grid.style.gridColumnGap = "10vw";
+    grid.style.maxWidth = "100%";
+    grid.style.fontSize = "1.8vw";
+    grid.style.position = "absolute";
+    grid.style.top = "30vh";
+    mainGrid.appendChild(grid);
+
+
+    var wrapper = document.createElement('div');
+    wrapper.className = "wrapper";
+    grid.appendChild(wrapper);
+    var pImage = new Image();
+    pImage.src = p.imgf;
+    pImage.className = "pokedex-entry-sprite-displayer";
+    pImage.onload = () => {
+        if (pImage.naturalWidth > pImage.naturalHeight * 1.5) {
+            pImage.style.height = "auto";
+            pImage.style.width = "30vw";
+        }
+    }
+    wrapper.appendChild(pImage);
+
+    var infoGrid = document.createElement('div');
+    infoGrid.className = "info-grid";
+    infoGrid.style.gridRowGap = "7vh";
+    grid.appendChild(infoGrid);
+
+    var typeGrid = document.createElement('div');
+    typeGrid.className = "dual-column-grid";
+    infoGrid.appendChild(typeGrid);
+
+    for (let t of p.types) {
+        var wrapper = document.createElement('div');
+        wrapper.className = "wrapper";
+        typeGrid.appendChild(wrapper);
+        var tImage = new Image();
+        tImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/" + t + ".webp";
+        tImage.style.height = "5vh";
+        tImage.style.width = "auto";
+        wrapper.appendChild(tImage);
+    }
+
+    var statsGrid = document.createElement('div');
+    statsGrid.className = "dual-column-grid";
+    statsGrid.style.gridRowGap = "0";
+    statsGrid.style.lineHeight = "2vw";
+    infoGrid.appendChild(statsGrid);
+    var hp = document.createElement('div');
+    hp.innerHTML = "HP:";
+    hp.style.textAlign = "right";
+    statsGrid.appendChild(hp);
+    var hpV = document.createElement('div');
+    hpV.innerHTML = p.name === "Shedinja" ? "???" : p.hp;
+    statsGrid.appendChild(hpV);
+    var atk = document.createElement('div');
+    atk.innerHTML = "Attack:";
+    atk.style.textAlign = "right";
+    statsGrid.appendChild(atk);
+    var atkV = document.createElement('div');
+    atkV.innerHTML = p.attack;
+    statsGrid.appendChild(atkV);
+    var def = document.createElement('div');
+    def.innerHTML = "Defense:";
+    def.style.textAlign = "right";
+    statsGrid.appendChild(def);
+    var defV = document.createElement('div');
+    defV.innerHTML = p.defense;
+    statsGrid.appendChild(defV);
+    var spatk = document.createElement('div');
+    spatk.innerHTML = "Sp. Attack:";
+    spatk.style.textAlign = "right";
+    statsGrid.appendChild(spatk);
+    var spatkV = document.createElement('div');
+    spatkV.innerHTML = p.spattack;
+    statsGrid.appendChild(spatkV);
+    var spdef = document.createElement('div');
+    spdef.innerHTML = "Sp. Defense:";
+    spdef.style.textAlign = "right";
+    statsGrid.appendChild(spdef);
+    var spdefV = document.createElement('div');
+    spdefV.innerHTML = p.spdefense;
+    statsGrid.appendChild(spdefV);
+    var spd = document.createElement('div');
+    spd.innerHTML = "Speed:";
+    spd.style.textAlign = "right";
+    statsGrid.appendChild(spd);
+    var spdV = document.createElement('div');
+    spdV.innerHTML = p.speed;
+    statsGrid.appendChild(spdV);
+
+    var talent = document.createElement('div');
+    talent.innerHTML = p.talent + "<br/>" + p.talentDesc;
+    talent.style.width = "40vw";
+    infoGrid.appendChild(talent);
+
+    var backButton = document.createElement('div');
+    backButton.className = "top-left";
+    backButton.addEventListener('click', () => {
+        document.body.removeChild(filter);
+        drawPokedexPokemon();
+    });
+    filter.appendChild(backButton);
+    var backImage = new Image();
+    backImage.id = "backImage";
+    backImage.className = "pixel-sprite";
+    backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
+    backButton.appendChild(backImage);
+}
+
+function drawPokedexMoves() {
+    fadeInTransition();
+
     document.body.removeChild(document.getElementById("pokedex-grid"));
 
     var filter = document.createElement('div');
@@ -14916,34 +15192,62 @@ function drawPokedexPokemon() {
 
     var title = document.createElement('div');
     title.className = "centered-title";
-    title.innerHTML = "Pokémon";
+    title.innerHTML = "Moves";
     mainGrid.appendChild(title);
 
     var grid = document.createElement('div');
     grid.className = "pokedex-grid";
+    grid.style.gridTemplateColumns = "auto auto";
+    grid.style.gridColumnGap = "12vw";
     mainGrid.appendChild(grid);
 
-    function createPokemonTile(p) {
+    function createMoveTile(move, disc) {
+        function makeCard(move) {
+            this.card = document.createElement('div');
+            this.card.className = "static-move-card";
+
+            var top = document.createElement('div');
+            top.className = "move-top";
+            this.card.appendChild(top);
+            var bottom = document.createElement('div');
+            bottom.className = "move-top";
+            this.card.appendChild(bottom);
+
+            var name = document.createElement('div');
+            name.innerHTML = move.name;
+            name.class = "move-name";
+            top.appendChild(name);
+            var cost = document.createElement('div');
+            cost.innerHTML = move.cost;
+            cost.className = "move-cost";
+            top.appendChild(cost);
+
+            var type = new Image();
+            if (move.type !== "")
+                type.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/types/' + move.type + '.webp'
+            type.className = "type-icon";
+            bottom.appendChild(type);
+            var cat = new Image();
+            cat.src = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/move_icons/category/' + move.cat + '.webp'
+            cat.className = "category-icon";
+            bottom.appendChild(cat);
+        }
         this.cell = document.createElement('div');
         this.cell.className = "dual-column-grid";
-        this.cell.p = createPokemon(p);
+        var card = (new makeCard(disc ? move : createMove("struggle"))).card;
+        if (!disc)
+            card.style.filter = "brightness(0)";
+        this.cell.appendChild(card);
 
-        var wrapper = document.createElement('div');
-        wrapper.className = "wrapper-padded";
-        this.cell.appendChild(wrapper);
-        var pImage = new Image();
-        pImage.src = this.cell.p.imgf;
-        pImage.className = "pokedex-sprite-displayer";
-        wrapper.appendChild(pImage);
-
-        var name = document.createElement('div');
-        name.className = "descriptor-name";
-        name.innerHTML = this.cell.p.name;
-        this.cell.appendChild(name);
+        var desc = document.createElement('div');
+        desc.className = "descriptor";
+        this.cell.appendChild(desc);
+        var text = document.createElement('div');
+        text.innerHTML = disc ? move.description : "?????";
+        desc.appendChild(text);
     }
 
-    var pokeList = pokemonList.concat(eventPokemonList).concat(bossList);
-    var sortedPokeList = pokeList.sort(function (a, b) {
+    var sortedMoveList = movesList.sort(function (a, b) {
         var nameA = a.toLowerCase();
         var nameB = b.toLowerCase();
         if (nameA < nameB)
@@ -14952,11 +15256,11 @@ function drawPokedexPokemon() {
             return 1;
         return 0;
     });
-    for (let p of sortedPokeList)
-        grid.appendChild((new createPokemonTile(p)).cell);
+    for (let m of sortedMoveList)
+        grid.appendChild((new createMoveTile(createMove(m), contains(foundMoves, m))).cell);
 
     var backButton = document.createElement('div');
-    backButton.className = "starting-menu-option top-left";
+    backButton.className = "top-left";
     backButton.addEventListener('click', () => {
         drawPokedex();
     });
@@ -14966,4 +15270,98 @@ function drawPokedexPokemon() {
     backImage.className = "pixel-sprite";
     backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
     backButton.appendChild(backImage);
+
+    var progress = document.createElement('div');
+    progress.className = "top-right";
+    var max = movesList.length;
+    var prog = Math.floor(foundMoves.length / max * 1000) / 10;
+    progress.innerHTML = prog + "%";
+    filter.appendChild(progress);
+}
+
+function drawPokedexItems() {
+    fadeInTransition();
+
+    document.body.removeChild(document.getElementById("pokedex-grid"));
+
+    var filter = document.createElement('div');
+    filter.className = "filter-clear";
+    document.body.appendChild(filter);
+
+    var mainGrid = document.createElement('div');
+    mainGrid.className = "pokedex-main-grid";
+    filter.appendChild(mainGrid);
+
+    var title = document.createElement('div');
+    title.className = "centered-title";
+    title.innerHTML = "Items";
+    mainGrid.appendChild(title);
+
+    var grid = document.createElement('div');
+    grid.className = "pokedex-grid";
+    grid.style.gridTemplateColumns = "auto auto";
+    grid.style.gridColumnGap = "12vw";
+    mainGrid.appendChild(grid);
+
+    function createItemTile(item, disc) {
+        this.cell = document.createElement('div');
+        this.cell.className = "dual-column-grid";
+        this.cell.style.gridColumnGap = "1vw";
+        this.cell.style.gridTemplateColumns = "auto auto auto";
+
+        var wrapper = document.createElement('div');
+        wrapper.className = "wrapper";
+        this.cell.appendChild(wrapper);
+        var sprite = new Image();
+        sprite.src = item.img;
+        sprite.className = "reward-sprite";
+        if (!disc)
+            sprite.style.filter = "brightness(0)";
+        wrapper.appendChild(sprite);
+
+        var desc = document.createElement('div');
+        desc.className = "descriptor-name";
+        this.cell.appendChild(desc);
+        var name = document.createElement('div');
+        name.innerHTML = disc ? item.name : "?????";
+        desc.appendChild(name);
+
+        var desc1 = document.createElement('div');
+        desc1.className = "descriptor";
+        this.cell.appendChild(desc1);
+        var text = document.createElement('div');
+        text.innerHTML = disc ? item.description : "?????";
+        desc1.appendChild(text);
+    }
+
+    var sortedItemList = heldItems.concat(specialItems).sort(function (a, b) {
+        var nameA = a.toLowerCase();
+        var nameB = b.toLowerCase();
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+        return 0;
+    });
+    for (let i of sortedItemList)
+        grid.appendChild((new createItemTile(createHeldItem(i), contains(foundItems, i))).cell);
+
+    var backButton = document.createElement('div');
+    backButton.className = "top-left";
+    backButton.addEventListener('click', () => {
+        drawPokedex();
+    });
+    filter.appendChild(backButton);
+    var backImage = new Image();
+    backImage.id = "backImage";
+    backImage.className = "pixel-sprite";
+    backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
+    backButton.appendChild(backImage);
+
+    var progress = document.createElement('div');
+    progress.className = "top-right";
+    var max = heldItems.length + specialItems.length;
+    var prog = Math.floor(foundItems.length / max * 1000) / 10;
+    progress.innerHTML = prog + "%";
+    filter.appendChild(progress);
 }

@@ -374,7 +374,6 @@ button.start:hover {
     width: 11.8vw;
     display: grid;
     grid-template-columns: auto;
-    grid-row-gap: 2vh;
     border: solid;
     border-color: black;
     color: black;
@@ -385,13 +384,13 @@ button.start:hover {
     vertical-align: middle;
     border-radius: 1vh;
     transition: background-color .2s;
+    padding: 3%;
 }
 
 .selected-move {
     width: 11.8vw;
     display: grid;
     grid-template-columns: auto;
-    grid-row-gap: 2vh;
     border: solid;
     border-color: #dd0000;
     color: #dd0000;
@@ -402,6 +401,7 @@ button.start:hover {
     vertical-align: middle;
     border-radius: 1vh;
     transition: background-color .2s;
+    padding: 3%;
 }
 
 .move-card:hover, .selected-move:hover {
@@ -604,7 +604,6 @@ button.start:hover {
     width: 11.8vw;
     display: grid;
     grid-template-columns: auto;
-    grid-row-gap: 2vh;
     border: solid;
     border-color: black;
     color: black;
@@ -614,6 +613,7 @@ button.start:hover {
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
+    padding: 3%;
 }
 
 .descriptor-name {
@@ -943,7 +943,6 @@ button.launch-tuto:hover {
     grid-template-columns: auto auto;
     column-gap: 3vw;
     font-size: 2vw;
-    line-height: 4vw;
     text-align: left;
     justify-self: center;
 }
@@ -1031,12 +1030,44 @@ button.launch-tuto:hover {
     font-family: 'Copperplate Gothic';
     text-align: center;
     overflow-y: auto;
+    justify-content: center;
 }
 
 .pokedex-sprite-displayer {
     max-height: 6vw;
     max-width: 6vw;
     text-align: center;
+}
+
+.pokedex-entry-sprite-displayer {
+    height: 20vw;
+    width: auto;
+    text-align: center;
+    grid-row: 1 / 4;
+    vertical-align: middle;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-rows: 5vh auto auto;
+    grid-row-gap: 2vh;
+    font-size: 1.8vw;
+    line-height: 2vw;
+}
+
+.hover-darkgoldenrod {
+    transition: color .2s;
+}
+
+.hover-darkgoldenrod:hover {
+    color: darkgoldenrod;
+}
+
+.centered {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 
@@ -1202,6 +1233,43 @@ input:checked + .slider:before {
     position: absolute;
     top: 3vh;
     left: 3vh;
+    filter: invert();
+    transition: transform .2s;
+    width: 8vh;
+    height: 8vh;
+}
+
+.top-left:hover {
+    transform: scale(1.2, 1.2);
+}
+
+.top-right {
+    position: absolute;
+    top: 3vh;
+    right: 3vh;
+    color: white;
+    font-size: 2vw;
+    font-family: 'Copperplate Gothic';
+    text-align: right;
+}
+
+
+
+/* width */
+::-webkit-scrollbar {
+    width: .5vw;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: .25vw;
+    background-color: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #cccccc;
+    border-radius: .25vw;
 }
 
 
