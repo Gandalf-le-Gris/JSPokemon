@@ -2347,8 +2347,10 @@ function dealDamage(damage, p, move, revive) {
         p.currenthp = Math.min(Math.max(0, Math.floor(p.currenthp - damage)), p.maxhp);
     else if (p.currenthp > 0)
         p.currenthp = Math.min(Math.max(1, Math.floor(p.currenthp - damage)), p.maxhp);
+
     refreshHealthBar(true);
     refreshHealthBar(false);
+
 
     if (music && move != undefined && damage > 0) {
         if (effectiveMultiplier(move, p) > 1)
@@ -2648,13 +2650,12 @@ function createOpponent(encounter, fixedOpponent) {
         var item = createHeldItem(i);
         var areaPool = Math.random() < .3;
         var areaBan = Math.random() < .5;
-        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || i.includes("sacred_ash") || i.includes("heart_scale") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
+        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || i.includes("sacred_ash") || i.includes("heart_scale") || i.includes("oval_stone") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
             i = heldItems[Math.floor(Math.random() * heldItems.length)];
             item = createHeldItem(i);
         }
         opponent.items.push(item);
     }
-
     return opponent;
 }
 
@@ -9959,7 +9960,7 @@ function SeedBomb() {
     this.name = "Seed Bomb";
     this.type = "grass";
     this.cat = "physical";
-    this.bp = 110;
+    this.bp = 120;
     this.cost = 2;
     this.effect = function (move, pA, pD) {
         applyEffect("ingrain", 1, pD);
@@ -13720,7 +13721,7 @@ function OvalStone() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/oval_stone.webp';
     this.area = "";
     this.init = true;
-    this.effect = (p) => { dealDamage(-.05 * p.maxhp, p); }
+    this.effect = (p) => { p.currenthp = Math.min(p.maxhp, Math.floor(p.currenthp + .05 * p.maxhp)); }
 }
 
 function DubiousDisc() {
@@ -13804,7 +13805,7 @@ function Magmarizer() {
 
 function Electirizer() {
     this.name = "Electirizer";
-    this.description = "Holder's attacks deal more damage to burned foes.";
+    this.description = "Holder's attacks deal more damage to paralyzed foes.";
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/electirizer.webp';
     this.area = "electric";
     this.boost = true;
@@ -13827,8 +13828,8 @@ function RazorClaw() {
 
 function RazorFang() {
     this.name = "Razor Fang";
-    this.description = "Whenever the holder uses the last move in its hand, restores 25 of its HP.";
-    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/razor_claw.webp';
+    this.description = "Whenever the holder successfully uses the last move in its hand, restores 25 of its HP.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/razor_fang.webp';
     this.area = "";
     this.boost = true;
     this.effect = (move, p) => {
