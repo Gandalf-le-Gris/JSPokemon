@@ -222,7 +222,7 @@ function loadResources() {
     loadAssets(sounds, false);
 }
 
-function clearBody() {
+function clearBody(keepAudio) {
     var nodes = Array.prototype.slice.call(document.body.childNodes);
     var audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
     for (let i = 0; i < nodes.length; i++) {
@@ -230,7 +230,8 @@ function clearBody() {
             document.body.removeChild(nodes[i]);
         }
     }
-    stopMusic();
+    if (keepAudio == undefined || !keepAudio)
+        stopMusic();
 }
 
 function drawStartingMenu() {
@@ -293,6 +294,8 @@ function drawStartingMenu() {
     settingsButton.className = "starting-menu-option";
     settingsButton.addEventListener('click', () => {
         toggleEscapeScreen();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     options.appendChild(settingsButton);
     var settingsImage = new Image();
@@ -306,6 +309,8 @@ function drawStartingMenu() {
     bookButton.addEventListener('click', () => {
         fadeOutTransition(1);
         setTimeout(drawPokedex, 1000);
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     options.appendChild(bookButton);
     var bookImage = new Image();
@@ -2643,7 +2648,7 @@ function createOpponent(encounter, fixedOpponent) {
         var item = createHeldItem(i);
         var areaPool = Math.random() < .3;
         var areaBan = Math.random() < .5;
-        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || i.includes("sacred_ash") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
+        while (i.includes("choice_") || i.includes("revive") || i.includes("bottle_cap") || i.includes("_fossil") || i.includes("amulet_coin") || i.includes("pearl") || i.includes("potion") || i.includes("sacred_ash") || i.includes("heart_scale") || (areaPool && encounter !== item.area) || (areaBan && item.area !== "" && item.area !== encounter)) {
             i = heldItems[Math.floor(Math.random() * heldItems.length)];
             item = createHeldItem(i);
         }
@@ -3165,7 +3170,7 @@ function pokemartEncounter() {
 
             this.reward1.p = i;
             this.reward1.move = move1;
-            this.reward.mName = moveN;
+            this.reward1.mName = moveN;
             this.reward1.priceTag = this.priceTag;
             this.reward1.article = this.article;
             this.reward1.onclick = function () {
@@ -3725,7 +3730,7 @@ function Pikachu() {
     this.items = [];
     this.talent = "Static";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are paralyzed."
-    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("paralysis", 1, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical" && !isPadded(pD)) applyEffect("paralysis", 1, pD); }
     this.unlocked = defeatedPokemon >= 5;
     this.hint = "Defeat 5 Pokémon\n" + defeatedPokemon + "/5";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/pikachu.ogg"
@@ -3759,7 +3764,7 @@ function Garchomp() {
     this.items = [];
     this.talent = "Rough skin"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
-    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical" && !isPadded(pD)) dealDamage(10, pD); }
     this.unlocked = defeatedPokemon >= 20;
     this.hint = "Defeat 20 Pokémon\n" + defeatedPokemon + "/20";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/garchomp.ogg"
@@ -3868,7 +3873,7 @@ function Volcarona() {
     this.items = [];
     this.talent = "Flame body";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are burned."
-    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("burn", 1, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical" && !isPadded(pD)) applyEffect("burn", 1, pD); }
     this.unlocked = defeatedPokemon >= 150;
     this.hint = "Defeat 150 Pokémon\n" + defeatedPokemon + "/150";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/volcarona.ogg"
@@ -4010,7 +4015,7 @@ function Ferrothorn() {
     this.items = [];
     this.talent = "Iron barbs"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
-    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical") dealDamage(10, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical" && !isPadded(pD)) dealDamage(10, pD); }
     this.unlocked = physicalDamageTaken >= 15000;
     this.hint = "Take 15,000 physical damage\n" + physicalDamageTaken + "/15000";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/ferrothorn.ogg"
@@ -4852,7 +4857,20 @@ function switchDarmanitan(p, zen) {
                 p.spdefense *= 21 / 11;
                 p.speed *= 11 / 19;
                 p.zen = true;
-            } else {
+
+                var temp = [].concat(p.moves);
+                p.moves = [].concat(p.moves2);
+                p.moves2 = temp;
+                var temp = [].concat(p.movepool);
+                p.movepool = [].concat(p.movepool2);
+                p.movepool2 = temp;
+
+                colorHeader(p);
+                initDeck(p);
+                drawMove(p, true);
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            } else if (!zen && p.zen) {
                 p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
                 p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
                 resizeSprites(p === team[activePokemon], p === opponent);
@@ -4868,22 +4886,27 @@ function switchDarmanitan(p, zen) {
                 p.spdefense *= 11 / 21;
                 p.speed *= 19 / 11;
                 p.zen = false;
-            }
-            var temp = [].concat(p.moves);
-            p.moves = [].concat(p.moves2);
-            p.moves2 = temp;
-            var temp = [].concat(p.movepool);
-            p.movepool = [].concat(p.movepool2);
-            p.movepool2 = temp;
 
-            colorHeader(p);
-            initDeck(p);
-            drawMove(p, true);
-            img.classList.remove("blink-transform1");
-            img.className += " unblink-transform1";
+                var temp = [].concat(p.moves);
+                p.moves = [].concat(p.moves2);
+                p.moves2 = temp;
+                var temp = [].concat(p.movepool);
+                p.movepool = [].concat(p.movepool2);
+                p.movepool2 = temp;
+
+                colorHeader(p);
+                initDeck(p);
+                drawMove(p, true);
+                img.classList.remove("blink-transform1");
+                img.className += " unblink-transform1";
+            }
         }, 100);
         setTimeout(() => {
             img.classList.remove("unblink-transform1");
+            if (p.zen && p.currenthp > .5 * p.maxhp)
+                switchDarmanitan(p, false);
+            else if (!p.zen && p.currenthp <= .5 * p.maxhp)
+                switchDarmanitan(p, true);
         }, 200);
     }
 }
@@ -5024,13 +5047,15 @@ function switchCastform(p) {
         if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
             img.className += " blink-transform1";
             setTimeout(() => {
-                p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
-                p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
-                resizeSprites(p === team[activePokemon], p === opponent);
-                p.types = ["normal"];
-                colorHeader(p);
-                img.classList.remove("blink-transform1");
-                img.className += " unblink-transform1";
+                if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
+                    p.imgf = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/front/castform.gif';
+                    p.imgb = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/pokemon_battle_icons/back/castform.gif';
+                    resizeSprites(p === team[activePokemon], p === opponent);
+                    p.types = ["normal"];
+                    colorHeader(p);
+                    img.classList.remove("blink-transform1");
+                    img.className += " unblink-transform1";
+                }
             }, 100);
             setTimeout(() => {
                 img.classList.remove("unblink-transform1");
@@ -5156,7 +5181,7 @@ function Nidoking(gender) {
     this.items = [];
     this.talent = "Poison point"
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are poisoned."
-    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical") applyEffect("poison", 6, pD); }
+    this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical" && !isPadded(pD)) applyEffect("poison", 6, pD); }
     this.unlocked = statRaised >= 100;
     this.hint = "Apply 300 poison stacks to foes\n" + poisonApplied + "/300";
     this.cry = this.gender ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/nidoking.ogg" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/nidoqueen.ogg"
@@ -7966,7 +7991,7 @@ function Feint() {
     this.exhaust = true;
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { drawMove(pA, false); };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card. Exhaust.";
 }
 
 function FeintAttack() {
@@ -11379,7 +11404,7 @@ function KingsProtection(stacks) {
     this.block = true;
     this.effect = (pA, pD) => { };
     this.bEffect = (move, pA, pD) => {
-        if (move.cat === "physical")
+        if (move.cat === "physical" && !isPadded(pD))
             boostStat(pD, "attack", -1);
         this.stacks--;
     };
@@ -11753,8 +11778,9 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "leftovers", "choice_band", "choice_specs", "choice_scarf", "rocky_helmet", "weakness_policy", "sitrus_berry", "life_orb", "helix_fossil", "air_balloon", "cheri_berry", "chesto_berry", "muscle_band", "wise_glasses", "rawst_berry", "big_root", "blunder_policy",
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone", "lum_berry", "moomoo_milk", "sacred_ash", "bug_gem", "dark_gem", "grass_gem", "fire_gem", "water_gem", "ice_gem", "flying_gem", "normal_gem",
-    "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale"];
-specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
+    "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale", "water_stone", "fire_stone", "thunder_stone", "leaf_stone", "ice_stone", "dawn_stone", "dusk_stone",
+    "moon_stone", "sun_stone", "shiny_stone", "reaper_cloth", "electirizer", "magmarizer", "dubious_disc", "upgrade", "razor_claw", "razor_fang", "protective_pads", "protector", "prism_scale", "heart_scale", "oval_stone"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb", "red_orb", "blue_orb", "soul_dew"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -11978,6 +12004,56 @@ function createHeldItem(item) {
             return new FireGem();
         case "dragon_scale":
             return new DragonScale();
+        case "water_stone":
+            return new WaterStone();
+        case "fire_stone":
+            return new FireStone();
+        case "thunder_stone":
+            return new ThunderStone();
+        case "leaf_stone":
+            return new LeafStone();
+        case "ice_stone":
+            return new IceStone();
+        case "shiny_stone":
+            return new ShinyStone();
+        case "moon_stone":
+            return new MoonStone();
+        case "sun_stone":
+            return new SunStone();
+        case "dawn_stone":
+            return new DawnStone();
+        case "dusk_stone":
+            return new DuskStone();
+        case "electirizer":
+            return new Electirizer();
+        case "magmarizer":
+            return new Magmarizer();
+        case "reaper_cloth":
+            return new ReaperCloth();
+        case "razor_fang":
+            return new RazorFang();
+        case "razor_claw":
+            return new RazorClaw();
+        case "dubious_disc":
+            return new DubiousDisc();
+        case "upgrade":
+            return new Upgrade();
+        case "protector":
+            return new Protector();
+        case "prism_scale":
+            return new PrismScale();
+        case "heart_scale":
+            return new HeartScale();
+        case "oval_stone":
+            return new OvalStone();
+        case "protective_pads":
+            return new ProtectivePads();
+        case "blue_orb":
+            return new BlueOrb();
+        case "red_orb":
+            return new RedOrb();
+        case "soul_dew":
+            return new SoulDew();
         default:
             alert("Unkown item: " + item);
             return new Leftovers();
@@ -13510,6 +13586,317 @@ function DragonScale() {
     };
 }
 
+function WaterStone() {
+    this.name = "Water Stone";
+    this.description = "If the holder is water type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/water_stone.webp';
+    this.area = "water";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "water");
+    };
+}
+
+function FireStone() {
+    this.name = "Fire Stone";
+    this.description = "If the holder is fire type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/fire_stone.webp';
+    this.area = "fire";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "fire");
+    };
+}
+
+function ThunderStone() {
+    this.name = "Thunder Stone";
+    this.description = "If the holder is electric type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/thunder_stone.webp';
+    this.area = "electric";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "electric");
+    };
+}
+
+function LeafStone() {
+    this.name = "Leaf Stone";
+    this.description = "If the holder is grass type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/leaf_stone.webp';
+    this.area = "grass";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "grass");
+    };
+}
+
+function IceStone() {
+    this.name = "Ice Stone";
+    this.description = "If the holder is ice type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/ice_stone.webp';
+    this.area = "ice";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "ice");
+    };
+}
+
+function DuskStone() {
+    this.name = "Dusk Stone";
+    this.description = "If the holder is ghost type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dusk_stone.webp';
+    this.area = "ghost";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "ghost");
+    };
+}
+
+function DawnStone() {
+    this.name = "Dawn Stone";
+    this.description = "If the holder is psychic type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dawn_stone.webp';
+    this.area = "psychic";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "psychic");
+    };
+}
+
+function ShinyStone() {
+    this.name = "Shiny Stone";
+    this.description = "If the holder is normal type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/shiny_stone.webp';
+    this.area = "normal";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "normal");
+    };
+}
+
+function MoonStone() {
+    this.name = "Moon Stone";
+    this.description = "If the holder is fairy type, raises its attack and special attack by 10%.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/moon_stone.webp';
+    this.area = "fairy";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .1 * contains(p.types, "fairy");
+    };
+}
+
+function SunStone() {
+    this.name = "Sun Stone";
+    this.description = "Attacks benefitting from STAB deal 15% extra damage.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/sun_stone.webp';
+    this.area = "boss";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .15 * contains(p.types, move.type);
+    };
+}
+
+function HeartScale() {
+    this.name = "Heart Scale";
+    this.description = "Shuffles a random move with exhaust and costing 1 less energy from the holder's movepool into its draw pile at the beginning of the battle.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/heart_scale.webp';
+    this.area = "boss";
+    this.init = true;
+    this.effect = (p) => {
+        var move = createMove(p.movepool[Math.floor(Math.random() * p.movepool.length)]);
+        move.cost = Math.max(0, move.cost - 1);
+        move.name += "*";
+        if (!move.description.includes('Exhaust.')) {
+            move.description += " Exhaust.";
+            move.exhaust = true;
+        }
+        p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, move);
+    }
+}
+
+function OvalStone() {
+    this.name = "Oval Stone";
+    this.description = "Restores 5% of the holder's HP at the beginning of each battle.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/oval_stone.webp';
+    this.area = "";
+    this.init = true;
+    this.effect = (p) => { dealDamage(-.05 * p.maxhp, p); }
+}
+
+function DubiousDisc() {
+    this.name = "Dubious Disc";
+    this.description = "Raises holder's attack and defense, but lowers its special attack and special defense.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/dubious_disc.webp';
+    this.area = "";
+    this.pickup = true;
+    this.effect = (p) => {
+        p.attack *= 1.2;
+        p.defense *= 1.2;
+        p.spattack /= 1.2;
+        p.spdefense /= 1.2;
+    }
+}
+
+function Upgrade() {
+    this.name = "Upgrade";
+    this.description = "Raises holder's special attack and special defense, but lowers its attack and defense.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/upgrade.webp';
+    this.area = "";
+    this.pickup = true;
+    this.effect = (p) => {
+        p.attack /= 1.2;
+        p.defense /= 1.2;
+        p.spattack *= 1.2;
+        p.spdefense *= 1.2;
+    }
+}
+
+function PrismScale() {
+    this.name = "Prism Scale";
+    this.description = "Holder's attacks deal 20% extra damage if it has at least 4 different move types in its hand.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/prism_scale.webp';
+    this.area = "boss";
+    this.boost = true;
+    this.effect = (move, p) => {
+        var typesH = [];
+        for (let c of p.hand)
+            if (!contains(typesH, c.type))
+                typesH.push(c.type)
+        return 1 + .2 * (typesH.length >= 4);
+    };
+}
+
+function Protector() {
+    this.name = "Protector";
+    this.description = "Slightly raises holder's defense and special defense.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/protector.webp';
+    this.area = "";
+    this.pickup = true;
+    this.effect = (p) => {
+        p.defense *= 1.05;
+        p.spdefense *= 1.05;
+    }
+}
+
+function ReaperCloth() {
+    this.name = "Reaper Cloth";
+    this.description = "Holder's attacks deal more damage to weakened foes.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/reaper_cloth.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => {
+        var target = contains(team, p) ? opponent : team[activePokemon];
+        return 1 + .15 * (1 - target.currenthp / target.maxhp);
+    }
+}
+
+function Magmarizer() {
+    this.name = "Magmarizer";
+    this.description = "Holder's attacks deal more damage to burned foes.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/magmarizer.webp';
+    this.area = "fire";
+    this.boost = true;
+    this.effect = (move, p) => {
+        var target = contains(team, p) ? opponent : team[activePokemon];
+        return 1 + .15 * isBurned(target);
+    }
+}
+
+function Electirizer() {
+    this.name = "Electirizer";
+    this.description = "Holder's attacks deal more damage to burned foes.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/electirizer.webp';
+    this.area = "electric";
+    this.boost = true;
+    this.effect = (move, p) => {
+        var target = contains(team, p) ? opponent : team[activePokemon];
+        return 1 + .15 * isParalyzed(target);
+    }
+}
+
+function RazorClaw() {
+    this.name = "Razor Claw";
+    this.description = "The last move in the holder's hand deals extra damage.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/razor_claw.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => {
+        return 1 + .15 * (p.hand.length == 1);
+    }
+}
+
+function RazorFang() {
+    this.name = "Razor Fang";
+    this.description = "Whenever the holder uses the last move in its hand, restores 25 of its HP.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/razor_claw.webp';
+    this.area = "";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (p.hand.length == 1)
+            dealDamage(-25, p);
+        return 1;
+    }
+}
+
+function ProtectivePads() {
+    this.name = "Protective Pads";
+    this.description = "Protects user from contact effects.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/protective_pads.webp';
+    this.area = "";
+}
+
+function isPadded(p) {
+    return p.items.findIndex(e => e.name === "Protective Pads") >= 0;
+}
+
+function BlueOrb() {
+    this.name = "Blue Orb";
+    this.description = "Increases special damage by 15%. Holder's special attacks gain 5% HP drain, or 5% recoil reduction.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/blue_orb.webp';
+    this.area = "boss";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (move.cat === "special")
+            if (move.recoil == undefined)
+                move.recoil = -.05;
+            else
+                move.recoil -= .05;
+        return 1 + .15 * (move.cat === "special");
+    };
+}
+
+function RedOrb() {
+    this.name = "Red Orb";
+    this.description = "Increases physical damage by 15%. Holder's physical attacks gain 5% HP drain, or 5% recoil reduction.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/red_orb.webp';
+    this.area = "boss";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (move.cat === "physical")
+            if (move.recoil == undefined)
+                move.recoil = -.05;
+            else
+                move.recoil -= .05;
+        return 1 + .15 * (move.cat === "physical");
+    };
+}
+
+function SoulDew() {
+    this.name = "Soul Dew";
+    this.description = "Increases non-STAB damage by 15%. Holder's non-STAB attacks gain 5% HP drain, or 5% recoil reduction.";
+    this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/soul_dew.webp';
+    this.area = "boss";
+    this.boost = true;
+    this.effect = (move, p) => {
+        if (!contains(p.types, move.type))
+            if (move.recoil == undefined)
+                move.recoil = -.05;
+            else
+                move.recoil -= .05;
+        return 1 + .1 * (!contains(p.types, move.type));
+    };
+}
+
 
 
 
@@ -14887,13 +15274,13 @@ function drawBattleExplanations() {
 /* ----------------------------------------------------- */
 
 function drawPokedex() {
-    clearBody();
+    clearBody(!document.getElementById("https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3").paused);
     fadeInTransition();
     var gArea = new gameArea('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/teamscreen.webp', () => { });
     gArea.start();
 
     ambientMusic = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/musics/pokemon_center.mp3";
-    if (music)
+    if (music && document.getElementById(ambientMusic).paused)
         playMusic(ambientMusic, true);
 
     var grid = document.createElement('div');
@@ -15009,8 +15396,11 @@ function drawPokedexPokemon() {
 
             this.cell.disc = disc;
             this.cell.onclick = function () {
-                if (this.disc)
+                if (this.disc) {
                     drawPokedexPokemonEntry(this.p);
+                    if (music)
+                        playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
+                }
             }
         }
 
@@ -15031,6 +15421,8 @@ function drawPokedexPokemon() {
         backButton.className = "top-left";
         backButton.addEventListener('click', () => {
             drawPokedex();
+            if (music)
+                playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
         });
         filter.appendChild(backButton);
         var backImage = new Image();
@@ -15168,12 +15560,14 @@ function drawPokedexPokemonEntry(p) {
     backButton.addEventListener('click', () => {
         document.body.removeChild(filter);
         drawPokedexPokemon();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     filter.appendChild(backButton);
     var backImage = new Image();
     backImage.id = "backImage";
     backImage.className = "pixel-sprite";
-    backImage.src = music ? "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp" : "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
+    backImage.src = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/ui_icons/back.webp"
     backButton.appendChild(backImage);
 }
 
@@ -15198,7 +15592,7 @@ function drawPokedexMoves() {
     var grid = document.createElement('div');
     grid.className = "pokedex-grid";
     grid.style.gridTemplateColumns = "auto auto";
-    grid.style.gridColumnGap = "12vw";
+    grid.style.gridColumnGap = "10vw";
     mainGrid.appendChild(grid);
 
     function createMoveTile(move, disc) {
@@ -15263,6 +15657,8 @@ function drawPokedexMoves() {
     backButton.className = "top-left";
     backButton.addEventListener('click', () => {
         drawPokedex();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     filter.appendChild(backButton);
     var backImage = new Image();
@@ -15300,7 +15696,7 @@ function drawPokedexItems() {
     var grid = document.createElement('div');
     grid.className = "pokedex-grid";
     grid.style.gridTemplateColumns = "auto auto";
-    grid.style.gridColumnGap = "12vw";
+    grid.style.gridColumnGap = "10vw";
     mainGrid.appendChild(grid);
 
     function createItemTile(item, disc) {
@@ -15350,6 +15746,8 @@ function drawPokedexItems() {
     backButton.className = "top-left";
     backButton.addEventListener('click', () => {
         drawPokedex();
+        if (music)
+            playMusic('https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/button_click.mp3', false);
     });
     filter.appendChild(backButton);
     var backImage = new Image();

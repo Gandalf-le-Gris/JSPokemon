@@ -1248,7 +1248,7 @@ input:checked + .slider:before {
     top: 3vh;
     right: 3vh;
     color: white;
-    font-size: 2vw;
+    font-size: 1.8vw;
     font-family: 'Copperplate Gothic';
     text-align: right;
 }
