@@ -576,7 +576,7 @@ button.start:hover {
     grid-auto-flow: column;
     grid-column-gap: .5vw;
     border-radius: 1vh;
-    transition: background .3s;
+    transition: background .2s;
 }
 
 .reward:hover {
