@@ -256,6 +256,7 @@ button.start:hover {
     border-bottom-right-radius: 1.3vh;
     border-top-left-radius: 1.2vh;
     border-top-right-radius: 1.2vh;
+    transition: background .3s;
 }
 
 .pokemon-hp {
