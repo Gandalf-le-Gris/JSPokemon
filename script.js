@@ -742,7 +742,7 @@ function unlockAll() {
     window.localStorage.setItem('fastBoss', JSON.stringify(1));
     window.localStorage.setItem('cardsPerTurn', JSON.stringify(8));
     window.localStorage.setItem('helixQuest', JSON.stringify(1));
-    window.localStorage.setItem('sandstormDamage', JSON.stringify(300));
+    window.localStorage.setItem('sandstormDamage', JSON.stringify(150));
     window.localStorage.setItem('survive1hp', JSON.stringify(1));
     window.localStorage.setItem('unlockedPokemon', JSON.stringify(10));
     window.localStorage.setItem('transforms', JSON.stringify(50));
@@ -1348,7 +1348,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         loot = lootAmount - 1;
     pokemonCenterChance += .05;
     pokemartChance += .05;
-    eventChance += .08;
+    eventChance += .07;
 
     opponent = createOpponent(encounter, fixedPokemon);
     player = true;
@@ -2339,9 +2339,9 @@ function useMove(move) {
 
         if (!cancelled && move.postEffect != undefined) {
             if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0) && team[activePokemon].currenthp > 0)
-                move.postEffect(move, team[activePokemon], opponent);
+                move.postEffect(move, team[activePokemon], target);
             else if (!player && (move.cat === "status" || effectiveMultiplier(move, team[activePokemon]) > 0) && opponent.currenthp > 0)
-                move.postEffect(move, opponent, team[activePokemon]);
+                move.postEffect(move, opponent, target);
         }
 
         if (player && doesBlock(opponent) && pDummy != undefined) {
@@ -3079,7 +3079,7 @@ function getFromItemPool(t) {
 function pokemonCenterEncounter() {
     pokemonCenterChance = 0;
     pokemartChance += .05;
-    eventChance += .08;
+    eventChance += .07;
 
     clearBody();
     fadeInTransition();
@@ -3137,7 +3137,7 @@ removePrice = 500;
 function pokemartEncounter() {
     pokemonCenterChance += .05;
     pokemartChance = 0;
-    eventChance += .08;
+    eventChance += .07;
 
     clearBody();
     fadeInTransition();
@@ -4507,7 +4507,7 @@ function Tyranitar() {
     this.talent = "Sand stream"
     this.talentDesc = "Whips up a sandstorm at the beginning of the battle."
     this.init = function () { setWeather("sandstorm", 10); }
-    this.unlocked = sandstormDamage >= 300;
+    this.unlocked = sandstormDamage >= 150;
     this.hint = "???";
     this.cry = "https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sounds/sfx/cries/tyranitar.ogg"
 }
@@ -6659,15 +6659,6 @@ function createMove(move) {
     }
 }
 
-/* Priorities
- * 10 buff + protection break
- * 5-X protection break for X energy
- * 4 buff/nerf
- * 3 secondary effect proc
- * 0 neutral
- * -5 no effect
- * */
-
 function Absorb() {
     this.name = "Absorb";
     this.type = "grass";
@@ -6722,7 +6713,7 @@ function AerialAce() {
     this.bp = 35;
     this.cost = 1;
     this.effect = function (move, pA, pD) {
-        this.bp = 35 + 25 * (pA.draw.length == 0);
+        this.bp = 35 + 25 * (pA.draw.length == 1);
     };
     this.postEffect = function (move, pA, pD) {
         drawMove(pA, false);
@@ -6760,7 +6751,7 @@ function AirSlash() {
     this.cat = "special";
     this.bp = 75;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (pA.hand.length >= 5) applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.hand.length >= 5) applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's hand contains at least 5 cards.";
     this.priority = function (pA, pD) { return 3 * (pA.hand.length >= 5); }
 }
@@ -6848,7 +6839,7 @@ function Astonish() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (pA.hand.findIndex(e => e.exhaust != undefined) >= 0) applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.hand.findIndex(e => e.exhaust != undefined) >= 0) applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's hand contains a card with exhaust.";
     this.priority = function (pA, pD) { return 3 * (pA.hand.findIndex(e => e.exhaust != undefined) >= 0); }
 }
@@ -6963,7 +6954,7 @@ function Bind() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 2 turns.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -6985,7 +6976,7 @@ function BlastBurn() {
     this.cat = "special";
     this.bp = 180;
     this.cost = 3;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
     };
@@ -7001,8 +6992,6 @@ function BlazeKick() {
     this.cost = 2;
     this.crit = false;
     this.effect = function (move, pA, pD) {
-        if (weather != undefined && weather.name === "Sun")
-            applyEffect("burn", 1, pD);
         var c = 0;
         c += Math.max(0, pA.statchanges.attack);
         c += Math.max(0, pA.statchanges.spattack);
@@ -7010,6 +6999,10 @@ function BlazeKick() {
             this.crit = true;
         else
             this.crit = false;
+    };
+    this.postEffect = function (move, pA, pD) {
+        if (weather != undefined && weather.name === "Sun")
+            applyEffect("burn", 1, pD);
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target in the sun. Always results in a critical hit if the user's attack or special attack have been raised at least twice in total.";
     this.priority = function (pA, pD) { return 2 * (weather != undefined && weather.name === "Sun") + 2 * (pA.statchanges.attack + pA.statchanges.spattack >= 2); }
@@ -7021,7 +7014,7 @@ function Blizzard() {
     this.cat = "special";
     this.bp = 130;
     this.cost = 3;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target in the hail.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Hail"); }
 }
@@ -7043,7 +7036,7 @@ function BodySlam() {
     this.cat = "physical";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (pA.statchanges.speed > 0) applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.statchanges.speed > 0) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if the user's speed has been raised.";
     this.priority = function (pA, pD) { return 3 * (pA.statchanges.speed > 0); }
 }
@@ -7103,7 +7096,7 @@ function BreakingSwipe() {
     this.cat = "physical";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { boostStat(pD, "attack", -1); };
+    this.postEffect = function (move, pA, pD) { boostStat(pD, "attack", -1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Lowers target's attack by 1 stage.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -7447,8 +7440,10 @@ function CrossPoison() {
     this.crit = false;
     this.effect = function (move, pA, pD) {
         this.crit = isPoisoned(pD);
-        applyEffect("poison", 6 * isPoisoned(pD), pD);
     };
+    this.postEffect = function (move, pA, pD) {
+        applyEffect("poison", 6 * isPoisoned(pD), pD);
+    }
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and applies 6 stacks of poison to the target if it is poisoned.";
     this.priority = function (pA, pD) { return 3 * (isPoisoned(pD)); }
 }
@@ -7648,13 +7643,14 @@ function Discharge() {
     this.bp = 0;
     this.cost = 0;
     this.fails = false;
+    this.doPost = false;
     this.effect = function (move, pA, pD) {
-        if (energy >= 3)
-            applyEffect("paralysis", 1, pD);
+        this.doPost = (energy >= 3);
         this.fails = energy == 0;
         this.bp = 50 * energy;
         energy = 0;
     };
+    this.postEffect = function (move, pA, pD) { if (this.doPost) applyEffect("paralysis", 1, pD); }
     this.description = "Deals 50 base power damage per energy point left to the opponent. Consumes all energy left. Applies 1 stack of paralysis to the target is at least 3 energy has been used.";
     this.priority = function (pA, pD) { return 3 * (energy >= 3); }
 }
@@ -7757,7 +7753,7 @@ function DragonBreath() {
     this.cat = "special";
     this.bp = 30;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var c = 0;
         for (let m of pA.moves) {
             c += (m.type === "dragon")
@@ -7840,8 +7836,8 @@ function DragonRush() {
     this.cat = "physical";
     this.bp = 85;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
-        if (pA.discard.findIndex(e => e.type === "dragon") >= 0)
+    this.postEffect = function (move, pA, pD) {
+        if (pA.discard.findIndex(e => e.type === "dragon") >= 1)
             applyEffect("fear", 1, pD);
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the opponent if the user's discard pile contains at least 1 dragon move.";
@@ -7854,7 +7850,7 @@ function DragonTail() {
     this.cat = "physical";
     this.bp = 45;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var i = pA.discard.findIndex(e => e.type === "dragon");
         if (i >= 0) {
             pA.hand.push(pA.discard[i]);
@@ -7966,10 +7962,12 @@ function DynamicPunch() {
     this.effect = function (move, pA, pD) {
         if (pA.currenthp >= pD.currenthp) {
             this.fails = false;
-            applyEffect("confusion", 1, pD);
         } else
             this.fails = true;
     };
+    this.postEffect = function (move, pA, pD) {
+        if (!this.fails) applyEffect("confusion", 1, pD);
+    }
     this.description = "Deals " + this.bp + " base power damage to the opponent and applies 1 stack of confusion to it. Fails unless user's HP is higher than target's HP.";
     this.priority = function (pA, pD) { return -10 + 13 * (pA.currenthp >= pD.currenthp); }
 }
@@ -8075,7 +8073,7 @@ function Eternabeam() {
     this.cat = "special";
     this.bp = 210;
     this.cost = 3;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
     };
@@ -8173,12 +8171,16 @@ function FakeOut() {
     this.fails = false;
     this.effect = function (move, pA, pD) {
         if (energy + this.cost >= 5) {
-            applyEffect("fear", 1, pD);
             this.fails = false;
         } else
             this.fails = true;
     };
-    this.postEffect = function (move, pA, pD) { if (!this.fails) drawMove(pA, false); };
+    this.postEffect = function (move, pA, pD) {
+        if (!this.fails) {
+            drawMove(pA, false);
+            applyEffect("fear", 1, pD);
+        }
+    };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target. Draw a card. Fails if energy is below 5 upon use.";
     this.priority = function (pA, pD) { return -10 + 18 * (energy + this.cost >= 5); }
 }
@@ -8237,7 +8239,7 @@ function FireBlast() {
     this.cat = "special";
     this.bp = 130;
     this.cost = 3;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sun") applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sun") applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target under the sun.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sun"); }
 }
@@ -8248,7 +8250,7 @@ function FireFang() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         if (weather != undefined && weather.name === "Sun") applyEffect("burn", 1, pD);
         if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD);
     };
@@ -8262,7 +8264,7 @@ function FirePunch() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (isBurned(pD)) applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (isBurned(pD)) applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target if it's burned already.";
     this.priority = function (pA, pD) { return 3 * isBurned(pD); }
 }
@@ -8273,7 +8275,7 @@ function FireSpin() {
     this.cat = "special";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 2 turns.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -8364,7 +8366,7 @@ function FlipTurn() {
     this.cat = "physical";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         switchesLeft = 1;
         removeEffect(pA, "Trap");
         removeEffect(pA, "Trap Damage");
@@ -8443,7 +8445,9 @@ function ForcePalm() {
     this.cat = "physical";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (pD.currenthp < .3 * pD.maxhp) applyEffect("paralysis", 1, pD); };
+    this.doPost = false;
+    this.effect = function (move, pA, pD) { this.doPost = (pD.currenthp < .3 * pD.maxhp) };
+    this.postEffect = function (move, pA, pD) { if (this.doPost) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if its HP is below 30%.";
     this.priority = function (pA, pD) { return 3 * (pD.currenthp < .3 * pD.maxhp); }
 }
@@ -8476,7 +8480,7 @@ function FrenzyPlant() {
     this.cat = "special";
     this.bp = 180;
     this.cost = 3;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
     };
@@ -8502,7 +8506,7 @@ function FuryCutter() {
     this.cat = "physical";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         this.bp += 20;
         this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
     };
@@ -8565,7 +8569,7 @@ function GigaImpact() {
     this.cat = "physical";
     this.bp = 350;
     this.cost = 5;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
@@ -8705,7 +8709,7 @@ function Headbutt() {
     this.cat = "physical";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's attack has been raised.";
     this.priority = function (pA, pD) { return 3 * (pA.statchanges.attack > 0); }
 }
@@ -8892,7 +8896,7 @@ function Hurricane() {
     this.cat = "special";
     this.bp = 130;
     this.cost = 3;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("confusion", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("confusion", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target in the rain.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Rain"); }
 }
@@ -8903,7 +8907,7 @@ function HydroCannon() {
     this.cat = "special";
     this.bp = 180;
     this.cost = 3;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
     };
@@ -8994,7 +8998,7 @@ function IceBeam() {
     this.cat = "special";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target in the hail.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Hail"); }
 }
@@ -9005,7 +9009,7 @@ function IceFang() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         if (weather != undefined && weather.name === "Hail") applyEffect("freeze", 1, pD);
         if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD);
     };
@@ -9019,7 +9023,7 @@ function IcePunch() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (isFrozen(pD)) applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (isFrozen(pD)) applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of freeze to the target if it's frozen already.";
     this.priority = function (pA, pD) { return 3 * isFrozen(pD); }
 }
@@ -9042,7 +9046,7 @@ function IcicleCrash() {
     this.cat = "physical";
     this.bp = 85;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Hail") applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target in the hail.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Hail"); }
 }
@@ -9069,10 +9073,10 @@ function Inferno() {
     this.effect = function (move, pA, pD) {
         if (weather != undefined && weather.name === "Sun") {
             this.fails = false;
-            applyEffect("burn", 2, pD);
         } else
             this.fails = true;
     };
+    this.postEffect = function (move, pA, pD) { if (!this.fails) applyEffect("burn", 2, pD); }
     this.description = "Deals " + this.bp + " base power damage to the opponent and applies 2 stacks of burn. Fails if not under the sun.";
     this.priority = function (pA, pD) { return -10 + 13 * (weather != undefined && weather.name === "Sun"); }
 }
@@ -9095,7 +9099,7 @@ function Infestation() {
     this.cat = "special";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 2 turns.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -9131,7 +9135,7 @@ function IronHead() {
     this.cat = "physical";
     this.bp = 85;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (pA.statchanges.defense > 0) applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.statchanges.defense > 0) applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's defense has been raised.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pA.currenthp / pA.maxhp)) + 10 * doesBlock(pD); }
 }
@@ -9207,7 +9211,7 @@ function LavaPlume() {
     this.cat = "special";
     this.bp = 90;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (!isBurned(pD)) applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (!isBurned(pD)) applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target if it's not burned already.";
     this.priority = function (pA, pD) { return 3 * !isBurned(pD); }
 }
@@ -9254,8 +9258,8 @@ function LeechSeed() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { applyEffect("leech_seed", 5, pD); };
-    this.description = "Drains a little HP from the opponent at the end of every turn for 5 turns. Grass type Pokémon are immune.";
+    this.effect = function (move, pA, pD) { applyEffect("leech_seed", 10, pD); };
+    this.description = "Drains a little HP from the opponent at the end of every turn for 10 turns. Grass type Pokémon are immune.";
     this.priority = function (pA, pD) { return -1 - 10 * contains(pD.types, "grass") + 3 * (pD.effects.findIndex(e => e.name === "Leech Seed") == -1); }
 }
 
@@ -9289,7 +9293,7 @@ function Lick() {
     this.bp = 20;
     this.cost = 0;
     this.exhaust = true;
-    this.effect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target. Exhaust.";
     this.priority = function (pA, pD) { return 1; }
 }
@@ -9345,7 +9349,7 @@ function MagmaStorm() {
     this.cat = "special";
     this.bp = 100;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 1, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("trap_damage", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 1 turn.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -9636,7 +9640,7 @@ function Nuzzle() {
     this.cat = "physical";
     this.bp = 20;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the opponent.";
     this.priority = function (pA, pD) { return 1; }
 }
@@ -9667,7 +9671,7 @@ function OriginPulse() {
     this.cat = "special";
     this.bp = 100;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Rain") setWeather("rain", 3); };
+    this.postEffect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Rain") setWeather("rain", 3); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Sets the weather to rain for 3 turns if not in the rain.";
     this.priority = function (pA, pD) { return 4 * (weather == undefined || weather.name !== "Rain"); }
 }
@@ -9721,7 +9725,7 @@ function PayDay() {
     this.bp = 25;
     this.cost = 1;
     this.exhaust = true;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         if (player) {
             money += 25;
             earnedMoney += 25;
@@ -9775,7 +9779,7 @@ function PlasmaFists() {
     this.cat = "physical";
     this.bp = 95;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         for (let m of pD.draw) {
             if (m.type === "normal") {
                 m.type = "electric";
@@ -9923,7 +9927,7 @@ function PrecipiceBlades() {
     this.cat = "physical";
     this.bp = 100;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Sun") setWeather("sun", 3); };
+    this.postEffect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Sun") setWeather("sun", 3); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Sets the weather to sun for 3 turns if not in the sun.";
     this.priority = function (pA, pD) { return 4 * (weather == undefined || weather.name !== "Sun"); }
 }
@@ -9945,7 +9949,7 @@ function Psybeam() {
     this.cat = "special";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (pA.draw.length >= 5) applyEffect("confusion", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.draw.length >= 5) applyEffect("confusion", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target if the user's draw pile contains at least 5 cards.";
     this.priority = function (pA, pD) { return 3 * (pA.draw.length >= 5); }
 }
@@ -10054,7 +10058,7 @@ function RapidSpin() {
     this.cat = "physical";
     this.bp = 20;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var t = team
         if (!player)
             t = [opponent]
@@ -10174,7 +10178,7 @@ function RockSlide() {
     this.cat = "physical";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sandstorm") applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Sandstorm") applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target in the sandstorm.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sandstorm"); }
 }
@@ -10209,7 +10213,7 @@ function Rollout() {
     this.bp = 40;
     this.cost = 1;
     this.exhaust = true;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         this.bp += 20;
         this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
     };
@@ -10245,7 +10249,7 @@ function SandTomb() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("trap_damage", 2, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals residual damage at the end of each turn for 2 turns.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -10267,7 +10271,7 @@ function Scald() {
     this.cat = "special";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (effectiveMultiplier(this, pD) >= 1) applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (effectiveMultiplier(this, pD) >= 1) applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target if this attack deals normal or super effective damage.";
     this.priority = function (pA, pD) { return 3 * (effectiveMultiplier(this, pD) >= 1); }
 }
@@ -10306,7 +10310,7 @@ function ScorchingSands() {
     this.cat = "special";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("burn", 1, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("burn", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -10339,7 +10343,7 @@ function SeedBomb() {
     this.cat = "physical";
     this.bp = 120;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         applyEffect("ingrain", 1, pD);
         applyEffect("trap", 1, pD);
         applyEffect("grounded", 1, pD);
@@ -10459,7 +10463,7 @@ function SignalBeam() {
     this.cat = "special";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var c = 0;
         for (let m of pA.draw) {
             c += m.type === "bug";
@@ -10574,7 +10578,7 @@ function Sludge() {
     this.cat = "special";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var i = pD.effects.findIndex(e => e.name === "Poison");
         if (i == -1 || pD.effects[i].stacks <= 0)
             applyEffect("poison", 4, pD);
@@ -10589,7 +10593,7 @@ function SludgeBomb() {
     this.cat = "special";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         var i = pD.effects.findIndex(e => e.name === "Poison");
         if (i != -1 && pD.effects[i].stacks > 0)
             applyEffect("poison", 6, pD);
@@ -10615,7 +10619,7 @@ function Smog() {
     this.cat = "special";
     this.bp = 20;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("poison", 4, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("poison", 4, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 4 stacks of poison to the target.";
     this.priority = function (pA, pD) { return 1; }
 }
@@ -10705,7 +10709,7 @@ function SmackDown() {
     this.cat = "physical";
     this.bp = 45;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { applyEffect("grounded", 1, pD); };
+    this.postEffect = function (move, pA, pD) { applyEffect("grounded", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Grounds target.";
     this.priority = function (pA, pD) { return 0; }
 }
@@ -10716,7 +10720,7 @@ function Spark() {
     this.cat = "physical";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (pA.hand.length >= 5) applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.hand.length >= 5) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis if the user's hand contains 5 or more cards.";
     this.priority = function (pA, pD) { return 3 * (pA.hand.length >= 5); }
 }
@@ -10808,7 +10812,7 @@ function SteelWing() {
     this.cat = "physical";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (pA.statchanges.defense <= 0) boostStat(pA, "defense", 1); };
+    this.postEffect = function (move, pA, pD) { if (pA.statchanges.defense <= 0) boostStat(pA, "defense", 1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Raises user's defense by 1 stage if it hasn't been raised already.";
     this.priority = function (pA, pD) { return 3 * (pA.statchanges.defense <= 0); }
 }
@@ -11120,7 +11124,7 @@ function Thunder() {
     this.cat = "special";
     this.bp = 130;
     this.cost = 3;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target in the rain.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Rain"); }
 }
@@ -11131,7 +11135,7 @@ function Thunderbolt() {
     this.cat = "special";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (energy == 1) applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (energy == 3 - this.cost) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if user's energy is 3 upon use.";
     this.priority = function (pA, pD) { return 3 * (energy == 3); }
 }
@@ -11142,7 +11146,7 @@ function ThunderFang() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         if (weather != undefined && weather.name === "Rain") applyEffect("paralysis", 1, pD);
         if (pA.statchanges.attack > 0) applyEffect("fear", 1, pD);
     };
@@ -11156,7 +11160,7 @@ function ThunderPunch() {
     this.cat = "physical";
     this.bp = 35;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of paralysis to the target if it's already paralyzed.";
     this.priority = function (pA, pD) { return 3 * isParalyzed(pD); }
 }
@@ -11239,7 +11243,7 @@ function TriAttack() {
     this.cat = "special";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         if (weather != undefined) {
             if (weather.name === "Rain") applyEffect("paralysis", 1, pD);
             if (weather.name === "Sun") applyEffect("burn", 1, pD);
@@ -11297,7 +11301,7 @@ function UTurn() {
     this.cat = "physical";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         switchesLeft = 1;
         removeEffect(pA, "Trap");
         removeEffect(pA, "Trap Damage");
@@ -11387,7 +11391,7 @@ function VoltSwitch() {
     this.cat = "special";
     this.bp = 70;
     this.cost = 2;
-    this.effect = function (move, pA, pD) {
+    this.postEffect = function (move, pA, pD) {
         switchesLeft = 1;
         removeEffect(pA, "Trap");
         removeEffect(pA, "Trap Damage");
@@ -11403,7 +11407,7 @@ function VoltTackle() {
     this.bp = 120;
     this.cost = 2;
     this.recoil = .33;
-    this.effect = function (move, pA, pD) { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (isParalyzed(pD)) applyEffect("paralysis", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. 33% recoil. Applies 1 stack of paralysis to the target if it's paralyzed already.";
     this.priority = function (pA, pD) { return 3 * isParalyzed(pD); }
 }
@@ -11414,7 +11418,7 @@ function Waterfall() {
     this.cat = "physical";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if it is raining.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Rain"); }
 }
@@ -11436,7 +11440,7 @@ function WaterPulse() {
     this.cat = "special";
     this.bp = 40;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("confusion", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") applyEffect("confusion", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of confusion to the target in the rain.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Rain"); }
 }
@@ -11598,11 +11602,11 @@ function ZapCannon() {
     this.fails = false;
     this.effect = function (move, pA, pD) {
         if (isParalyzed(pD)) {
-            applyEffect("paralysis", 2, pD);
             this.fails = false;
         } else
             this.fails = true;
     };
+    this.postEffect = function (move, pA, pD) { if (!this.fails) applyEffect("paralysis", 2, pD); }
     this.description = "Deals " + this.bp + " base power damage to the opponent and applies 2 stacks of paralysis to it. Fails unless target is paralyzed.";
     this.priority = function (pA, pD) { return -10 + 13 * isParalyzed(pD); }
 }
@@ -11613,7 +11617,7 @@ function ZenHeadbutt() {
     this.cat = "physical";
     this.bp = 80;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (pA.draw.length >= 5) applyEffect("fear", 1, pD); };
+    this.postEffect = function (move, pA, pD) { if (pA.draw.length >= 5) applyEffect("fear", 1, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target if the user's draw pile contains at least 5 cards.";
     this.priority = function (pA, pD) { return 3 * (pA.draw.length >= 5); }
 }
@@ -11816,7 +11820,7 @@ function CurseE(stacks) {
 
 function Disguise(stacks) {
     this.name = "Disguise";
-    this.description = "Disguise\nCancel next attack targetting this Pokémon.";
+    this.description = "Disguise\nPrevents next ennemy attack from affecting this this Pokémon. Only broken by damaging moves.";
     this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
@@ -11884,7 +11888,7 @@ function IngrainE(stacks) {
 
 function KingsProtection(stacks) {
     this.name = "King's Protection";
-    this.description = "King's Protection\nCancel next attack targetting this Pokémon. Attackers making contact have their attack lowered by one stage.";
+    this.description = "King's Protection\nPrevents next ennemy attack from affecting this this Pokémon. Attackers making contact have their attack lowered by one stage.";
     this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
@@ -11929,7 +11933,7 @@ function Poison(stacks) {
 
 function Protection(stacks) {
     this.name = "Protection";
-    this.description = "Protection\nCancel next attack targetting this Pokémon.";
+    this.description = "Protection\nPrevents next ennemy attack from affecting this this Pokémon.";
     this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/shield.webp';
     this.stacks = stacks;
     this.block = true;
@@ -11941,13 +11945,13 @@ function Protection(stacks) {
 
 function Seed(stacks) {
     this.name = "Leech Seed";
-    this.description = "Leech Seed\nTransfer 15HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
+    this.description = "Leech Seed\nTransfer 20HP to the opposing Pokémon at the end of the turn, then remove 1 stack.";
     this.icon = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/effect_icons/seed.png';
     this.stacks = stacks;
     this.immune = ["grass"];
     this.effect = (pA, pD) => {
-        dealDamage(15, pA);
-        dealDamage(-15, pD);
+        dealDamage(20, pA);
+        dealDamage(-20, pD);
         this.stacks--;
     }
 }
@@ -13758,7 +13762,7 @@ function LumBerry() {
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
-        if (isAsleep(pA) || isBurned(pA) || isPoisoned(pA) || isParalyzed(pA) || isFrozen(pA) || isConfused(pA)) {
+        if (!this.consumed && (isAsleep(pA) || isBurned(pA) || isPoisoned(pA) || isParalyzed(pA) || isFrozen(pA) || isConfused(pA))) {
             this.consumed = true;
             removeEffect(pA, "Sleep");
             removeEffect(pA, "Burn");
@@ -14664,8 +14668,8 @@ function checkGameOver() {
         return false;
 }
 
-function createEvent(event) {
-    event = event != undefined ? event : Math.floor(Math.random() * 13);
+function createEvent(eventS) {
+    event = eventS != undefined ? eventS : Math.floor(Math.random() * 13);
     switch (event) {
         case 0:
             return new Event0();
@@ -15429,7 +15433,6 @@ function Event10() {
                 battleEncounter(Math.random() < 1 / 3 ? "fire" : (Math.random() < .5 ? "water" : "electric"));
         },
         description: fire < 0 && water < 0 && electric < 0 ? "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, a wild Pokémon you scared attacks you!." : "You enter the tower and start climbing the stairs inside. Once you reach the top, you see nothing but an empty, dusty space. You couldn't find the bell you were hearing earlier. As you were about to leave, you notice a silver feather on the ground. You're certain it wasn't there before.",
-        subdescription: (p2 === winner) ? undefined : "Your Pokémon have lost some of their memories."
     })
     var kommoo = team.findIndex(e => e.name === "Kommo-o");
     if (kommoo >= 0) {
