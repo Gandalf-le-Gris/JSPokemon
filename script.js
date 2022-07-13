@@ -12276,8 +12276,9 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "pecha_berry", "persim_berry", "mental_herb", "white_herb", "wide_lens", "scope_lens", "damp_rock", "heat_rock", "icy_rock", "smooth_rock", "bottle_cap", "gold_bottle_cap", "tm_xx", "shed_shell", "enigma_berry", "iron_ball", "quick_claw", "kings_rock",
     "destiny_knot", "revive", "pearl", "potion", "amulet_coin", "odd_keystone", "aspear_berry", "shell_bell", "everstone", "lum_berry", "moomoo_milk", "sacred_ash", "bug_gem", "dark_gem", "grass_gem", "fire_gem", "water_gem", "ice_gem", "flying_gem", "normal_gem",
     "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale", "water_stone", "fire_stone", "thunder_stone", "leaf_stone", "ice_stone", "dawn_stone", "dusk_stone",
-    "moon_stone", "sun_stone", "shiny_stone", "reaper_cloth", "electirizer", "magmarizer", "dubious_disc", "upgrade", "razor_claw", "razor_fang", "protective_pads", "protector", "prism_scale", "heart_scale", "oval_stone", "expert_belt"];
-specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb", "red_orb", "blue_orb", "soul_dew"];
+    "moon_stone", "sun_stone", "shiny_stone", "reaper_cloth", "electirizer", "magmarizer", "dubious_disc", "upgrade", "razor_claw", "razor_fang", "protective_pads", "protector", "prism_scale", "heart_scale", "oval_stone", "expert_belt", "red_orb", "blue_orb",
+    "soul_dew"];
+specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
     switch (item) {
@@ -13181,6 +13182,7 @@ function AspearBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/aspear_berry.webp';
     this.area = "ice";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Freeze"); };
 }
 
@@ -13190,6 +13192,7 @@ function CheriBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/cheri_berry.webp';
     this.area = "electric";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Paralysis"); };
 }
 
@@ -13199,6 +13202,7 @@ function ChestoBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/chesto_berry.webp';
     this.area = "normal";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Sleep"); };
 }
 
@@ -13208,6 +13212,7 @@ function MentalHerb() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/mental_herb.webp';
     this.area = "dark";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => {
         if (isTaunted(pA)) {
             removeEffect(pA, "Taunt");
@@ -13241,6 +13246,7 @@ function PechaBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/pecha_berry.webp';
     this.area = "poison";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Poison"); };
 }
 
@@ -13250,6 +13256,7 @@ function PersimBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/persim_berry.webp';
     this.area = "psychic";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Confusion"); };
 }
 
@@ -13259,6 +13266,7 @@ function RawstBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rawst_berry.webp';
     this.area = "fire";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => { removeEffect(pA, "Burn"); };
 }
 
@@ -13768,6 +13776,7 @@ function LumBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/lum_berry.webp';
     this.area = "";
     this.revenge = true;
+    this.effectR = (move, pA, pD) => { }
     this.effectRA = (move, pA, pD) => {
         if (!this.consumed && (isAsleep(pA) || isBurned(pA) || isPoisoned(pA) || isParalyzed(pA) || isFrozen(pA) || isConfused(pA))) {
             this.consumed = true;
@@ -14219,7 +14228,7 @@ function OvalStone() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/oval_stone.webp';
     this.area = "";
     this.init = true;
-    this.effect = (p) => { p.currenthp = Math.min(p.maxhp, Math.floor(p.currenthp + .05 * p.maxhp)); }
+    this.effect = (p) => { if (p.currenthp > 0) p.currenthp = Math.min(p.maxhp, Math.floor(p.currenthp + .05 * p.maxhp)); }
 }
 
 function DubiousDisc() {
