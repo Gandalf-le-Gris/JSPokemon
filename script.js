@@ -2337,6 +2337,7 @@ function useMove(move) {
         }
         discardCard(move);
 
+        //postEffects
         if (!cancelled && move.postEffect != undefined) {
             if (player && (move.cat === "status" || effectiveMultiplier(move, opponent) > 0) && team[activePokemon].currenthp > 0)
                 move.postEffect(move, team[activePokemon], target);
@@ -2344,6 +2345,12 @@ function useMove(move) {
                 move.postEffect(move, opponent, target);
         }
 
+        //status immunities
+        for (let i of target.items)
+            if (i.effectRA != undefined)
+                i.effectRA(move, target, target === opponent ? team[activePokemon] : opponent);
+
+        //block effects
         if (player && doesBlock(opponent) && pDummy != undefined) {
             var i = opponent.effects.findIndex(e => e.block != undefined);
             opponent.effects[i].bEffect(move, opponent, team[activePokemon]);
@@ -13174,7 +13181,7 @@ function AspearBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/aspear_berry.webp';
     this.area = "ice";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Freeze"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Freeze"); };
 }
 
 function CheriBerry() {
@@ -13183,7 +13190,7 @@ function CheriBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/cheri_berry.webp';
     this.area = "electric";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Paralysis"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Paralysis"); };
 }
 
 function ChestoBerry() {
@@ -13192,7 +13199,7 @@ function ChestoBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/chesto_berry.webp';
     this.area = "normal";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Sleep"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Sleep"); };
 }
 
 function MentalHerb() {
@@ -13201,7 +13208,7 @@ function MentalHerb() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/mental_herb.webp';
     this.area = "dark";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => {
+    this.effectRA = (move, pA, pD) => {
         if (isTaunted(pA)) {
             removeEffect(pA, "Taunt");
             boostStat(pA, "attack", 1);
@@ -13234,7 +13241,7 @@ function PechaBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/pecha_berry.webp';
     this.area = "poison";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Poison"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Poison"); };
 }
 
 function PersimBerry() {
@@ -13243,7 +13250,7 @@ function PersimBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/persim_berry.webp';
     this.area = "psychic";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Confusion"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Confusion"); };
 }
 
 function RawstBerry() {
@@ -13252,7 +13259,7 @@ function RawstBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/rawst_berry.webp';
     this.area = "fire";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => { removeEffect(pA, "Burn"); };
+    this.effectRA = (move, pA, pD) => { removeEffect(pA, "Burn"); };
 }
 
 function ShedShell() {
@@ -13548,18 +13555,18 @@ function OddKeystone() {
     this.boost = true;
     this.effect = (move, p) => {
         this.energy += 1 + contains(p.types, move.type) + (move.cat === "status");
-        if (this.energy >= 65) {
+        if (this.energy >= 55) {
             dealDamage(108, contains(team, p) ? opponent : team[activePokemon]);
-            this.energy -= 65;
+            this.energy -= 55;
         }
         return 1;
     }
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
         this.energy += 2 * move != undefined;
-        if (this.energy >= 65) {
+        if (this.energy >= 55) {
             dealDamage(108, pD);
-            this.energy -= 65;
+            this.energy -= 55;
         }
     }
 }
@@ -13761,7 +13768,7 @@ function LumBerry() {
     this.img = 'https://api.allorigins.win/raw?url=https://raw.githubusercontent.com/Gandalf-le-Gris/JSPokemon/main/resources/sprites/held_items/lum_berry.webp';
     this.area = "";
     this.revenge = true;
-    this.effectR = (move, pA, pD) => {
+    this.effectRA = (move, pA, pD) => {
         if (!this.consumed && (isAsleep(pA) || isBurned(pA) || isPoisoned(pA) || isParalyzed(pA) || isFrozen(pA) || isConfused(pA))) {
             this.consumed = true;
             removeEffect(pA, "Sleep");
