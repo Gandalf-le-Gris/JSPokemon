@@ -48,7 +48,10 @@ button.start:hover {
 
 .selector-title {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto min-content;
+    padding-left: 3vw;
+    padding-right: 3vw;
+    background: rgba(0, 0, 0, .6);
 }
 
 .title {
@@ -83,6 +86,7 @@ button.start:hover {
     text-align: right;
     background-color: transparent;
     border: none;
+    width: fit-content;
 }
 
 .selector-count-start {
@@ -92,12 +96,25 @@ button.start:hover {
     text-align: right;
     background-color: transparent;
     border: none;
+    animation: zoom-animation 1.2s ease infinite;
+    -webkit-animation: zoom-animation 1.2s ease infinite;
+    width: fit-content;
 }
 
 .team-selector-screen {
     position: absolute;
-    top: 50%;
     left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-rows: 10vh 90vh;
+    max-height: 100vh;
+    width: 100%;
+}
+
+.path-selector-screen {
+    position: absolute;
+    left: 50%;
+    top: 50%;
     transform: translate(-50%, -50%);
     display: grid;
     grid-row-gap: 5vh;
@@ -107,10 +124,13 @@ button.start:hover {
 .team-selector {
     height: 100%;
     width: 100%;
+    padding-top: 5vh;
+    padding-bottom: 3vh;
     display: grid;
-    grid-gap: 3vh 1vw;
+    grid-gap: 7vh 1vw;
     grid-template-columns: 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw;
     grid-template-rows: 18vh 18vh 18vh 18vh;
+    overflow-y: auto;
 }
 
 .team-selector-element {
@@ -123,7 +143,7 @@ button.start:hover {
     grid-gap: 0px 0px;
     column-count: 1;
     text-align: center;
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .selected-cell {
@@ -136,7 +156,7 @@ button.start:hover {
     grid-gap: 0px 0px;
     column-count: 1;
     text-align: center;
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .not-unlocked {
@@ -145,6 +165,7 @@ button.start:hover {
 
 .team-selector-element:hover, .selected-cell:hover {
     color: goldenrod;
+    transform: scale(1.1);
 }
 
 .pixel-sprite {
@@ -157,6 +178,7 @@ button.start:hover {
     height: 15vh;
     justify-self: center;
     display: block;
+    transform: translateY(-2vh);
 }
 
 .random-selector-pixel-sprite {
@@ -544,11 +566,12 @@ button.start:hover {
 .replay {
     background: rgba(0, 0, 0, .6);
     border-radius: 1.5vh;
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .replay:hover {
     color: goldenrod;
+    transform: scale(1.1);
 }
 
 .filter {
@@ -577,11 +600,12 @@ button.start:hover {
     grid-auto-flow: column;
     grid-column-gap: .5vw;
     border-radius: 1vh;
-    transition: background .2s;
+    transition: background .2s, transform .2s;
 }
 
 .reward:hover {
-    background: black;
+    background: rgba(0, 0, 0, .5);
+    transform: scale(1.1);
 }
 
 .reward-sprite {
@@ -731,11 +755,12 @@ button.start:hover {
     grid-auto-flow: column;
     grid-column-gap: .5vw;
     justify-self: center;
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .remove-button:hover {
     color: goldenrod;
+    transform: scale(1.1);
 }
 
 .remove-text {
@@ -752,6 +777,7 @@ button.start:hover {
     margin-top: 10vh;
     left: 50%;
     transform: translate(-50%, 0%);
+    padding-bottom: 5vh;
 }
 
 button.launch-tuto {
@@ -856,13 +882,14 @@ button.launch-tuto:hover {
 }
 
 .starting-menu-option {
-    transition: filter .2s;
+    transition: filter .2s, transform .2s;
     width: 100%;
     height: 8vh;
 }
 
     .starting-menu-option:hover {
         filter: invert(.6);
+        transform: scale(1.1);
     }
 
 .fade-dark1 {
@@ -993,11 +1020,12 @@ button.launch-tuto:hover {
 }
 
 .pokedex-option {
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .pokedex-option:hover {
     color: darkgoldenrod;
+    transform: scale(1.1);
 }
 
 .pokedex-main-grid {
@@ -1030,8 +1058,9 @@ button.launch-tuto:hover {
     color: #ffffff;
     font-family: 'Copperplate Gothic';
     text-align: center;
-    overflow-y: auto;
+    overflow: hidden;
     justify-content: center;
+    padding-bottom: 5vh;
 }
 
 .pokedex-sprite-displayer {
@@ -1069,6 +1098,14 @@ button.launch-tuto:hover {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+.hover-zoom {
+    transition: transform .2s;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.1);
 }
 
 
@@ -1357,6 +1394,34 @@ input:checked + .slider:before {
 
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes zoom-animation {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1.1, 1.1);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@-webkit-keyframes zoom-animation {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1.1, 1.1);
+    }
+
+    100% {
+        transform: scale(1, 1);
     }
 }
 
