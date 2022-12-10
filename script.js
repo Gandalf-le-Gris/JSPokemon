@@ -1882,7 +1882,7 @@ function colorHeader(p) {
     var c2 = p.types.length > 1 ? typeColors[types.findIndex(e => e === p.types[1])] : c1;
     header.style.background = c1;
     if (c2 !== c1)
-        header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 40%, " + c2 + " 60%, " + c2 + " 100%)";
+        header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 43%, " + c2 + " 57%, " + c2 + " 100%)";
 }
 
 function drawEffects(side) {
@@ -2153,6 +2153,8 @@ function copyPokemon(poke) {
         p.init = poke.init.bind(p);
     if (poke.boost != undefined)
         p.boost = poke.boost.bind(p);
+    if (poke.preEffect != undefined)
+        p.preEffect = poke.preEffect.bind(p);
     if (poke.revenge != undefined)
         p.revenge = poke.revenge.bind(p);
     if (poke.endTurn != undefined)
@@ -2568,9 +2570,47 @@ function moveAnimation(move, damage, target) {
     if (move != undefined && move.cat !== "status" && damage > 0) {
         if (player) {
             document.getElementById('rightSprite').classList.add("blink");
+            if (move.cat === "physical")
+                document.getElementById('pLeftView').classList.add("attacker-left");
+            else {
+                var oldProjectile = document.getElementById("projectile");
+                if (oldProjectile !== null)
+                    document.body.removeChild(oldProjectile);
+                var projectile = document.createElement('div');
+                projectile.id = "projectile";
+                projectile.className = "projectile left-projectile";
+                var color = "#fff";
+                if (contains(types, move.type))
+                    color = typeColors[types.findIndex(e => e === move.type)];
+                projectile.style.background = "radial-gradient(" + color + " 0, " + color + " 40%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0) 100%)";
+                var x = document.getElementById("pLeftView").offsetLeft + document.getElementById("pLeftView").clientWidth;
+                var y = document.getElementById("pLeftView").offsetTop + document.getElementById("pLeftView").clientHeight / 2;
+                projectile.style.left = x + "px";
+                projectile.style.top = y + "px";
+                document.body.appendChild(projectile);
+            }
             setTimeout(endMoveAnimation, 600);
         } else {
             document.getElementById('leftSprite').classList.add("blink");
+            if (move.cat === "physical")
+                document.getElementById('pRightView').classList.add("attacker-right");
+            else {
+                var oldProjectile = document.getElementById("projectile");
+                if (oldProjectile !== null)
+                    document.body.removeChild(oldProjectile);
+                var projectile = document.createElement('div');
+                projectile.id = "projectile";
+                projectile.className = "projectile right-projectile";
+                var color = "#fff";
+                if (contains(types, move.type))
+                    color = typeColors[types.findIndex(e => e === move.type)];
+                projectile.style.background = "radial-gradient(" + color + " 0, " + color + " 40%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0) 100%)";
+                var x = document.getElementById("pRightView").offsetLeft;
+                var y = document.getElementById("pRightView").offsetTop + document.getElementById("pRightView").clientHeight / 2;
+                projectile.style.left = x + "px";
+                projectile.style.top = y + "px";
+                document.body.appendChild(projectile);
+            }
             setTimeout(endMoveAnimation, 600);
         }
     }
@@ -2617,6 +2657,11 @@ function moveAnimation(move, damage, target) {
 function endMoveAnimation() {
     document.getElementById('rightSprite').classList.remove("blink");
     document.getElementById('leftSprite').classList.remove("blink");
+    document.getElementById('pRightView').classList.remove("attacker-right");
+    document.getElementById('pLeftView').classList.remove("attacker-left");
+    var projectile = document.getElementById("projectile");
+    if (projectile !== null)
+        document.body.removeChild(projectile);
 }
 
 function discardCard(move) {
@@ -6719,7 +6764,7 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "drill_run", "megahorn", "poison_sting", "poison_tail", "cotton_guard", "cotton_spore", "fairy_wind", "stun_spore", "grass_whistle", "frost_breath",
     "freeze_dry", "dragon_breath", "incinerate", "psyshock", "round", "sparkling_aria", "belch", "knock_off", "dragon_darts", "psychic_fangs", "aura_wheel",
     "swift", "tailwind", "supersonic", "aqua_cutter", "fissure", "rock_wrecker", "core_enforcer", "lands_wrath", "thousand_arrows", "thousand_waves",
-    "glacial_lance", "astral_barrage", "jungle_healing", "steam_eruption", "spectral_thief", "take_down"];
+    "glacial_lance", "astral_barrage", "jungle_healing", "steam_eruption", "spectral_thief", "take_down", "power_trip"];
 
 function createMove(move) {
     switch (move) {
@@ -7211,6 +7256,8 @@ function createMove(move) {
             return new Pound();
         case "power_gem":
             return new PowerGem();
+        case "power_trip":
+            return new PowerTrip();
         case "power_up_punch":
             return new PowerUpPunch();
         case "power_whip":
@@ -11133,6 +11180,25 @@ function PowerGem() {
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sandstorm"); }
 }
 
+function PowerTrip() {
+    this.name = "Power Trip";
+    this.type = "dark";
+    this.cat = "physical";
+    this.bp = 0;
+    this.cost = 2;
+    this.effect = function (move, pA, pD) {
+        var c = 0;
+        c += Math.max(0, pA.statchanges.attack);
+        c += Math.max(0, pA.statchanges.defense);
+        c += Math.max(0, pA.statchanges.spattack);
+        c += Math.max(0, pA.statchanges.spdefense);
+        c += Math.max(0, pA.statchanges.speed);
+        this.bp = 20 * (c + 1);
+    };
+    this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of positive stat changes on the user.";
+    this.priority = function (pA, pD) { return -2 + (Math.max(0, pA.statchanges.attack) + Math.max(0, pA.statchanges.defense) + Math.max(0, pA.statchanges.spattack) + Math.max(0, pA.statchanges.spdefense) + Math.max(0, pA.statchanges.speed)); }
+}
+
 function PowerUpPunch() {
     this.name = "Power-Up Punch";
     this.type = "fighting";
@@ -13790,7 +13856,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale", "water_stone", "fire_stone", "thunder_stone", "leaf_stone", "ice_stone", "dawn_stone", "dusk_stone",
     "moon_stone", "sun_stone", "shiny_stone", "reaper_cloth", "electirizer", "magmarizer", "dubious_disc", "upgrade", "razor_claw", "razor_fang", "protective_pads", "protector", "prism_scale", "heart_scale", "oval_stone", "expert_belt", "red_orb", "blue_orb",
     "soul_dew", "loaded_dice", "zygarde_core", "auspicious_armor", "malicious_armor", "booster_energy", "punching_glove", "safety_goggles", "throat_spray", "starf_berry", "rowap_berry", "jaboca_berry", "oran_berry", "metronome", "mirror_herb", "leppa_berry",
-    "heavy_duty_boots", "binding_band", "adrenaline_orb", "tera_orb", "rotom_phone"];
+    "heavy_duty_boots", "binding_band", "adrenaline_orb", "tera_orb", "rotom_phone", "adamant_mint", "jolly_mint", "timid_mint", "modest_mint"];
 specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
@@ -14107,6 +14173,14 @@ function createHeldItem(item) {
             return new TeraOrb();
         case "rotom_phone":
             return new RotomPhone();
+        case "modest_mint":
+            return new ModestMint();
+        case "timid_mint":
+            return new TimidMint();
+        case "adamant_mint":
+            return new AdamantMint();
+        case "jolly_mint":
+            return new JollyMint();
         default:
             alert("Unkown item: " + item);
             return new AmuletCoin();

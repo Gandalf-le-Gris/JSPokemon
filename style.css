@@ -101,6 +101,12 @@ button.start:hover {
     width: fit-content;
 }
 
+    .selector-count-start:hover {
+        transform: scale(1.3);
+        animation: none;
+        -webkit-animation: none;
+    }
+
 .team-selector-screen {
     position: absolute;
     left: 50%;
@@ -380,6 +386,10 @@ button.start:hover {
     text-align: center;
 }
 
+.stacker {
+    display: grid;
+}
+
 .stack {
     grid-area: 1 / 1 / 2 / 2;
     width: 100%;
@@ -490,24 +500,27 @@ button.start:hover {
     font-family: 'Copperplate Gothic';
     color: black;
     font-size: 1.2vw;
+    padding-top: .8vh;
+    padding-left: 1.5vh;
 }
 
 .switch-header {
     display: grid;
     align-items: center;
-    grid-auto-flow: column;
+    grid-template-columns: 5vw auto;
     height: 12vh;
-    transition: color .2s;
+    transition: color .2s, transform .2s;
 }
 
 .switch-header:hover {
     color: white;
+    transform: scale(1.1);
 }
 
 .switch-pokemon {
-    max-height: 100%;
-    max-width: 100%;
-    margin-left: auto;
+    max-height: 10.8vh;
+    max-width: 90%;
+    margin: auto;
     display: block;
 }
 
@@ -826,8 +839,8 @@ button.launch-tuto:hover {
 }
 
 .blink {
-    animation: blink-animation .2s steps(5, start) infinite;
-    -webkit-animation: blink-animation .2s steps(5, start) infinite;
+    animation: blink-animation .2s ease infinite;
+    -webkit-animation: blink-animation .2s ease infinite;
 }
 
 .blink-transform1 {
@@ -848,6 +861,33 @@ button.launch-tuto:hover {
 .unblink-transform2 {
     animation: fadeDark .3s;
     -webkit-animation: fadeDark .3s;
+}
+
+.attacker-left {
+    animation: attacker-left-animation .6s ease forwards;
+    -webkit-animation: attacker-left-animation .6s ease forwards;
+}
+
+.attacker-right {
+    animation: attacker-right-animation .6s ease forwards;
+    -webkit-animation: attacker-right-animation .6s ease forwards;
+}
+
+.projectile {
+    width: 8vh;
+    height: 8vh;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.left-projectile {
+    animation: projectile-left-animation .6s ease forwards;
+    -webkit-animation: projectile-left-animation .6s ease forwards;
+}
+
+.right-projectile {
+    animation: projectile-right-animation .6s ease forwards;
+    -webkit-animation: projectile-right-animation .6s ease forwards;
 }
 
 .damage-indicator {
@@ -1403,7 +1443,7 @@ input:checked + .slider:before {
     }
 
     50% {
-        transform: scale(1.1, 1.1);
+        transform: scale(1.2, 1.2);
     }
 
     100% {
@@ -1417,11 +1457,175 @@ input:checked + .slider:before {
     }
 
     50% {
-        transform: scale(1.1, 1.1);
+        transform: scale(1.2, 1.2);
     }
 
     100% {
         transform: scale(1, 1);
+    }
+}
+
+@keyframes attacker-left-animation {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(5vw, -2vh);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@-webkit-keyframes attacker-left-animation {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(5vw, -2vh);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes attacker-right-animation {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-5vw, 2vh);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@-webkit-keyframes attacker-right-animation {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-5vw, 2vh);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes projectile-left-animation {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(40vw, -10vh) scale(1.2);
+        opacity: 1;
+    }
+
+    90% {
+        transform: translate(40vw, -10vh) scale(2.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(40vw, -10vh) scale(2.5);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes projectile-left-animation {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(40vw, -10vh) scale(1.2);
+        opacity: 1;
+    }
+
+    90% {
+        transform: translate(40vw, -10vh) scale(2.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(40vw, -10vh) scale(2.5);
+        opacity: 0;
+    }
+}
+
+@keyframes projectile-right-animation {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-40vw, 10vh) scale(1.2);
+        opacity: 1;
+    }
+
+    90% {
+        transform: translate(-40vw, 10vh) scale(2.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-40vw, 10vh) scale(2.5);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes projectile-right-animation {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-40vw, 10vh) scale(1.2);
+        opacity: 1;
+    }
+
+    90% {
+        transform: translate(-40vw, 10vh) scale(2.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-40vw, 10vh) scale(2.5);
+        opacity: 0;
     }
 }
 
