@@ -93,6 +93,9 @@ function loadResources() {
         imgs.push("resources/sprites/map_icons/" + t + ".png");
         imgs.push("resources/sprites/move_icons/types/" + t + ".webp");
     }
+    for (let m of modifiersList) {
+        imgs.push(createModifier(m).icon);
+    }
 
     imgs.push("resources/sprites/map_icons/boss.png");
     imgs.push("resources/sprites/map_icons/special.png");
@@ -173,6 +176,7 @@ function loadResources() {
     imgs.push("resources/sprites/ui_icons/settings.webp");
     imgs.push("resources/sprites/ui_icons/pokeball.webp");
     imgs.push("resources/sprites/ui_icons/back.webp");
+    imgs.push("resources/sprites/ui_icons/refresh.webp");
 
     sounds.push("resources/sounds/musics/battle.mp3");
     sounds.push("resources/sounds/musics/boss.mp3");
