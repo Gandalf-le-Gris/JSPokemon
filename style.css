@@ -11,6 +11,7 @@ html, body {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+    cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
 }
 
 canvas {
@@ -44,6 +45,7 @@ button.start {
 button.start:hover {
     font-size: 10.3vw;
     color: goldenrod;
+    cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
 }
 
 .selector-title {
@@ -105,6 +107,7 @@ button.start:hover {
         transform: scale(1.3);
         animation: none;
         -webkit-animation: none;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     }
 
 .team-selector-screen {
@@ -112,7 +115,7 @@ button.start:hover {
     left: 50%;
     transform: translateX(-50%);
     display: grid;
-    grid-template-rows: 10vh 90vh;
+    grid-template-rows: 10vh 82vh 8vh;
     max-height: 100vh;
     width: 100%;
 }
@@ -172,6 +175,7 @@ button.start:hover {
 .team-selector-element:hover, .selected-cell:hover {
     color: goldenrod;
     transform: scale(1.1);
+    cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
 }
 
 .pixel-sprite {
@@ -192,6 +196,49 @@ button.start:hover {
     height: 10vh;
     justify-self: center;
     display: block;
+}
+
+.selector-footer {
+    display: grid;
+    grid-template-columns: min-content auto min-content min-content;
+    grid-column-gap: 2vw;
+    padding-left: 3vw;
+    padding-right: 3vw;
+    background: rgba(0, 0, 0, .6);
+    color: white;
+    font-family: 'Copperplate Gothic';
+    font-size: 2vh;
+    line-height: 8vh;
+    text-align: left;
+}
+
+.modifiers-grid {
+    display: grid;
+    grid-template-columns: 8vh 8vh 8vh;
+    grid-column-gap: 1vw;
+    padding-right: 5vw;
+}
+
+.modifier-icon {
+    margin: auto;
+    max-width: 80%;
+    max-height: 80%;
+    transition: transform .2s;
+}
+
+.modifier-icon-div {
+    display: flex;
+    width: 8vh;
+    height: 8vh;
+}
+
+.modifier-icon:hover {
+    transform: scale(1.1);
+}
+
+.refresh:hover {
+    transform: scale(1.15);
+    cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
 }
 
 .encounter-selector {
@@ -437,9 +484,10 @@ button.start:hover {
     padding: 3%;
 }
 
-.move-card:hover, .selected-move:hover {
-    background-color: grey;
-}
+    .move-card:hover, .selected-move:hover {
+        background-color: grey;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .move-top, .move-bottom {
     display: grid;
@@ -488,6 +536,7 @@ button.start:hover {
         color: #dd0000;
         background-color: #ffd0d0;
         font-size: 3.1vh;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     }
 
 .switch-headers {
@@ -512,10 +561,11 @@ button.start:hover {
     transition: color .2s, transform .2s;
 }
 
-.switch-header:hover {
-    color: white;
-    transform: scale(1.1);
-}
+    .switch-header:hover {
+        color: white;
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .switch-pokemon {
     max-height: 10.8vh;
@@ -551,6 +601,10 @@ button.start:hover {
     animation-fill-mode: forwards;
 }
 
+.consumed-item {
+    filter: grayscale();
+}
+
 .environment-section {
     display: grid;
     grid-auto-flow: row;
@@ -562,6 +616,10 @@ button.start:hover {
     position: absolute;
     right: 0;
     bottom: 12vh;
+    padding: 1vh;
+    padding-left: 1vh;
+    border-top-left-radius: 1.5vh;
+    border-bottom-left-radius: 1.5vh;
 }
 
 .gameover-grid {
@@ -582,10 +640,11 @@ button.start:hover {
     transition: color .2s, transform .2s;
 }
 
-.replay:hover {
-    color: goldenrod;
-    transform: scale(1.1);
-}
+    .replay:hover {
+        color: goldenrod;
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .filter {
     position: absolute;
@@ -616,16 +675,18 @@ button.start:hover {
     transition: background .2s, transform .2s;
 }
 
-.reward:hover {
-    background: rgba(0, 0, 0, .5);
-    transform: scale(1.1);
-}
+    .reward:hover {
+        background: rgba(0, 0, 0, .5);
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .reward-sprite {
     max-height: 10vh;
     width: auto;
     vertical-align: middle;
     text-align: center;
+    margin: auto;
 }
 
 .descriptor {
@@ -652,6 +713,8 @@ button.start:hover {
     vertical-align: middle;
     border-radius: 1vh;
     padding: 3%;
+    margin: auto;
+    min-height: 10vh;
 }
 
 .descriptor-name {
@@ -771,10 +834,11 @@ button.start:hover {
     transition: color .2s, transform .2s;
 }
 
-.remove-button:hover {
-    color: goldenrod;
-    transform: scale(1.1);
-}
+    .remove-button:hover {
+        color: goldenrod;
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .remove-text {
     font-size: 1.5vw;
@@ -809,11 +873,12 @@ button.launch-tuto {
     transition: font-size .2s, color .2s, -webkit-text-stroke-color .2s;
 }
 
-button.launch-tuto:hover {
-    font-size: 2.1vw;
-    color: goldenrod;
-    -webkit-text-stroke-color: black;
-}
+    button.launch-tuto:hover {
+        font-size: 2.1vw;
+        color: goldenrod;
+        -webkit-text-stroke-color: black;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .overlay-text {
     background: rgba(0, 0, 0, .65);
@@ -930,6 +995,7 @@ button.launch-tuto:hover {
     .starting-menu-option:hover {
         filter: invert(.6);
         transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     }
 
 .fade-dark1 {
@@ -1001,9 +1067,10 @@ button.launch-tuto:hover {
     transition: color .2s;
 }
 
-.settings-option:hover {
-    color: darkgoldenrod;
-}
+    .settings-option:hover {
+        color: darkgoldenrod;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .dual-column-grid {
     max-width: 40vw;
@@ -1043,9 +1110,10 @@ button.launch-tuto:hover {
     transition: color .2s;
 }
 
-.event-option:hover {
-    color: darkgoldenrod;
-}
+    .event-option:hover {
+        color: darkgoldenrod;
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .event-option-grid {
     display: grid;
@@ -1063,10 +1131,11 @@ button.launch-tuto:hover {
     transition: color .2s, transform .2s;
 }
 
-.pokedex-option:hover {
-    color: darkgoldenrod;
-    transform: scale(1.1);
-}
+    .pokedex-option:hover {
+        color: darkgoldenrod;
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .pokedex-main-grid {
     width: 100%;
@@ -1144,9 +1213,10 @@ button.launch-tuto:hover {
     transition: transform .2s;
 }
 
-.hover-zoom:hover {
-    transform: scale(1.1);
-}
+    .hover-zoom:hover {
+        transform: scale(1.1);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 
 
@@ -1171,7 +1241,7 @@ button.launch-tuto:hover {
 /* The slider */
 .slider {
     position: absolute;
-    cursor: pointer;
+    cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     top: 0;
     left: 0;
     right: 0;
@@ -1251,7 +1321,7 @@ input:checked + .slider:before {
         height: 1.6vw; /* Slider handle height */
         border-radius: 50%;
         background: darkgoldenrod; /* Green background */
-        cursor: pointer; /* Cursor on hover */
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default; /* Cursor on hover */
     }
 
 
@@ -1317,9 +1387,10 @@ input:checked + .slider:before {
     height: 8vh;
 }
 
-.top-left:hover {
-    transform: scale(1.2, 1.2);
-}
+    .top-left:hover {
+        transform: scale(1.2, 1.2);
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
 
 .top-right {
     position: absolute;

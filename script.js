@@ -860,6 +860,82 @@ function drawTeamSelection() {
 
     teamSelectorScreen.appendChild(teamSelector);
 
+    gameModifierBar = document.createElement('div');
+    gameModifierBar.className = "selector-footer";
+    teamSelectorScreen.appendChild(gameModifierBar);
+
+    var modifiersSwitch = document.createElement('label');
+    modifiersSwitch.className = "switch";
+    modifiersSwitch.style.margin = "auto";
+    gameModifierBar.appendChild(modifiersSwitch);
+    var modifiersSwitchInput = document.createElement('input');
+    modifiersSwitchInput.type = "checkbox";
+    modifiersSwitchInput.checked = false;
+    modifiersSwitch.appendChild(modifiersSwitchInput);
+    var modifiersSwitchSlider = document.createElement('span');
+    modifiersSwitchSlider.className = "slider round";
+    modifiersSwitch.appendChild(modifiersSwitchSlider);
+
+    var modifiersText = document.createElement('div');
+    modifiersText.innerHTML = "Modifiers disabled";
+    gameModifierBar.appendChild(modifiersText);
+
+    var modifiersDisplay = document.createElement('div');
+    modifiersDisplay.className = "modifiers-grid";
+    modifiersDisplay.style.visibility = "hidden";
+    gameModifierBar.appendChild(modifiersDisplay);
+
+    var modifier1 = document.createElement('img');
+    modifier1.className = "modifier-icon";
+    modifiersDisplay.appendChild(modifier1);
+    var modifier2 = document.createElement('img');
+    modifier2.className = "modifier-icon";
+    modifiersDisplay.appendChild(modifier2);
+    var modifier3 = document.createElement('img');
+    modifier3.className = "modifier-icon";
+    modifiersDisplay.appendChild(modifier3);
+
+    var refreshDiv = document.createElement('div');
+    refreshDiv.className = "modifier-icon-div";
+    gameModifierBar.appendChild(refreshDiv);
+    var refresh = document.createElement('img');
+    refresh.className = "modifier-icon refresh";
+    refresh.style.visibility = "hidden";
+    refresh.src = 'resources/sprites/ui_icons/refresh.webp';
+    refreshDiv.appendChild(refresh);
+    refresh.onclick = () => {
+        modifiers = generateModifiers();
+        modifier1.src = modifiers[0].icon;
+        modifier2.src = modifiers[1].icon;
+        modifier3.src = modifiers[2].icon;
+        modifier1.title = modifiers[0].name + "\n" + modifiers[0].description;
+        modifier2.title = modifiers[1].name + "\n" + modifiers[1].description;
+        modifier3.title = modifiers[2].name + "\n" + modifiers[2].description;
+    }
+
+    modifiers = [];
+
+    modifiersSwitchInput.onclick = () => {
+        if (modifiersSwitchInput.checked) {
+            modifiersText.innerHTML = "Modifiers enabled";
+            modifiers = generateModifiers();
+            modifier1.src = modifiers[0].icon;
+            modifier2.src = modifiers[1].icon;
+            modifier3.src = modifiers[2].icon;
+            modifier1.title = modifiers[0].name + "\n" + modifiers[0].description;
+            modifier2.title = modifiers[1].name + "\n" + modifiers[1].description;
+            modifier3.title = modifiers[2].name + "\n" + modifiers[2].description;
+            modifiersDisplay.style.visibility = "visible";
+            refresh.style.visibility = "visible";
+        } else {
+            modifiersText.innerHTML = "Modifiers disabled";
+            modifiers = [];
+            modifiersDisplay.style.visibility = "hidden";
+            refresh.style.visibility = "hidden";
+        }
+    }
+
+
     if (tuto) {
         var filter = document.createElement('div');
         filter.className = "filter";
@@ -1049,7 +1125,7 @@ function typemultiplier(move, attacker, defender) {
         for (let t of defender.types) {
             n = types.findIndex(e => e === t);
             if (!(move.type === "ground" && t === "flying" && isGrounded(defender)))
-                mul *= typetable[i][n];
+                mul *= typetable[i][n] ** (1 + .5 * modExists("Extreme Typing"));
         }
     }
     if (move.type === "ground" && !isGrounded(defender))
@@ -1112,6 +1188,11 @@ function damageCalculator(move, pA, pD) {
     if (isCharged(pA) && move.type === "electric")
         other *= 2;
 
+    if (modExists("Brutality") && move.cat === "physical")
+        other *= 1.3;
+    else if (modExists("Mastermind") && move.cat === "special")
+        other *= 1.3;
+
     for (let i of pA.items) {
         if (i.boost != undefined)
             other *= i.effect(move, pA);
@@ -1126,7 +1207,7 @@ function effectiveMultiplier(move, pD) {
         for (let t of pD.types) {
             n = types.findIndex(e => e === t);
             if (!(move.type === "ground" && t === "flying" && isGrounded(pD)))
-                mul *= typetable[i][n];
+                mul *= typetable[i][n] ** (1 + .5 * modExists("Extreme Typing"));
         }
     }
     if (move.type === "ground" && !isGrounded(pD))
@@ -1140,7 +1221,9 @@ function launchGame() {
     world = 1;
     area = 1;
     money = 0;
-    removePrice = 300;
+    movePrice = 750 + 450 * modExists("Inflation");
+    itemPrice = 1500 + 750 * modExists("Inflation");
+    removePrice = 300 + 200 * modExists("Inflation");
     extraLoot = 0;
     pokemonCenterChance = 0;
     pokemartChance = 0;
@@ -1185,6 +1268,10 @@ function launchGame() {
             for (let m2 of movesList)
                 if (createMove(m2).name === m.name && !contains(foundMoves, m2))
                     foundMoves.push(m2);
+
+    if (modExists("Undying"))
+        for (let p of team)
+            p.items.push(new RevivalHerb());
 
     mapSelection();
 }
@@ -1696,6 +1783,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     for (let p of team) {
         var itemSubsection = document.createElement('div');
         itemSubsection.className = "held-items-pokemon";
+        itemSubsection.id = "itemSubsection" + team.findIndex(e => e === p);
         itemSection.appendChild(itemSubsection);
 
         var pImage = new Image();
@@ -1711,7 +1799,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
             var pImage = new Image();
             pImage.src = i.img;
             pImage.className = "item-sprite";
-            pImage.title = i.description;
+            pImage.title = i.name + "\n" + i.description;
             wrapper.appendChild(pImage);
         }
     }
@@ -1736,6 +1824,27 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     }
     initDeck(opponent);
     initItems(opponent);
+    drawConsumedItems();
+
+    if (modExists("Rayquaza's Influence"))
+        setWeather("air_lock", 99);
+    if (modExists("Storm Warning")) {
+        switch (Math.floor(Math.random() * 4)) {
+            case 0:
+                setWeather("sun", 99);
+                break;
+            case 1:
+                setWeather("rain", 99);
+                break;
+            case 2:
+                setWeather("hail", 99);
+                break;
+            case 3:
+                setWeather("sandstorm", 99);
+                break;
+            default:
+        }
+    }
 
     startTurn();
 
@@ -1883,6 +1992,28 @@ function colorHeader(p) {
     header.style.background = c1;
     if (c2 !== c1)
         header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 43%, " + c2 + " 57%, " + c2 + " 100%)";
+}
+
+function drawConsumedItems() {
+    let section;
+    for (let i = 0; i < team.length; i++) {
+        let p = team[i];
+        section = document.getElementById("itemSubsection" + i);
+        for (let j = 0; j < p.items.length; j++) {
+            if (p.items[j].consumed)
+                section.children[j + 1].classList.add("consumed-item");
+            else
+                section.children[j + 1].classList.remove("consumed-item");
+        }
+    }
+
+    section = document.getElementById("rightItems");
+    for (let i = 0; i < opponent.items.length; i++) {
+        if (opponent.items[i].consumed)
+            section.children[i].classList.add("consumed-item");
+        else
+            section.children[i].classList.remove("consumed-item");
+    }
 }
 
 function drawEffects(side) {
@@ -2453,11 +2584,15 @@ function useMove(move) {
         }
 
         refreshIconCounts();
+        drawConsumedItems();
     } else
         document.getElementById("movePreview").className = "preview-off";
 }
 
 function dealDamage(damage, p, move, revive) {
+    if (damage < 0 && modExists("No Healing"))
+        return;
+
     if (p.talent === "Wonder guard" && damage > 1)
         damage = 1;
 
@@ -2705,6 +2840,7 @@ function endTurn() {
             turn++;
             maxRound = Math.max(turn, maxRound);
         }
+        drawConsumedItems();
         startTurn();
     }
 }
@@ -2868,7 +3004,7 @@ function createOpponent(encounter, fixedOpponent) {
         opponent.moves.push(createMove(opponent.movepool[Math.floor(Math.random() * opponent.movepool.length)]));
     }
 
-    for (let j = 0; j < Math.floor(world * Math.random() * 1.5) + (encounter === "boss") + 1; j++) {
+    for (let j = 0; j < Math.floor(world * Math.random() * (1.5 + modExists("Item Frenzy"))) + (encounter === "boss") + modExists("Item Frenzy") + 1; j++) {
         var i = heldItems[Math.floor(Math.random() * heldItems.length)];
         var item = createHeldItem(i);
         var areaPool = Math.random() < .3;
@@ -2877,8 +3013,13 @@ function createOpponent(encounter, fixedOpponent) {
             i = heldItems[Math.floor(Math.random() * heldItems.length)];
             item = createHeldItem(i);
         }
+        if (modExists("Berries Only"))
+            while (!item.name.includes("Berry"))
+                item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
         opponent.items.push(item);
     }
+    if (modExists("Undying") && encounter === "boss")
+        opponent.items.push(new RevivalHerb());
     return opponent;
 }
 
@@ -3058,7 +3199,7 @@ function rewardScreen() {
                 maxDeckSize = Math.max(maxDeckSize, team[this.p].moves.length);
                 if (music)
                     playMusic('resources/sounds/sfx/button_click.mp3', false);
-                if (Math.random() < extraLoot || tuto || encounterType === "boss") {
+                if (Math.random() < extraLoot * (1 + 2 * modExists("Item Frenzy")) + .3 * modExists("Item Frenzy") || tuto || encounterType === "boss") {
                     extraLoot = 0;
                     extraReward();
                 } else {
@@ -3078,7 +3219,7 @@ function rewardScreen() {
         earnedMoney += 100;
         if (music)
             playMusic('resources/sounds/sfx/button_click.mp3', false);
-        if (Math.random() < extraLoot || tuto || encounterType === "boss") {
+        if (Math.random() < extraLoot * (1 + 2 * modExists("Item Frenzy")) + .3 * modExists("Item Frenzy") || tuto || encounterType === "boss") {
             extraLoot = 0;
             extraReward();
         } else {
@@ -3133,6 +3274,9 @@ function extraReward() {
 
             var itemN = getFromItemPool(i == ind ? encounterType : undefined);
             var item = createHeldItem(itemN);
+            if (modExists("Berries Only"))
+                while (!item.name.includes("Berry"))
+                    item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -3303,6 +3447,7 @@ function pokemartEncounter() {
     pokemartChance = 0;
     eventChance += .07;
 
+
     clearBody();
     fadeInTransition();
     gArea = new gameArea('resources/teamscreen.webp', () => { });
@@ -3311,6 +3456,12 @@ function pokemartEncounter() {
     ambientMusic = "resources/sounds/musics/pokemart.mp3";
     if (music)
         playMusic(ambientMusic, true);
+
+    if (modExists("Inflation")) {
+        for (let p of team) {
+            p.currenthp = Math.min(p.maxhp, Math.floor(p.currenthp + .15 * p.maxhp));
+        }
+    }
 
     var moneyT = document.createElement('div');
     moneyT.className = "money-text";
@@ -3454,6 +3605,9 @@ function pokemartEncounter() {
             var t = Math.random() < .3 ? types[Math.floor(Math.random() * types.length)] : undefined;
             var itemN = getFromItemPool(t);
             var item = createHeldItem(itemN);
+            if (modExists("Berries Only"))
+                while (!item.name.includes("Berry"))
+                    item = createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]);
             var sprite1 = new Image();
             sprite1.src = item.img;
             sprite1.className = "reward-sprite";
@@ -3613,7 +3767,7 @@ function drawRemoveCard() {
                             playMusic('resources/sounds/sfx/button_click.mp3', false);
                         hideCardRemove();
                         money -= removePrice;
-                        removePrice += 150;
+                        removePrice += 150 + 100 * modExists("Inflation");
                         document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
                         document.getElementById('removePriceTag').innerHTML = String.fromCharCode(08381) + removePrice;
                     }
@@ -18229,4 +18383,116 @@ function drawPokedexItems() {
     var prog = Math.floor(foundItems.length / max * 1000) / 10;
     progress.innerHTML = prog + "%";
     filter.appendChild(progress);
+}
+
+
+
+
+
+/* ----------------------------------------------------- */
+/* --------------------- Modifiers --------------------- */
+/* ----------------------------------------------------- */
+
+modifiersList = ["item_frenzy", "rayquazas_influence", "no_healing", "extreme_typing", "berries_only", "storm_warning", "brutality", "mastermind", "inflation", "undying"];
+
+function generateModifiers() {
+    let mods = [];
+    while (mods.length < 3) {
+        let mod = modifiersList[Math.floor(Math.random() * modifiersList.length)];
+        if (!contains(mods, mod))
+            mods.push(mod);
+    }
+    return [createModifier(mods[0]), createModifier(mods[1]), createModifier(mods[2])];
+}
+
+function createModifier(mod) {
+    switch (mod) {
+        case "item_frenzy":
+            return new ItemFrenzy();
+        case "rayquazas_influence":
+            return new RayquazasInfluence();
+        case "no_healing":
+            return new NoHealing();
+        case "extreme_typing":
+            return new ExtremeTyping();
+        case "berries_only":
+            return new BerriesOnly();
+        case "storm_warning":
+            return new StormWarning();
+        case "brutality":
+            return new Brutality();
+        case "mastermind":
+            return new Mastermind();
+        case "inflation":
+            return new Inflation();
+        case "undying":
+            return new Undying();
+        default:
+            alert("Unknown modifier: " + mod);
+            return new RayquazasInfluence();
+    }
+}
+
+function modExists(mod) {
+    return modifiers.findIndex(e => e.name === mod) >= 0;
+}
+
+function ItemFrenzy() {
+    this.name = "Item Frenzy";
+    this.icon = "resources/sprites/mods_icons/item_frenzy.webp";
+    this.description = "Held items are much more frequent, but ennemies also carry more of them.";
+}
+
+function RayquazasInfluence() {
+    this.name = "Rayquaza's Influence";
+    this.icon = "resources/sprites/mods_icons/rayquazas_influence.webp";
+    this.description = "The weather cannot be changed by any means.";
+}
+
+function NoHealing() {
+    this.name = "No Healing";
+    this.icon = "resources/sprites/mods_icons/no_healing.webp";
+    this.description = "Healing in battle is prohibited.";
+}
+
+function ExtremeTyping() {
+    this.name = "Extreme Typing";
+    this.icon = "resources/sprites/mods_icons/extreme_typing.webp";
+    this.description = "Super effective moves deal even more damage; not very effective moves deal even less damage.";
+}
+
+function BerriesOnly() {
+    this.name = "Berries Only";
+    this.icon = "resources/sprites/mods_icons/berries_only.webp";
+    this.description = "All items from battles and from the shop are berries.";
+}
+
+function StormWarning() {
+    this.name = "Storm Warning";
+    this.icon = "resources/sprites/mods_icons/storm_warning.webp";
+    this.description = "Summons a random weather at the beginning of each battle.";
+}
+
+function Brutality() {
+    this.name = "Brutality";
+    this.icon = "resources/sprites/mods_icons/brutality.webp";
+    this.description = "Increases the base power of all physical moves.";
+}
+
+function Mastermind() {
+    this.name = "Mastermind";
+    this.icon = "resources/sprites/mods_icons/mastermind.webp";
+    this.description = "Increases the base power of all special moves.";
+}
+
+function Inflation() {
+    this.name = "Inflation";
+    this.icon = "resources/sprites/mods_icons/inflation.webp";
+    this.description = "Increases the prices in shops, but visiting a shop slighlty heals the party.";
+}
+
+function Undying() {
+    this.name = "Undying";
+    this.icon = "resources/sprites/mods_icons/undying.webp";
+    this.description = "The entire party begins with revival herbs, but bosses can revive as well.";
 }
