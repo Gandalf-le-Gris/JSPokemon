@@ -1633,7 +1633,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         var pImage = new Image();
         pImage.src = i.img;
         pImage.className = "item-sprite-pokemon-displayer";
-        pImage.title = i.description;
+        pImage.title = i.name + "\n" + i.description;
         wrapper.appendChild(pImage);
     }
     pRightView.title = opponent.name + "\nTypes: ";
