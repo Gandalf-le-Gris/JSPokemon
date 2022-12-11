@@ -13208,7 +13208,8 @@ function Cursed() {
 function isSoundBased(move) {
     return move.name.includes("Voice") || move.name.includes("Buzz") || move.name.includes("Chatter") || move.name.includes("Grass Whistle") || move.name.includes("Growl")
         || move.name.includes("Heal Bell") || move.name.includes("Sound") || move.name.includes("Song") || move.name.includes("Roar") || move.name.includes("Round")
-        || move.name.includes("Screech") || move.name.includes("Sing") || move.name.includes("Snarl") || move.name.includes("Snore") || move.name.includes("Supersonic");
+        || move.name.includes("Screech") || move.name.includes("Sing") || move.name.includes("Snarl") || move.name.includes("Snore") || move.name.includes("Supersonic")
+        || move.name.includes("Clanging Scales");
 }
 
 function isSlicing(move) {
@@ -16046,7 +16047,7 @@ function ExpertBelt() {
 
 function LoadedDice() {
     this.name = "Loaded Dice";
-    this.description = "Holder super effective attacks deal 15% extra damage.";
+    this.description = "Holder multi-hitting attacks hit one more time.";
     this.img = 'resources/sprites/held_items/loaded_dice.webp';
     this.area = "";
     this.effect = (move, p) => { }
