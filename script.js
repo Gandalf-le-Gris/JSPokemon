@@ -724,7 +724,7 @@ function saveProgress() {
     if (berriesFound < 8) {
         berriesFound = 0;
         for (let i of foundItems) {
-            if (i.includes(berry))
+            if (i.includes("berry"))
                 berriesFound++;
         }
     }
@@ -1775,6 +1775,15 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     switchHP2.max = team[switchInd[1]].maxhp;
     switchHeader2.appendChild(switchHP2);
 
+    if (team[switchInd[0]].currenthp == 0)
+        document.getElementById("switch1").classList.add("gray");
+    else
+        document.getElementById("switch1").classList.remove("gray");
+    if (team[switchInd[1]].currenthp == 0)
+        document.getElementById("switch2").classList.add("gray");
+    else
+        document.getElementById("switch2").classList.remove("gray");
+
     movePreview = document.createElement('div');
     movePreview.className = "preview-off";
     movePreview.id = "movePreview";
@@ -2217,6 +2226,11 @@ function switchPokemon(ind) {
             colorHeader(pS);
             document.getElementById("leftSprite").classList.remove("blink-transform2");
             document.getElementById("leftSprite").className += " unblink-transform2";
+
+            if (pS.currenthp == 0)
+                document.getElementById("switch" + n).classList.add("gray");
+            else
+                document.getElementById("switch" + n).classList.remove("gray");
         }, 300);
         setTimeout(() => {
             document.getElementById("leftSprite").classList.remove("unblink-transform2");
@@ -2523,7 +2537,7 @@ function useMove(move) {
         if (!cancelled && ((player && (!doesBlock(opponent) || pDummy == undefined)) || (!player && (!doesBlock(team[activePokemon]) || pDummy == undefined)))) {
             var effMul = effectiveMultiplier(move, player ? opponent : team[activePokemon]);
             if (move.cat !== "status") {
-                if (move.crit && effMul > 0 && pD.talent !== "Shell Armor") {
+                if ((move.crit || isFocused(player ? team[activePokemon] : opponent)) && effMul > 0 && pD.talent !== "Shell Armor") {
                     desc.innerHTML += "It's a critical hit!<br />";
                     if (pD === opponent)
                         criticalHits++;
@@ -8067,17 +8081,28 @@ function BatonPass() {
     this.bp = 0;
     this.cost = 1;
     this.exhaust = true;
+    this.fails = false;
     this.effect = function (move, pA, pD) {
-        switchesLeft += 1;
-        removeEffect(pA, "Trap");
-        removeEffect(pA, "Trap Damage");
-        if (player) {
-            team[switchInd[0]].statchanges = JSON.parse(JSON.stringify(pA.statchanges));
-            switchPokemon(0);
+        if (team[switchInd[0]].currenthp > 0 || team[switchInd[1]].currenthp > 0) {
+            this.fails = false;
+            switchesLeft += 1;
+            removeEffect(pA, "Trap");
+            removeEffect(pA, "Trap Damage");
+            if (player) {
+                if (team[switchInd[0]].currenthp > 0) {
+                    team[switchInd[0]].statchanges = JSON.parse(JSON.stringify(pA.statchanges));
+                    switchPokemon(0);
+                } else {
+                    team[switchInd[1]].statchanges = JSON.parse(JSON.stringify(pA.statchanges));
+                    switchPokemon(1);
+                }
+            }
+            pA.statchanges = new StatChanges();
+            drawStats(player);
+            drawEffects(player);
+        } else {
+            this.fails = true;
         }
-        pA.statchanges = new StatChanges();
-        drawStats(player);
-        drawEffects(player);
     };
     this.description = "User shoves off all trapping effects, switches places with the first other party member and transfers all of its stats changes. Resets user's stats changes in the process. Exhaust.";
     this.priority = function (pA, pD) { return -10 + 11 * isTrapped(pA); }
@@ -13386,7 +13411,7 @@ function isSlicing(move) {
 
 effectList = ["burn", "charge", "confined", "confusion", "curse", "disguise", "extra_draw", "fear", "freeze", "grounded", "immunity", "ingrain", "kings_protection",
     "leech_seed", "levitation", "paralysis", "poison", "protection", "sleep", "slow_start", "spikes", "stealth_rock", "sticky_web", "taunt", "thick_fat",
-    "toxic_spikes", "trap", "trap_damage", "type_changed", "wish"];
+    "toxic_spikes", "trap", "trap_damage", "type_changed", "wish", "cells", "focus_energy"];
 
 function applyEffect(type, stacks, p, extra) {
     var effect = createEffect(type, stacks, extra);
@@ -13435,6 +13460,8 @@ function createEffect(type, stacks, extra) {
             return new ExtraDraw(stacks);
         case "fear":
             return new Fear(stacks);
+        case "focus_energy":
+            return new FocusEnergy(stacks);
         case "freeze":
             return new Freeze(stacks);
         case "grounded":
@@ -13579,6 +13606,14 @@ function Fear(stacks) {
     this.stacks = stacks;
     this.cancel = true;
     this.specialMessage = " has flinched!<br/>"
+    this.effect = (pA, pD) => { this.stacks--; };
+}
+
+function FocusEnergy(stacks) {
+    this.name = "Focus Energy";
+    this.description = "Focus Energy\nAll attacks result in critical hits.";
+    this.icon = 'resources/sprites/effect_icons/focus_energy.webp';
+    this.stacks = stacks;
     this.effect = (pA, pD) => { this.stacks--; };
 }
 
@@ -13892,6 +13927,11 @@ function isRooted(p) {
     return i >= 0 && p.effects[i].stacks > 0;
 }
 
+function isFocused(p) {
+    var i = p.effects.findIndex(e => e.name === "Focus Energy");
+    return i >= 0 && p.effects[i].stacks > 0;
+}
+
 
 
 
@@ -14015,7 +14055,7 @@ heldItems = ["black_belt", "black_glasses", "charcoal", "dragon_fang", "hard_sto
     "dragon_gem", "electric_gem", "steel_gem", "fairy_gem", "psychic_gem", "poison_gem", "fighting_gem", "rock_gem", "ground_gem", "ghost_gem", "dragon_scale", "water_stone", "fire_stone", "thunder_stone", "leaf_stone", "ice_stone", "dawn_stone", "dusk_stone",
     "moon_stone", "sun_stone", "shiny_stone", "reaper_cloth", "electirizer", "magmarizer", "dubious_disc", "upgrade", "razor_claw", "razor_fang", "protective_pads", "protector", "prism_scale", "heart_scale", "oval_stone", "expert_belt", "red_orb", "blue_orb",
     "soul_dew", "loaded_dice", "zygarde_core", "auspicious_armor", "malicious_armor", "booster_energy", "punching_glove", "safety_goggles", "throat_spray", "starf_berry", "rowap_berry", "jaboca_berry", "oran_berry", "metronome", "mirror_herb", "leppa_berry",
-    "heavy_duty_boots", "binding_band", "adrenaline_orb", "tera_orb", "rotom_phone", "adamant_mint", "jolly_mint", "timid_mint", "modest_mint"];
+    "heavy_duty_boots", "binding_band", "adrenaline_orb", "tera_orb", "rotom_phone", "adamant_mint", "jolly_mint", "timid_mint", "modest_mint", "apicot_berry", "ganlon_berry", "liechi_berry", "petaya_berry", "salac_berry", "lansat_berry"];
 specialItems = ["tm-1", "aguav_berry", "adamant_orb", "lustrous_orb", "griseous_orb", "red_chain", "rainbow_wing", "silver_wing", "gs_ball", "revival_herb"];
 
 function createHeldItem(item) {
@@ -14340,6 +14380,18 @@ function createHeldItem(item) {
             return new AdamantMint();
         case "jolly_mint":
             return new JollyMint();
+        case "apicot_berry":
+            return new ApicotBerry();
+        case "ganlon_berry":
+            return new GanlonBerry();
+        case "liechi_berry":
+            return new LiechiBerry();
+        case "petaya_berry":
+            return new PetayaBerry();
+        case "salac_berry":
+            return new SalacBerry();
+        case "lansat_berry":
+            return new LansatBerry();
         default:
             alert("Unkown item: " + item);
             return new AmuletCoin();
@@ -16193,7 +16245,7 @@ function SoulDew() {
 
 function ExpertBelt() {
     this.name = "Expert Belt";
-    this.description = "Holder super effective attacks deal 15% extra damage.";
+    this.description = "Holder's super effective attacks deal 15% extra damage.";
     this.img = 'resources/sprites/held_items/expert_belt.webp';
     this.area = "";
     this.boost = true;
@@ -16514,6 +16566,120 @@ function RotomPhone() {
     this.effect = (move, p) => {
         return 1 + .05 * p.items.length;
     };
+}
+
+function ApicotBerry() {
+    this.name = "Apicot Berry";
+    this.description = "Raises special defense by 2 stages the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/apicot_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            boostStat(pA, "spdefense", 2);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function GanlonBerry() {
+    this.name = "Ganlon Berry";
+    this.description = "Raises defense by 2 stages the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/ganlon_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            boostStat(pA, "defense", 2);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function LiechiBerry() {
+    this.name = "Liechi Berry";
+    this.description = "Raises attack by 2 stages the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/liechi_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            boostStat(pA, "attack", 2);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function PetayaBerry() {
+    this.name = "Petaya Berry";
+    this.description = "Raises special attack by 2 stages the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/petaya_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            boostStat(pA, "spattack", 2);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function SalacBerry() {
+    this.name = "Salac Berry";
+    this.description = "Raises speed by 2 stages the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/salac_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            boostStat(pA, "speed", 2);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
+}
+
+function LansatBerry() {
+    this.name = "Lansat Berry";
+    this.description = "Next attacks will be critical hits the first time an attack brings the holder below 50% of maximum HP.";
+    this.img = 'resources/sprites/held_items/lansat_berry.webp';
+    this.area = "";
+    this.revenge = true;
+    this.effectR = (move, pA, pD) => {
+        if (pA.currenthp < .5 * pA.maxhp && !this.consumed) {
+            this.consumed = true;
+            applyEffect("focus_energy", 1, pA);
+        }
+    };
+    this.init = true;
+    this.consumed = false;
+    this.effect = (p) => {
+        this.consumed = false;
+    }
 }
 
 

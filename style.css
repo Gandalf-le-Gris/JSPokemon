@@ -12,6 +12,7 @@ html, body {
     -webkit-user-select: none;
     -ms-user-select: none;
     cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
+    overflow-x: hidden;
 }
 
 canvas {
@@ -91,6 +92,10 @@ button.start:hover {
     width: fit-content;
 }
 
+    .selector-count:hover {
+        cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
+    }
+
 .selector-count-start {
     font-size: 2.5vw;
     color: lawngreen;
@@ -140,6 +145,7 @@ button.start:hover {
     grid-template-columns: 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw 9vw;
     grid-template-rows: 18vh 18vh 18vh 18vh;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .team-selector-element {
@@ -1232,6 +1238,16 @@ button.launch-tuto {
         cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     }
 
+.gray {
+    filter: grayscale();
+}
+
+    .gray:hover {
+        transform: none;
+        color: black;
+        cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
+    }
+
 
 
 /* The switch - the box around the slider */
@@ -1244,6 +1260,10 @@ button.launch-tuto {
     margin-top: auto;
     margin-bottom: auto;
 }
+
+    .switch:hover {
+        cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
+    }
 
 /* Hide default HTML checkbox */
 .switch input {
