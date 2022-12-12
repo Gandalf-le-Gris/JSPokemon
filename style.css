@@ -978,9 +978,8 @@ button.launch-tuto {
     font-family: 'Copperplate Gothic';
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: white;
-    animation: fadeShift 1s;
-    -webkit-animation: fadeShift 1s;
-    animation-fill-mode: forwards;
+    animation: fadeShift 1s linear forwards;
+    -webkit-animation: fadeShift 1s linear forwards;
 }
 
 .damage-particles {
@@ -1741,24 +1740,42 @@ input:checked + .slider:before {
 
 @keyframes fadeShift {
     0% {
+        transform: translateY(0) scale(.5);
+    }
+
+    10% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(-.3vh) scale(1);
+    }
+
+    75% {
+        opacity: 1;
+        transform: translateY(-2.25vh);
     }
 
     100% {
-        opacity: 0.5;
+        opacity: 0;
         transform: translateY(-3vh);
     }
 }
 
 @-webkit-keyframes fadeShift {
     0% {
+        transform: translateY(0) scale(.5);
+    }
+
+    10% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(-.3vh) scale(1);
+    }
+
+    75% {
+        opacity: 1;
+        transform: translateY(-2.25vh);
     }
 
     100% {
-        opacity: 0.5;
+        opacity: 0;
         transform: translateY(-3vh);
     }
 }
