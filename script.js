@@ -1277,6 +1277,17 @@ function launchGame() {
         for (let p of team)
             p.items.push(new RevivalHerb());
 
+    if (modExists("Shuckle's Influence")) {
+        for (let p of team) {
+            let temp = p.attack;
+            p.attack = p.defense;
+            p.defense = temp;
+            temp = p.spattack;
+            p.spattack = p.spdefense;
+            p.spdefense = temp;
+        }
+    }
+
     mapSelection();
 }
 
@@ -1546,6 +1557,47 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         ambientMusic = "resources/sounds/musics/boss.mp3";
     if (music)
         playMusic(ambientMusic, true);
+
+    if (modExists("Arceus's Influence")) {
+        for (let p of team) {
+            p.types = [types[Math.floor(Math.random() * types.length)]];
+            let type2 = types[Math.floor(Math.random() * types.length)];
+            if (Math.random() < .7 && !contains(p.types, type2))
+                p.types.push(type2);
+        }
+        opponent.types = [types[Math.floor(Math.random() * types.length)]];
+        let type2 = types[Math.floor(Math.random() * types.length)];
+        if (Math.random() < .7 && !contains(opponent.types, type2))
+            opponent.types.push(type2);
+    }
+    if (modExists("Bidoof's Influence")) {
+        for (let p of team) {
+            let bst = p.hp + p.attack + p.defense + p.spattack + p.spdefense + p.speed;
+            p.hp = Math.random() + .3;
+            p.attack = Math.random() + .3;
+            p.defense = Math.random() + .3;
+            p.spattack = Math.random() + .3;
+            p.spdefense = Math.random() + .3;
+            p.speed = Math.random() + .3;
+            adjustBST(p, bst, false);
+        }
+        let bst = opponent.hp + opponent.attack + opponent.defense + opponent.spattack + opponent.spdefense + opponent.speed;
+        opponent.hp = Math.random() + .3;
+        opponent.attack = Math.random() + .3;
+        opponent.defense = Math.random() + .3;
+        opponent.spattack = Math.random() + .3;
+        opponent.spdefense = Math.random() + .3;
+        opponent.speed = Math.random() + .3;
+        adjustBST(opponent, bst, false);
+    }
+    if (modExists("Shuckle's Influence")) {
+        let temp = opponent.attack;
+        opponent.attack = opponent.defense;
+        opponent.defense = temp;
+        temp = opponent.spattack;
+        opponent.spattack = opponent.spdefense;
+        opponent.spdefense = temp;
+    }
 
     pLeftView = document.createElement('div');
     pLeftView.className = "pokemon-displayer-left";
@@ -2272,6 +2324,13 @@ function initDeck(p) {
     p.hand = [];
     p.discard = [];
     shuffle(p.draw);
+
+    if (modExists("Short Circuit")) {
+        for (let m of p.draw) {
+            let r = Math.random();
+            m.cost = r < .1 ? 0 : (r < .4 ? 1 : (r < .75 ? 2 : (r < .9 ? 3 : (r < .95 ? 4 : 5))));
+        }
+    }
 }
 
 function initItems(p) {
@@ -2576,6 +2635,11 @@ function useMove(move) {
             }
         }
         discardCard(move);
+
+        if (!cancelled && move.cat === "status" && modExists("Mischief")) {
+            dealDamage(20 - 40 * player, team[activePokemon]);
+            dealDamage(-20 + 40 * player, opponent);
+        }
 
         //postEffects
         if (!cancelled && move.postEffect != undefined) {
@@ -3057,6 +3121,34 @@ function nextEncounter() {
                     for (let p of team) {
                         p.currenthp = Math.floor(Math.min(p.maxhp, p.currenthp + .5 * p.maxhp));
                     }
+
+                    if (modExists("Giratina's Influence") && area == 10) {
+                        for (let i = 0; i < team.length; i++) {
+                            var p = team[i];
+                            var name = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+                            if (name === "nidoking" && Math.random() < .5)
+                                name = "nidoqueen";
+                            var poke = createPokemon(name);
+                            adjustBST(poke, 600, false);
+                            poke.currenthp = Math.floor(p.currenthp / p.maxhp * poke.maxhp);
+                            for (let j = 0; j < 3; j++)
+                                poke.moves.push(createMove(poke.movepool[Math.floor(Math.random() * poke.movepool.length)]));
+                            for (let j = 0; j < p.items.length; j++)
+                                poke.items.push(createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]));
+                            team[i] = poke;
+                        }
+                        if (modExists("Shuckle's Influence")) {
+                            for (let p of team) {
+                                let temp = p.attack;
+                                p.attack = p.defense;
+                                p.defense = temp;
+                                temp = p.spattack;
+                                p.spattack = p.spdefense;
+                                p.spdefense = temp;
+                            }
+                        }
+                    }
+
                     area = 1;
                     world += 1;
                 }
@@ -3373,7 +3465,10 @@ function extraReward() {
 }
 
 function getFromMovepool(p) {
-    return p.movepool[Math.floor(Math.random() * p.movepool.length)];
+    if (modExists("Mew's Influence"))
+        return movesList[Math.floor(Math.random() * movesList.length)];
+    else
+        return p.movepool[Math.floor(Math.random() * p.movepool.length)];
 }
 
 function getFromItemPool(t) {
@@ -17389,6 +17484,16 @@ function Event5() {
                     poke.items.push(createHeldItem(heldItems[Math.floor(Math.random() * heldItems.length)]));
                 team[i] = poke;
             }
+            if (modExists("Shuckle's Influence")) {
+                for (let p of team) {
+                    let temp = p.attack;
+                    p.attack = p.defense;
+                    p.defense = temp;
+                    temp = p.spattack;
+                    p.spattack = p.spdefense;
+                    p.spdefense = temp;
+                }
+            }
             nextEncounter();
         },
         description: "After a while, you start feeling dizzy. The world around you starts spinning, and everything goes dark.",
@@ -18563,7 +18668,8 @@ function drawPokedexItems() {
 /* --------------------- Modifiers --------------------- */
 /* ----------------------------------------------------- */
 
-modifiersList = ["item_frenzy", "rayquazas_influence", "no_healing", "extreme_typing", "berries_only", "storm_warning", "brutality", "mastermind", "inflation", "undying"];
+modifiersList = ["item_frenzy", "rayquazas_influence", "no_healing", "extreme_typing", "berries_only", "storm_warning", "brutality", "mastermind", "inflation", "undying", "short_circuit",
+    "giratinas_influence", "arceuss_influence", "shuckles_influence", "bidoofs_influence", "mews_influence", "mischief"];
 
 function generateModifiers() {
     let mods = [];
@@ -18597,6 +18703,20 @@ function createModifier(mod) {
             return new Inflation();
         case "undying":
             return new Undying();
+        case "short_circuit":
+            return new ShortCircuit();
+        case "giratinas_influence":
+            return new GiratinasInfluence();
+        case "arceuss_influence":
+            return new ArceussInfluence();
+        case "shuckles_influence":
+            return new ShucklesInfluence();
+        case "bidoofs_influence":
+            return new BidoofsInfluence();
+        case "mews_influence":
+            return new MewsInfluence();
+        case "mischief":
+            return new Mischief();
         default:
             alert("Unknown modifier: " + mod);
             return new RayquazasInfluence();
@@ -18665,4 +18785,46 @@ function Undying() {
     this.name = "Undying";
     this.icon = "resources/sprites/mods_icons/undying.webp";
     this.description = "The entire party begins with revival herbs, but bosses can revive as well.";
+}
+
+function ShortCircuit() {
+    this.name = "Short Circuit";
+    this.icon = "resources/sprites/mods_icons/short_circuit.webp";
+    this.description = "The energy cost of all moves is randomized each battle.";
+}
+
+function GiratinasInfluence() {
+    this.name = "Giratina's Influence";
+    this.icon = "resources/sprites/mods_icons/giratinas_influence.webp";
+    this.description = "The entire party gets randomized after defeating a boss.";
+}
+
+function ShucklesInfluence() {
+    this.name = "Shuckle's Influence";
+    this.icon = "resources/sprites/mods_icons/shuckles_influence.webp";
+    this.description = "All Pokémon have their defensive and offensive stats swapped.";
+}
+
+function ArceussInfluence() {
+    this.name = "Arceus's Influence";
+    this.icon = "resources/sprites/mods_icons/arceuss_influence.webp";
+    this.description = "All Pokémon change types randomly at the start of each battle.";
+}
+
+function BidoofsInfluence() {
+    this.name = "Bidoof's Influence";
+    this.icon = "resources/sprites/mods_icons/bidoofs_influence.webp";
+    this.description = "All Pokémon stats are randomized at the start of each battle.";
+}
+
+function MewsInfluence() {
+    this.name = "Mew's Influence";
+    this.icon = "resources/sprites/mods_icons/mews_influence.webp";
+    this.description = "Any Pokémon can learn any move.";
+}
+
+function Mischief() {
+    this.name = "Mischief";
+    this.icon = "resources/sprites/mods_icons/mischief.webp";
+    this.description = "Using a status move restores 20 HP and deals 20 damage.";
 }

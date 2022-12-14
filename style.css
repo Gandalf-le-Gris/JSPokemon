@@ -1248,6 +1248,10 @@ button.launch-tuto {
         cursor: url('resources/sprites/ui_icons/indicator.cur'), default;
     }
 
+.pulsating {
+    animation: zoom-animation 1.2s ease infinite;
+    -webkit-animation: zoom-animation 1.2s ease infinite;
+}
 
 
 /* The switch - the box around the slider */
