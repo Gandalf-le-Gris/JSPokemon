@@ -6861,7 +6861,7 @@ function Zarude() {
     this.currenthp = 0;
     this.types = ["grass", "dark"];
     this.moves = [];
-    this.opponentMoves = [[createMove("jungle_healing"), createMove("sunny_day"), createMove("power_whip"), createMove("darkest_lariat"), createMove("drain_punch"), createMove("solar_blade"), createMove("synthesis"), createMove("bullet_seed"), createMove("crunch"), createMove("bite")]];
+    this.opponentMoves = [[createMove("jungle_healing"), createMove("sunny_day"), createMove("power_whip"), createMove("darkest_lariat"), createMove("drain_punch"), createMove("solar_blade"), createMove("stomping_tantrum"), createMove("bullet_seed"), createMove("crunch"), createMove("bite")]];
     this.movepool = ["struggle"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/zarude.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/zarude.gif';
@@ -6873,8 +6873,8 @@ function Zarude() {
     this.items = [];
     this.talent = "Leaf Guard";
     this.init = function (move, pD) { setWeather("sun", 5); };
-    this.talentDesc = "Restores 10% HP at the end of the turn in the sun. Summons harsh sunlight at the beginning of the battle.";
-    this.endTurn = function () { if (weather !== undefined && weather.name === "Sun") dealDamage(-Math.round(.1 * this.maxhp), this); };
+    this.talentDesc = "Restores 5% HP at the end of the turn in the sun. Summons harsh sunlight at the beginning of the battle.";
+    this.endTurn = function () { if (weather !== undefined && weather.name === "Sun") dealDamage(-.05 * this.maxhp, this); };
     this.cry = "resources/sounds/sfx/cries/zarude.ogg";
 }
 
@@ -17152,7 +17152,7 @@ function checkGameOver() {
 }
 
 function createEvent(eventS) {
-    event = eventS != undefined ? eventS : Math.floor(Math.random() * 13);
+    event = eventS != undefined ? eventS : Math.floor(Math.random() * 14);
     switch (event) {
         case 0:
             return new Event0();
