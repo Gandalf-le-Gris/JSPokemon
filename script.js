@@ -716,7 +716,7 @@ function loadProgress() {
         unlockedPokemon += createPokemon(p).unlocked;
     }
     for (let p of pokemonList)
-        if (createPokemon(p).unlocked && !contains(encounteredPokemon, p))
+        if (createPokemon(p).unlocked && !contains(encounteredPokemon, p) && p !== "nidoqueen")
             encounteredPokemon.push(p);
 }
 
@@ -1228,6 +1228,7 @@ function launchGame() {
     movePrice = 750 + 450 * modExists("Inflation");
     itemPrice = 1500 + 750 * modExists("Inflation");
     removePrice = 300 + 200 * modExists("Inflation");
+    encounteredBosses = [];
     extraLoot = 0;
     pokemonCenterChance = 0;
     pokemartChance = 0;
@@ -1476,7 +1477,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola", "torterra", "delphox", "primarina", "yanmega", "rhyperior", "toxicroak", "aurorus", "dragapult", "morpeko", "gallade"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie", "zygarde", "calyrex", "zarude", "volcanion", "marshadow"];
-eventPokemonList = ["unown", "shedinja", "spiritomb"]; //"bidoof"
+eventPokemonList = ["unown", "shedinja", "spiritomb", "zoroark"]; //"bidoof"
 
 energy = 5;
 maxEnergy = 5;
@@ -1515,6 +1516,9 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     eventChance += .07;
 
     opponent = createOpponent(encounter, fixedPokemon);
+    if (opponent.preBattle !== undefined)
+        opponent.preBattle(encounter);
+
     player = true;
     weather = undefined;
     terrain = undefined;
@@ -1689,7 +1693,8 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         wrapper.appendChild(pImage);
     }
     pRightView.title = opponent.name + "\nTypes: ";
-    for (let type of opponent.types) {
+    let pTypes = opponent.illusion === undefined ? opponent.types : opponent.illusion.types;
+    for (let type of pTypes) {
         var t = type.charAt(0).toUpperCase() + type.slice(1)
         pRightView.title += t + " ";
     }
@@ -2052,8 +2057,9 @@ function colorHeader(p) {
         header = document.getElementById("switchHeader1");
     else
         header = document.getElementById("switchHeader2");
-    var c1 = typeColors[types.findIndex(e => e === p.types[0])];
-    var c2 = p.types.length > 1 ? typeColors[types.findIndex(e => e === p.types[1])] : c1;
+    let pTypes = p.illusion === undefined ? p.types : p.illusion.types;
+    var c1 = typeColors[types.findIndex(e => e === pTypes[0])];
+    var c2 = pTypes.length > 1 ? typeColors[types.findIndex(e => e === pTypes[1])] : c1;
     header.style.background = c1;
     if (c2 !== c1)
         header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 43%, " + c2 + " 57%, " + c2 + " 100%)";
@@ -2369,6 +2375,8 @@ function copyPokemon(poke) {
         p.endTurn = poke.endTurn.bind(p);
     if (poke.endBattle != undefined)
         p.endBattle = poke.endBattle.bind(p);
+    if (poke.preBattle !== undefined)
+        p.preBattle = poke.preBattle.bind(p);
 }
 
 function drawMove(p, newHand) {
@@ -2887,8 +2895,8 @@ function discardCard(move) {
         p = team[activePokemon];
     var i = p.hand.findIndex(e => e === move);
     let leppaBerry = p.items.findIndex(e => e.name === "Leppa Berry" && !e.consumed);
-    if ((move.exhaust == undefined || leppaBerry >= 0) && i >= 0) {
-        if (leppaBerry >= 0)
+    if ((move.exhaust === undefined || leppaBerry >= 0) && i >= 0) {
+        if (leppaBerry >= 0 && move.exhaust !== undefined)
             p.items[leppaBerry].consumed = true;
         p.discard.push(p.hand[i]);
     }
@@ -3052,21 +3060,26 @@ function createOpponent(encounter, fixedOpponent) {
     var opponentN = fixedOpponent;
     if (fixedOpponent == undefined)
         if (area < 10) {
-            while (opponent == undefined || !contains(opponent.types, encounter)) {
-                opponentN = opponentList[Math.floor(Math.random() * opponentList.length)];
-                if (opponentN === "nidoking" && Math.random() < .5)
-                    opponentN = "nidoqueen";
+            if (Math.random() < 1 / 128 && !tuto) {
+                opponentN = "zoroark";
                 opponent = createPokemon(opponentN);
+            } else {
+                while (opponent == undefined || !contains(opponent.types, encounter)) {
+                    opponentN = opponentList[Math.floor(Math.random() * opponentList.length)];
+                    if (opponentN === "nidoking" && Math.random() < .5)
+                        opponentN = "nidoqueen";
+                    opponent = createPokemon(opponentN);
+                }
             }
         } else {
             opponentN = bossList[Math.floor(Math.random() * bossList.length)];
-            if (opponentN === "nidoking" && Math.random() < .5)
-                opponentN = "nidoqueen";
+            while (contains(encouteredBosses, opponentN))
+                opponentN = bossList[Math.floor(Math.random() * bossList.length)];
             opponent = createPokemon(opponentN);
         }
     else
         opponent = createPokemon(fixedOpponent);
-    if (!contains(encounteredPokemon, opponentN))
+    if (!contains(encounteredPokemon, opponentN) && opponentN !== "nidoqueen")
         encounteredPokemon.push(opponentN);
 
     adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
@@ -4104,6 +4117,8 @@ function createPokemon(pokemon) {
             return new Volcanion();
         case "marshadow":
             return new Marshadow();
+        case "zoroark":
+            return new Zoroark();
         default:
             return new MissingNo();
     }
@@ -4292,7 +4307,7 @@ function Garchomp() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Rough skin"
+    this.talent = "Rough Skin"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical" && !isPadded(pD)) dealDamage(10, pD); }
     this.unlocked = defeatedPokemon >= 20;
@@ -4367,7 +4382,7 @@ function Lucario() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Inner focus"
+    this.talent = "Inner Focus"
     this.talentDesc = "This Pokémon cannot be made to flinch."
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = defeatedPokemon >= 100;
@@ -4401,7 +4416,7 @@ function Volcarona() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Flame body";
+    this.talent = "Flame Body";
     this.talentDesc = "Attackers making contact with this Pokémon with not very effective attacks are burned."
     this.revenge = function (move, pD) { if (move != undefined && effectiveMultiplier(move, this) < 1 && move.cat === "physical" && !isPadded(pD)) applyEffect("burn", 1, pD); }
     this.unlocked = defeatedPokemon >= 150;
@@ -4509,7 +4524,7 @@ function Dragonite() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Inner focus"
+    this.talent = "Inner Focus"
     this.talentDesc = "This Pokémon cannot be made to flinch."
     this.revenge = function (move, pD) { removeEffect(this, "Fear"); }
     this.unlocked = starterVictories >= 1;
@@ -4543,7 +4558,7 @@ function Ferrothorn() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Iron barbs"
+    this.talent = "Iron Barbs"
     this.talentDesc = "Attackers making contact with this Pokémon take 10 damage."
     this.revenge = function (move, pD) { if (move != undefined && move.cat === "physical" && !isPadded(pD)) dealDamage(10, pD); }
     this.unlocked = physicalDamageTaken >= 15000;
@@ -4576,7 +4591,7 @@ function Blissey() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Natural cure"
+    this.talent = "Natural Cure"
     this.talentDesc = "Status conditions are removed at the end of each turn, after taking effect."
     this.endTurn = function (pD) {
         if (isPoisoned(this)) removeEffect(this, "Poison");
@@ -4688,7 +4703,7 @@ function Aegislash() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Stance change";
+    this.talent = "Stance Change";
     this.talentDesc = "Switch to blade form by using damaging moves and shield form by using King's Shield.";
     this.stance = "shield";
     this.init = function () { switchAegislash(this, true); }
@@ -4820,7 +4835,7 @@ function Metagross() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Clear body"
+    this.talent = "Clear Body"
     this.talentDesc = "Lowered stats are restored at the end of each turn."
     this.endTurn = function () {
         this.statchanges.attack = Math.max(0, this.statchanges.attack);
@@ -4895,7 +4910,7 @@ function Zeraora() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Volt absorb"
+    this.talent = "Volt Absorb"
     this.talentDesc = "Electric immunity."
     this.init = function () { applyEffect("immunity", 1, this, "electric"); }
     this.unlocked = cardsPerTurn >= 8;
@@ -4929,7 +4944,7 @@ function Omanyte() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Swift swim"
+    this.talent = "Swift Swim"
     this.talentDesc = "Draw 2 extra cards at the beginning of each turn in the rain."
     this.endTurn = function () {
         if (drawsExtra(this)) removeEffect(this, "Extra Draw");
@@ -4966,7 +4981,7 @@ function Tyranitar() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Sand stream"
+    this.talent = "Sand Stream"
     this.talentDesc = "Whips up a sandstorm at the beginning of the battle."
     this.init = function () { setWeather("sandstorm", 10); }
     this.unlocked = sandstormDamage >= 150;
@@ -5034,19 +5049,21 @@ function Ditto() {
     this.talent = "Imposter"
     this.talentDesc = "Transforms into the opponent at the beginning of the battle, copying its stats, types and moves."
     this.init = function () {
-        this.types = [].concat(opponent.types);
-        n = opponent.hp + opponent.attack + opponent.defense + opponent.spattack + opponent.spdefense + opponent.speed;
-        ratio = 500 / n;
-        this.attack = Math.round(opponent.attack * ratio);
-        this.defense = Math.round(opponent.defense * ratio);
-        this.spattack = Math.round(opponent.spattack * ratio);
-        this.spdefense = Math.round(opponent.spdefense * ratio);
-        this.speed = Math.round(opponent.speed * ratio);
-        this.imgb = opponent.imgb;
-        this.moves = [].concat(opponent.moves);
-        if (this === team[activePokemon])
-            document.getElementById("leftSprite").src = this.imgb;
-        transforms++;
+        if (opponent.illusion === undefined) {
+            this.types = [].concat(opponent.types);
+            n = opponent.hp + opponent.attack + opponent.defense + opponent.spattack + opponent.spdefense + opponent.speed;
+            ratio = 500 / n;
+            this.attack = Math.round(opponent.attack * ratio);
+            this.defense = Math.round(opponent.defense * ratio);
+            this.spattack = Math.round(opponent.spattack * ratio);
+            this.spdefense = Math.round(opponent.spdefense * ratio);
+            this.speed = Math.round(opponent.speed * ratio);
+            this.imgb = opponent.imgb;
+            this.moves = [].concat(opponent.moves);
+            if (this === team[activePokemon])
+                document.getElementById("leftSprite").src = this.imgb;
+            transforms++;
+        }
     }
     this.endBattle = function () {
         this.moves = [createMove("struggle")];
@@ -5302,7 +5319,7 @@ function Mamoswine() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Thick fat";
+    this.talent = "Thick Fat";
     this.talentDesc = "Lowers the damage of incoming ice and fire type moves.";
     this.init = function () { applyEffect("thick_fat", 1, this); }
     this.unlocked = rockIceKO >= 1;
@@ -5337,7 +5354,7 @@ function Darmanitan() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Zen mode";
+    this.talent = "Zen Mode";
     this.talentDesc = "Switches to zen mode when under 50% HP.";
     this.zen = false;
     this.init = function () {
@@ -5781,7 +5798,7 @@ function AlolanNinetales() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Snow warning"
+    this.talent = "Snow Warning"
     this.talentDesc = "Causes the hail to fall at the beginning of the battle."
     this.init = function () { setWeather("hail", 10); }
     this.unlocked = hailStarted >= 10;
@@ -5959,7 +5976,7 @@ function Dragapult() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Clear body"
+    this.talent = "Clear Body"
     this.talentDesc = "Lowered stats are restored at the end of each turn."
     this.endTurn = function () {
         this.statchanges.attack = Math.max(0, this.statchanges.attack);
@@ -6227,7 +6244,7 @@ function Shedinja() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Wonder guard";
+    this.talent = "Wonder Guard";
     this.talentDesc = "This Pokémon can only be damaged by super effective damage and indirect damage. Takes at most 1 damage per hit."
     this.cry = "resources/sounds/sfx/cries/shedinja.ogg"
 }
@@ -6345,7 +6362,7 @@ function Heatran() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Flash fire";
+    this.talent = "Flash Fire";
     this.talentDesc = "Immunity to fire type moves.";
     this.init = function () { applyEffect("immunity", 1, this, "fire"); }
     this.cry = "resources/sounds/sfx/cries/heatran.ogg"
@@ -6517,7 +6534,7 @@ function Rayquaza() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Air lock"
+    this.talent = "Air Lock"
     this.talentDesc = "Prevents weather changes."
     this.init = function () { setWeather("air_lock", 99); }
     this.cry = "resources/sounds/sfx/cries/rayquaza.ogg"
@@ -6640,7 +6657,7 @@ function Regigigas() {
     this.discard = [];
     this.items = [];
     this.slowStart = true;
-    this.talent = "Slow start"
+    this.talent = "Slow Start"
     this.talentDesc = "Reduced attack at the beginning of the battle."
     this.boost = function (move) { return 1 - .4 * (this.slowStart && move.cat === "physical"); }
     this.init = function (move, pD) { applyEffect("slow_start", 3, this); }
@@ -6669,7 +6686,7 @@ function Diancie() {
     this.hand = [];
     this.discard = [];
     this.items = [];
-    this.talent = "Clear body"
+    this.talent = "Clear Body"
     this.talentDesc = "Lowered stats are restored at the end of each turn."
     this.endTurn = function () {
         this.statchanges.attack = Math.max(0, this.statchanges.attack);
@@ -6915,6 +6932,95 @@ function Marshadow() {
     this.talentDesc = "Damaging moves with a cost of 1 or less deal 20% extra damage."
     this.boost = function (move) { return 1 + .2 * (move.bp > 0 && move.cost <= 1); }
     this.cry = "resources/sounds/sfx/cries/marshadow.ogg";
+}
+
+function Zoroark() {
+    this.name = "Zoroark";
+    this.hp = 60;
+    this.attack = 105;
+    this.defense = 60;
+    this.spattack = 120;
+    this.spdefense = 60;
+    this.speed = 105;
+    this.maxhp = 0;
+    this.currenthp = 0;
+    this.types = ["dark"];
+    this.moves = [];
+    this.opponentMoves = [[createMove("nasty_plot"), createMove("dark_pulse"), createMove("dark_pulse"), createMove("night_slash"), createMove("assurance"), createMove("flamethrower"), createMove("flamethrower"), createMove("sludge_bomb"), createMove("low_sweep"), createMove("snarl")]];
+    this.movepool = ["aerial_ace", "agility", "assurance", "calm_mind", "dark_pulse", "dig", "extrasensory", "fake_tears", "flamethrower", "fling", "focus_blast", "foul_play", "fury_swipes", "grass_knot", "hex", "hone_claws", "hyper_voice", "knock_off", "lash_out", "low_sweep", "nasty_plot", "night_slash", "payback", "revenge", "shadow_ball", "shadow_claw", "skitter_smack", "sludge_bomb", "snarl", "spite", "sucker_punch", "swagger", "swords_dance", "taunt", "throat_chop", "uproar", "u_turn"];
+    this.imgf = 'resources/sprites/pokemon_battle_icons/front/zoroark.gif';
+    this.imgb = 'resources/sprites/pokemon_battle_icons/back/zoroark.gif';
+    this.effects = [];
+    this.statchanges = new StatChanges();
+    this.draw = [];
+    this.hand = [];
+    this.discard = [];
+    this.items = [];
+    this.talent = "Illusion";
+    this.talentDesc = "Impersonates another Pokémon at the beginning of the battle."
+    this.preBattle = function (encounter) { illusionZoroark(this, encounter); }
+    this.revenge = function (move, pD) { if (move !== undefined && this.illusion !== undefined && this.currenthp < 2/3 * this.maxhp) switchZoroark(this); }
+    this.cry = "resources/sounds/sfx/cries/zoroark.ogg";
+    this.self = {
+        name: "Zoroark",
+        talent: "Illusion",
+        talentDesc: "Impersonates another Pokémon at the beginning of the battle.",
+        cry: "resources/sounds/sfx/cries/zoroark.ogg",
+        imgf: 'resources/sprites/pokemon_battle_icons/front/zoroark.gif',
+        imgb: 'resources/sprites/pokemon_battle_icons/back/zoroark.gif'
+    };
+}
+
+function switchZoroark(p) {
+    if (p.self !== undefined && p.self.name === "Zoroark") {
+        var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
+        img.className += " blink-transform1";
+        setTimeout(() => {
+            p.imgf = p.self.imgf;
+            p.imgb = p.self.imgb;
+            p.name = p.self.name;
+            p.cry = p.self.cry;
+            p.talent = p.self.talent;
+            p.talentDesc = p.self.talentDesc;
+            p.illusion = undefined;
+
+            resizeSprites(p === team[activePokemon], p === opponent);
+            colorHeader(p);
+            if (p === opponent) {
+                document.getElementById("rightName").innerHTML = p.name;
+                let pRightView = document.getElementById("pRightView");
+                pRightView.title = opponent.name + "\nTypes: ";
+                for (let type of opponent.types) {
+                    var t = type.charAt(0).toUpperCase() + type.slice(1)
+                    pRightView.title += t + " ";
+                }
+                pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
+            } else
+                document.getElementById("leftName").innerHTML = p.name;
+
+            if (music)
+                playMusic(p.cry, false);
+
+            img.classList.remove("blink-transform1");
+            img.className += " unblink-transform1";
+        }, 100);
+        setTimeout(() => {
+            img.classList.remove("unblink-transform1");
+        }, 200);
+    }
+}
+
+function illusionZoroark(p, encounter) {
+    poke = undefined;
+    while (poke === undefined || !contains(poke.types, encounter))
+        poke = createPokemon(opponentList[Math.floor(Math.random() * opponentList.length)]);
+    p.illusion = poke;
+    p.name = poke.name;
+    p.talent = poke.talent;
+    p.talentDesc = poke.talentDesc;
+    p.cry = poke.cry;
+    p.imgf = poke.imgf;
+    p.imgb = poke.imgb;
 }
 
 function StatChanges() {
@@ -14495,7 +14601,7 @@ function createHeldItem(item) {
 
 function BlackBelt() {
     this.name = "Black Belt";
-    this.description = "Raises the power of fighting type moves by 20%";
+    this.description = "Raises the power of fighting type moves by 20%.";
     this.img = 'resources/sprites/held_items/black_belt.webp';
     this.area = "fighting";
     this.boost = true;
@@ -14504,7 +14610,7 @@ function BlackBelt() {
 
 function BlackGlasses() {
     this.name = "Black Glasses";
-    this.description = "Raises the power of dark type moves by 20%";
+    this.description = "Raises the power of dark type moves by 20%.";
     this.img = 'resources/sprites/held_items/black_glasses.webp';
     this.area = "dark";
     this.boost = true;
@@ -14513,7 +14619,7 @@ function BlackGlasses() {
 
 function Charcoal() {
     this.name = "Charcoal";
-    this.description = "Raises the power of fire type moves by 20%";
+    this.description = "Raises the power of fire type moves by 20%.";
     this.img = 'resources/sprites/held_items/charcoal.webp';
     this.area = "fire";
     this.boost = true;
@@ -14522,7 +14628,7 @@ function Charcoal() {
 
 function DragonFang() {
     this.name = "Dragon Fang";
-    this.description = "Raises the power of dragon type moves by 20%";
+    this.description = "Raises the power of dragon type moves by 20%.";
     this.img = 'resources/sprites/held_items/dragon_fang.webp';
     this.area = "dragon";
     this.boost = true;
@@ -14531,7 +14637,7 @@ function DragonFang() {
 
 function HardStone() {
     this.name = "Hard Stone";
-    this.description = "Raises the power of rock type moves by 20%";
+    this.description = "Raises the power of rock type moves by 20%.";
     this.img = 'resources/sprites/held_items/hard_stone.webp';
     this.area = "rock";
     this.boost = true;
@@ -14540,7 +14646,7 @@ function HardStone() {
 
 function Magnet() {
     this.name = "Magnet";
-    this.description = "Raises the power of electric type moves by 20%";
+    this.description = "Raises the power of electric type moves by 20%.";
     this.img = 'resources/sprites/held_items/magnet.webp';
     this.area = "electric";
     this.boost = true;
@@ -14549,7 +14655,7 @@ function Magnet() {
 
 function MetalCoat() {
     this.name = "Metal Coat";
-    this.description = "Raises the power of steel type moves by 20%";
+    this.description = "Raises the power of steel type moves by 20%.";
     this.img = 'resources/sprites/held_items/metal_coat.webp';
     this.area = "steel";
     this.boost = true;
@@ -14558,7 +14664,7 @@ function MetalCoat() {
 
 function MiracleSeed() {
     this.name = "Miracle Seed";
-    this.description = "Raises the power of grass type moves by 20%";
+    this.description = "Raises the power of grass type moves by 20%.";
     this.img = 'resources/sprites/held_items/miracle_seed.webp';
     this.area = "grass";
     this.boost = true;
@@ -14567,7 +14673,7 @@ function MiracleSeed() {
 
 function MysticWater() {
     this.name = "Mystic Water";
-    this.description = "Raises the power of water type moves by 20%";
+    this.description = "Raises the power of water type moves by 20%.";
     this.img = 'resources/sprites/held_items/mystic_water.webp';
     this.area = "water";
     this.boost = true;
@@ -14576,7 +14682,7 @@ function MysticWater() {
 
 function NeverMeltIce() {
     this.name = "Never-Melt Ice";
-    this.description = "Raises the power of ice type moves by 20%";
+    this.description = "Raises the power of ice type moves by 20%.";
     this.img = 'resources/sprites/held_items/never_melt_ice.webp';
     this.area = "ice";
     this.boost = true;
@@ -14585,7 +14691,7 @@ function NeverMeltIce() {
 
 function PoisonBarb() {
     this.name = "Poison Barb";
-    this.description = "Raises the power of poison type moves by 20%";
+    this.description = "Raises the power of poison type moves by 20%.";
     this.img = 'resources/sprites/held_items/poison_barb.webp';
     this.area = "poison";
     this.boost = true;
@@ -14594,7 +14700,7 @@ function PoisonBarb() {
 
 function SharpBeak() {
     this.name = "Sharp Beak";
-    this.description = "Raises the power of flying type moves by 20%";
+    this.description = "Raises the power of flying type moves by 20%.";
     this.img = 'resources/sprites/held_items/sharp_beak.webp';
     this.area = "flying";
     this.boost = true;
@@ -14603,7 +14709,7 @@ function SharpBeak() {
 
 function SilkScarf() {
     this.name = "Silk Scarf";
-    this.description = "Raises the power of normal type moves by 20%";
+    this.description = "Raises the power of normal type moves by 20%.";
     this.img = 'resources/sprites/held_items/silk_scarf.webp';
     this.area = "normal";
     this.boost = true;
@@ -14612,7 +14718,7 @@ function SilkScarf() {
 
 function SilverPowder() {
     this.name = "Silver Powder";
-    this.description = "Raises the power of bug type moves by 20%";
+    this.description = "Raises the power of bug type moves by 20%.";
     this.img = 'resources/sprites/held_items/silver_powder.webp';
     this.area = "bug";
     this.boost = true;
@@ -14621,7 +14727,7 @@ function SilverPowder() {
 
 function SoftSand() {
     this.name = "Soft Sand";
-    this.description = "Raises the power of ground type moves by 20%";
+    this.description = "Raises the power of ground type moves by 20%.";
     this.img = 'resources/sprites/held_items/soft_sand.webp';
     this.area = "ground";
     this.boost = true;
@@ -14630,7 +14736,7 @@ function SoftSand() {
 
 function SpellTag() {
     this.name = "Spell Tag";
-    this.description = "Raises the power of ghost type moves by 20%";
+    this.description = "Raises the power of ghost type moves by 20%.";
     this.img = 'resources/sprites/held_items/spell_tag.webp';
     this.area = "ghost";
     this.boost = true;
@@ -14639,7 +14745,7 @@ function SpellTag() {
 
 function TwistedSpoon() {
     this.name = "Twisted Spoon";
-    this.description = "Raises the power of psychic type moves by 20%";
+    this.description = "Raises the power of psychic type moves by 20%.";
     this.img = 'resources/sprites/held_items/twisted_spoon.webp';
     this.area = "psychic";
     this.boost = true;
@@ -15539,7 +15645,7 @@ function ShellBell() {
 
 function AdamantOrb() {
     this.name = "Adamant Orb";
-    this.description = "Raises the power of dragon and steel type moves by 15%";
+    this.description = "Raises the power of dragon and steel type moves by 15%.";
     this.img = 'resources/sprites/held_items/adamant_orb.webp';
     this.area = "event";
     this.boost = true;
@@ -15548,7 +15654,7 @@ function AdamantOrb() {
 
 function LustrousOrb() {
     this.name = "Lustrous Orb";
-    this.description = "Raises the power of dragon and water type moves by 15%";
+    this.description = "Raises the power of dragon and water type moves by 15%.";
     this.img = 'resources/sprites/held_items/lustrous_orb.webp';
     this.area = "event";
     this.boost = true;
@@ -15557,7 +15663,7 @@ function LustrousOrb() {
 
 function GriseousOrb() {
     this.name = "Griseous Orb";
-    this.description = "Raises the power of dragon and ghost type moves by 15%";
+    this.description = "Raises the power of dragon and ghost type moves by 15%.";
     this.img = 'resources/sprites/held_items/griseous_orb.webp';
     this.area = "event";
     this.boost = true;
@@ -18329,7 +18435,7 @@ function drawPokedexPokemon() {
 
         var progress = document.createElement('div');
         progress.className = "top-right";
-        var max = pokemonList.length + eventPokemonList.length + bossList.length;
+        var max = pokeList.length;
         var prog = Math.floor(encounteredPokemon.length / max * 1000) / 10;
         progress.innerHTML = prog + "%";
         filter.appendChild(progress);
