@@ -2724,6 +2724,7 @@ function useMove(move) {
 
         let copiedMove = copyMove(move);
         copiedMove.owner = team[activePokemon];
+        copiedMove.failed = cancelled;
         battleHistory[battleHistory.length - 1].push(copiedMove);
     } else
         document.getElementById("movePreview").className = "preview-off";
@@ -3200,6 +3201,8 @@ function drawHistory() {
             function makeReward(p, move1) {
                 this.reward1 = document.createElement('div');
                 this.reward1.className = "static-reward";
+                if (move.failed)
+                    this.reward1.style.filter = "grayscale() brightness(.5)";
                 var sprite1 = new Image();
                 sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
                 sprite1.className = "reward-sprite";
