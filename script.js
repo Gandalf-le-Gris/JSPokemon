@@ -177,6 +177,7 @@ function loadResources() {
     imgs.push("resources/sprites/ui_icons/pokeball.webp");
     imgs.push("resources/sprites/ui_icons/back.webp");
     imgs.push("resources/sprites/ui_icons/refresh.webp");
+    imgs.push("resources/sprites/ui_icons/history.png");
 
     sounds.push("resources/sounds/musics/battle.mp3");
     sounds.push("resources/sounds/musics/boss.mp3");
@@ -1840,7 +1841,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     historyButton.className = "history-button";
     historyButton.onclick = drawHistory;
     historyIcon = document.createElement('img');
-    historyIcon.src = 'resources/sprites/ui_icons/energy.png';
+    historyIcon.src = 'resources/sprites/ui_icons/history.png';
     document.body.appendChild(historyButton);
     historyButton.appendChild(historyIcon);
 
