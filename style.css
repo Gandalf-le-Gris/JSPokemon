@@ -405,6 +405,43 @@ button.start:hover {
     justify-self: center;
 }
 
+.history-button {
+    position: absolute;
+    top: 10vh;
+    right: 0;
+    width: 8vh;
+    height: 8vh;
+    background: rgba(255, 255, 255, .25);
+    border-top-left-radius: 1vh;
+    border-bottom-left-radius: 1vh;
+}
+
+    .history-button:hover {
+        cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
+    }
+
+.history-button > img {
+    width: 100%;
+    height: 100%;
+    transition: transform .2s;
+}
+
+    .history-button > img:hover {
+        transform: scale(1.1);
+    }
+
+.turn-header {
+    color: white;
+    font-size: 2vw;
+    font-family: 'Copperplate Gothic';
+    display: grid;
+    grid-auto-flow: row;
+}
+
+.turn-header > hr {
+    width: 50%;
+}
+
 .action-section {
     position: absolute;
     left: 0;
@@ -437,6 +474,14 @@ button.start:hover {
     -webkit-text-stroke-color: black;
     line-height: 10vh;
     text-align: center;
+}
+
+.action-information-cell > .stack {
+    transition: transform .2s;
+}
+
+.action-information-cell > .stack:hover {
+    transform: scale(1.1);
 }
 
 .stacker {
@@ -700,6 +745,14 @@ button.start:hover {
     margin: auto;
 }
 
+.static-reward {
+    display: grid;
+    grid-auto-flow: column;
+    grid-column-gap: .5vw;
+    border-radius: 1vh;
+    transition: background .2s, transform .2s;
+}
+
 .descriptor {
     width: 20vw;
     font-family: 'Copperplate Gothic';
@@ -813,7 +866,7 @@ button.start:hover {
 .article-section {
     display: grid;
     grid-auto-flow: column;
-    grid-column-gap: 8vw;
+    grid-column-gap: 6vw;
 }
 
 .article-selector {

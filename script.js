@@ -966,6 +966,7 @@ function drawTeamSelection() {
 
         var grid = document.createElement('div');
         grid.className = "gameover-grid";
+        grid.style.gridRowGap = "8vh";
         grid.appendChild(title);
         grid.appendChild(message);
         grid.appendChild(replay);
@@ -1489,6 +1490,7 @@ weather = undefined;
 terrain = undefined;
 environment = [];
 encounterType = undefined;
+battleHistory = [];
 
 battleFilter = document.createElement('div');
 battleFilter.className = "filter-clear";
@@ -1528,6 +1530,7 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     encounterType = encounter;
     turn = 1;
     flawlessBattle = true;
+    battleHistory = [];
 
     if (team[0].currenthp > 0) {
         activePokemon = 0;
@@ -1832,6 +1835,15 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     switchHP2.max = team[switchInd[1]].maxhp;
     switchHeader2.appendChild(switchHP2);
 
+    historyButton = document.createElement('div');
+    historyButton.id = "historyButton";
+    historyButton.className = "history-button";
+    historyButton.onclick = drawHistory;
+    historyIcon = document.createElement('img');
+    historyIcon.src = 'resources/sprites/ui_icons/energy.png';
+    document.body.appendChild(historyButton);
+    historyButton.appendChild(historyIcon);
+
     if (team[switchInd[0]].currenthp == 0)
         document.getElementById("switch1").classList.add("gray");
     else
@@ -1941,6 +1953,7 @@ function startTurn() {
     cardsPlayed = 0;
     drawn = 0;
     healing = 0;
+    battleHistory.push([]);
     if (player) {
         switchesLeft = 1;
         for (let p of team) {
@@ -1949,6 +1962,7 @@ function startTurn() {
         drawHand();
         if (document.body.contains(battleFilter))
             document.body.removeChild(battleFilter);
+        writeDrawDiscard();
     } else {
         drawMove(opponent, true);
         document.body.appendChild(battleFilter);
@@ -2045,6 +2059,27 @@ function drawHand() {
     }
 
     refreshIconCounts();
+}
+
+function writeDrawDiscard() {
+    let deckCount = document.getElementById("deckCount");
+    let deckNames = [];
+    for (let m of team[activePokemon].draw)
+        deckNames.push(m.name);
+    shuffle(deckNames);
+    let deckTitle = deckNames.length + " move" + (deckNames.length > 1 ? "s" : "") + " in draw pile\n";
+    for (let m of deckNames)
+        deckTitle += m + "\n";
+    deckCount.title = deckTitle;
+
+    let discardCount = document.getElementById("discardCount");
+    let discardNames = [];
+    for (let m of team[activePokemon].discard)
+        discardNames.push(m.name);
+    let discardTitle = discardNames.length + " move" + (discardNames.length > 1 ? "s" : "") + " in discard pile\n";
+    for (let m of discardNames)
+        discardTitle += m + "\n";
+    discardCount.title = discardTitle;
 }
 
 function colorHeader(p) {
@@ -2218,6 +2253,11 @@ function drawStats(side) {
 
 function drawEnvironment() {
     var grid = document.getElementById('environmentSection');
+    if (weather === undefined) {
+        document.getElementById('environmentSection').style.visibility = "hidden";
+    } else {
+        document.getElementById('environmentSection').style.visibility = "visible";
+    }
     grid.innerHTML = "";
 
     if (weather != undefined) {
@@ -2282,6 +2322,7 @@ function switchPokemon(ind) {
 
             colorHeader(pA);
             colorHeader(pS);
+            writeDrawDiscard();
             document.getElementById("leftSprite").classList.remove("blink-transform2");
             document.getElementById("leftSprite").className += " unblink-transform2";
 
@@ -2416,6 +2457,8 @@ function drawMove(p, newHand) {
             document.getElementById("switch2").title = getMoveDescription(p);
     }
     drawHand();
+    if (contains(team, p))
+        writeDrawDiscard();
 }
 
 function refreshIconCounts() {
@@ -2643,6 +2686,8 @@ function useMove(move) {
             }
         }
         discardCard(move);
+        if (player)
+            writeDrawDiscard();
 
         if (!cancelled && move.cat === "status" && modExists("Mischief")) {
             dealDamage(20 - 40 * player, team[activePokemon]);
@@ -2675,6 +2720,10 @@ function useMove(move) {
 
         refreshIconCounts();
         drawConsumedItems();
+
+        let copiedMove = copyMove(move);
+        copiedMove.owner = team[activePokemon];
+        battleHistory[battleHistory.length - 1].push(copiedMove);
     } else
         document.getElementById("movePreview").className = "preview-off";
 }
@@ -3116,6 +3165,118 @@ function createOpponent(encounter, fixedOpponent) {
     if (modExists("Undying") && encounter === "boss")
         opponent.items.push(new RevivalHerb());
     return opponent;
+}
+
+function drawHistory() {
+    var filter = document.createElement('div');
+    filter.className = "filter";
+    filter.id = 'filter';
+    document.body.appendChild(filter);
+
+    var grid = document.createElement('div');
+    grid.className = "remove-selector";
+    filter.appendChild(grid);
+
+    var title = document.createElement('div');
+    title.className = "centered-subtitle";
+    title.innerHTML = "Battle history";
+    grid.appendChild(title);
+
+    for (let i = 0; i < battleHistory.length; i++) {
+        let turnHeader = document.createElement('div');
+        turnHeader.className = "turn-header";
+        grid.appendChild(turnHeader);
+        let sep = document.createElement('hr');
+        turnHeader.appendChild(sep);
+        let turnText = document.createElement('div');
+        let turnI = i + 1;
+        turnText.innerHTML = "Turn " + turnI;
+        if (i % 2 != 0)
+            turnText.style.textAlign = "right";
+        turnHeader.appendChild(turnText);
+
+        for (let move of battleHistory[i]) {
+            function makeReward(p, move1) {
+                this.reward1 = document.createElement('div');
+                this.reward1.className = "static-reward";
+                var sprite1 = new Image();
+                sprite1.src = 'resources/sprites/pokemon_icons/' + p.id + '.png';
+                sprite1.className = "reward-sprite";
+                if (i % 2 != 0) {
+                    //sprite1.style.filter = "sepia(1) saturate(5) hue-rotate(300deg) grayscale(.5)";
+                    sprite1.style.visibility = "hidden";
+                }
+                this.reward1.appendChild(sprite1);
+                
+
+                function makeCard(move) {
+                    this.card = document.createElement('div');
+                    this.card.className = "static-move-card";
+
+                    var top = document.createElement('div');
+                    top.className = "move-top";
+                    this.card.appendChild(top);
+                    var bottom = document.createElement('div');
+                    bottom.className = "move-top";
+                    this.card.appendChild(bottom);
+
+                    var name = document.createElement('div');
+                    name.innerHTML = move.name;
+                    name.class = "move-name";
+                    top.appendChild(name);
+                    var cost = document.createElement('div');
+                    cost.innerHTML = move.cost;
+                    cost.className = "move-cost";
+                    top.appendChild(cost);
+
+                    var type = new Image();
+                    if (move.type !== "")
+                        type.src = 'resources/sprites/move_icons/types/' + move.type + '.webp'
+                    type.className = "type-icon";
+                    bottom.appendChild(type);
+                    var cat = new Image();
+                    cat.src = 'resources/sprites/move_icons/category/' + move.cat + '.webp'
+                    cat.className = "category-icon";
+                    bottom.appendChild(cat);
+                }
+                var card1 = new makeCard(move1);
+                this.reward1.appendChild(card1.card);
+                var desc1 = document.createElement('div');
+                desc1.className = "descriptor";
+                this.reward1.appendChild(desc1);
+                var text = document.createElement('div');
+                text.innerHTML = move1.description;
+                desc1.appendChild(text);
+
+                this.reward1.p = p;
+                this.reward1.move = move1;
+                this.reward1.onclick = function () {
+                    if (money >= removePrice) {
+                        var i = this.p.moves.findIndex(e => e === this.move);
+                        this.p.moves.splice(i, 1);
+                        if (music)
+                            playMusic('resources/sounds/sfx/button_click.mp3', false);
+                        hideCardRemove();
+                        money -= removePrice;
+                        removePrice += 150 + 100 * modExists("Inflation");
+                        document.getElementById('money').innerHTML = "Balance: " + String.fromCharCode(08381) + money;
+                        document.getElementById('removePriceTag').innerHTML = String.fromCharCode(08381) + removePrice;
+                    }
+                };
+            }
+            grid.appendChild((new makeReward(move.owner, move)).reward1);
+        }
+    }
+
+    var continueB = document.createElement('div');
+    continueB.className = "centered-subtitle replay";
+    continueB.innerHTML = "back";
+    continueB.onclick = () => {
+        hideCardRemove();
+        if (music)
+            playMusic('resources/sounds/sfx/button_click.mp3', false);
+    }
+    grid.appendChild(continueB);
 }
 
 function nextEncounter() {
