@@ -1091,6 +1091,7 @@ var world = 1;
 var area = 1;
 var money = 0;
 var extraLoot = 0;
+var encounteredBosses = [];
 
 var im = 0;
 var se = 1.6;
@@ -3124,7 +3125,7 @@ function createOpponent(encounter, fixedOpponent) {
             }
         } else {
             opponentN = bossList[Math.floor(Math.random() * bossList.length)];
-            while (contains(encouteredBosses, opponentN))
+            while (contains(encounteredBosses, opponentN))
                 opponentN = bossList[Math.floor(Math.random() * bossList.length)];
             opponent = createPokemon(opponentN);
         }
