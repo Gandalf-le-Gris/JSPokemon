@@ -1433,7 +1433,7 @@ function pathSelector() {
                 image.src = 'resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance || Math.random() < .99) {
+            } else if (Math.random() < eventChance) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -17334,7 +17334,6 @@ function checkGameOver() {
 
 function createEvent(eventS) {
     event = eventS != undefined ? eventS : Math.floor(Math.random() * 14);
-    event = 7;
     switch (event) {
         case 0:
             return new Event0();
