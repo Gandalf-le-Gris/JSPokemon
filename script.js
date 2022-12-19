@@ -1522,6 +1522,9 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     opponent = createOpponent(encounter, fixedPokemon);
     if (opponent.preBattle !== undefined)
         opponent.preBattle(encounter);
+    for (let p of team)
+        if (p.preBattle !== undefined)
+            p.preBattle(encounter);
 
     player = true;
     weather = undefined;
@@ -2819,7 +2822,7 @@ function checkKO() {
         if (music)
             setTimeout(() => { playMusic(opponent.cry, false); }, 750);
         for (let p of team) {
-            if (p.endBattle != undefined)
+            if (p.endBattle !== undefined)
                 p.endBattle();
         }
         if (rewardTimeout == -1) {
@@ -4886,6 +4889,7 @@ function Aegislash() {
             switchAegislash(this, true);
         return 1;
     }
+    this.endBattle = function () { setTimeout(() => {resetAegislash(this)}, 300); }
     this.unlocked = blockedHits >= 30;
     this.hint = "Block 30 attacks\n" + blockedHits + "/30";
     this.cry = "resources/sounds/sfx/cries/aegislash.ogg"
@@ -4944,6 +4948,22 @@ function switchAegislash(p, shield) {
             setTimeout(() => {
                 img.classList.remove("unblink-transform1");
             }, 200);
+        }
+    }
+}
+
+function resetAegislash(p) {
+    if (p.name === "Aegislash") {
+        if (p.stance !== "shield") {
+            var temp = p.attack;
+            p.attack = p.defense;
+            p.defense = temp;
+            temp = p.spattack;
+            p.spattack = p.spdefense;
+            p.spdefense = temp;
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+            p.stance = "shield";
         }
     }
 }
@@ -5239,8 +5259,11 @@ function Ditto() {
         }
     }
     this.endBattle = function () {
-        this.moves = [createMove("struggle")];
-        this.imgb = 'resources/sprites/pokemon_battle_icons/back/ditto.gif';
+        setTimeout(() => {
+            this.moves = [createMove("struggle")];
+            this.types = ["normal"];
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/ditto.gif';
+        }, 300);
     }
     this.unlocked = unlockedPokemon >= 10;
     this.hint = "???";
@@ -5417,6 +5440,10 @@ function Mimikyu() {
         switchMimikyu(this, true);
         applyEffect("disguise", 2, this);
     }
+    this.endBattle = function () {
+        this.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
+        this.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+    }
     this.unlocked = pikachuVictory >= 1;
     this.hint = "???";
     this.cry = "resources/sounds/sfx/cries/mimikyu.ogg"
@@ -5531,6 +5558,17 @@ function Darmanitan() {
     this.talent = "Zen Mode";
     this.talentDesc = "Switches to zen mode when under 50% HP.";
     this.zen = false;
+    this.preBattle = function () {
+        if (this.currenthp <= .5 * this.maxhp) {
+            this.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
+            this.types = ["fire", "psychic"];
+        } else {
+            this.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
+            this.types = ["fire"];
+        }
+    }
     this.init = function () {
         if (this === opponent) {
             for (let i = 0; i <= Math.floor(Math.random() * 3); i++) {
@@ -5669,13 +5707,20 @@ function Rotom() {
         switchRotom(this, move);
         return 1;
     }
+    this.endBattle = function () {
+        setTimeout(() => {
+            this.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+            this.types = ["electric", "ghost"];
+        }, 300);
+    }
     this.unlocked = bossesDefeated >= 10;
     this.hint = "Defeat 10 bosses\n" + bossesDefeated + "/10";
     this.cry = "resources/sounds/sfx/cries/rotom.ogg"
 }
 
 function switchRotom(p, move) {
-    if (p.name === "Rotom" && !contains(p.types, move.type) && (move.type === "ghost" || move.type === "water" || move.type === "ice" || move.type === "fire" || move.type === "grass" || move.type === "flying")) {
+    if (p.name === "Rotom" && move !== undefined && !contains(p.types, move.type) && (move.type === "ghost" || move.type === "water" || move.type === "ice" || move.type === "fire" || move.type === "grass" || move.type === "flying")) {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
         setTimeout(() => {
@@ -5714,7 +5759,7 @@ function switchRotom(p, move) {
                     p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
                     p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
                     resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "fire"];
+                    p.types = ["electric", "water"];
                     break;
                 default:
             }
@@ -5758,6 +5803,13 @@ function Castform() {
     this.items = [];
     this.talent = "Forecast"
     this.init = function () { switchCastform(this); };
+    this.endBattle = function () {
+        setTimeout(() => {
+            this.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
+            this.types = ["normal"];
+        }, 300);
+    }
     this.talentDesc = "Changes form depending on the current weather."
     this.unlocked = weatherChanged >= 50;
     this.hint = "Change the weather 50 times\n" + weatherChanged + "/50";
@@ -6200,6 +6252,12 @@ function Morpeko() {
     this.talent = "Hunger Switch"
     this.talentDesc = "Changes form at the end of each turn."
     this.endTurn = function () { switchMorpeko(this); }
+    this.endBattle = function () {
+        setTimeout(() => {
+            this.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko.gif';
+            this.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko.gif';
+        }, 300);
+    }
     this.unlocked = berriesFound >= 8;
     this.hint = "Discover 8 different berries\n" + berriesFound + "/8";
     this.cry = "resources/sounds/sfx/cries/morpeko.ogg";
