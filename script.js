@@ -1433,7 +1433,7 @@ function pathSelector() {
                 image.src = 'resources/sprites/map_icons/pokemart.png';
                 title.innerHTML = "pokémart";
                 encounter = "pokemart";
-            } else if (Math.random() < eventChance) {
+            } else if (Math.random() < eventChance || Math.random() < .99) {
                 eventChance = Math.min(eventChance, .15);
                 image.src = 'resources/sprites/map_icons/special.png';
                 image.style.filter = "invert()";
@@ -1697,14 +1697,8 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         pImage.title = i.name + "\n" + i.description;
         wrapper.appendChild(pImage);
     }
-    pRightView.title = opponent.name + "\nTypes: ";
-    let pTypes = opponent.illusion === undefined ? opponent.types : opponent.illusion.types;
-    for (let type of pTypes) {
-        var t = type.charAt(0).toUpperCase() + type.slice(1)
-        pRightView.title += t + " ";
-    }
-    pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
 
+    writePokemonTitle();
     resizeSprites(true, true);
 
     actions = document.createElement('div');
@@ -2100,6 +2094,17 @@ function colorHeader(p) {
     header.style.background = c1;
     if (c2 !== c1)
         header.style.background = "linear-gradient(90deg, " + c1 + " 0%, " + c1 + " 43%, " + c2 + " 57%, " + c2 + " 100%)";
+}
+
+function writePokemonTitle() {
+    let pRightView = document.getElementById("pRightView");
+    pRightView.title = opponent.name + "\nTypes: ";
+    let pTypes = opponent.illusion === undefined ? opponent.types : opponent.illusion.types;
+    for (let type of pTypes) {
+        var t = type.charAt(0).toUpperCase() + type.slice(1)
+        pRightView.title += t + " ";
+    }
+    pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
 }
 
 function drawConsumedItems() {
@@ -3127,6 +3132,7 @@ function createOpponent(encounter, fixedOpponent) {
             opponentN = bossList[Math.floor(Math.random() * bossList.length)];
             while (contains(encounteredBosses, opponentN))
                 opponentN = bossList[Math.floor(Math.random() * bossList.length)];
+            encounteredBosses.push(opponentN);
             opponent = createPokemon(opponentN);
         }
     else
@@ -3594,8 +3600,8 @@ function extraReward() {
                 team[this.p].items.push(this.item);
                 if (music)
                     playMusic('resources/sounds/sfx/button_click.mp3', false);
-                if (this.item.pickup != undefined)
-                    this.item.effect(this.p);
+                if (this.item.pickup !== undefined)
+                    this.item.effect(team[this.p]);
                 if (loot > 0) {
                     if (loot == 2)
                         towerRayquaza++;
@@ -4906,6 +4912,7 @@ function switchAegislash(p, shield) {
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
+                writePokemonTitle();
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             }, 100);
@@ -5430,6 +5437,7 @@ function switchMimikyu(p, disguise) {
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
+                writePokemonTitle();
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             }, 100);
@@ -5581,6 +5589,7 @@ function switchDarmanitan(p, zen) {
                 colorHeader(p);
                 initDeck(p);
                 drawMove(p, true);
+                writePokemonTitle();
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             } else if (!zen && p.zen) {
@@ -5710,6 +5719,7 @@ function switchRotom(p, move) {
                 default:
             }
             colorHeader(p);
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -5766,6 +5776,7 @@ function switchCastform(p) {
                     resizeSprites(p === team[activePokemon], p === opponent);
                     p.types = ["normal"];
                     colorHeader(p);
+                    writePokemonTitle();
                     img.classList.remove("blink-transform1");
                     img.className += " unblink-transform1";
                 }
@@ -5784,6 +5795,7 @@ function switchCastform(p) {
                             resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["fire"];
                             colorHeader(p);
+                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -5801,6 +5813,7 @@ function switchCastform(p) {
                             resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["water"];
                             colorHeader(p);
+                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -5818,6 +5831,7 @@ function switchCastform(p) {
                             resizeSprites(p === team[activePokemon], p === opponent);
                             p.types = ["ice"];
                             colorHeader(p);
+                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -6205,6 +6219,7 @@ function switchMorpeko(p) {
             }
             resizeSprites(p === team[activePokemon], p === opponent);
             colorHeader(p);
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6613,6 +6628,7 @@ function switchHoopa(p) {
             colorHeader(p);
             initDeck(p);
             drawMove(p, true);
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6763,6 +6779,7 @@ function switchGiratina(p) {
             p.talentDesc = "Levitates above the ground, granting ground type immunity."
             dealDamage(-.1 * p.maxhp, p);
             p.origin = true;
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6925,6 +6942,7 @@ function switchZygarde(p) {
             p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
             p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
             p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -7006,6 +7024,7 @@ function switchCalyrex(p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
             resizeSprites(p === team[activePokemon], p === opponent);
+            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -7154,13 +7173,7 @@ function switchZoroark(p) {
             colorHeader(p);
             if (p === opponent) {
                 document.getElementById("rightName").innerHTML = p.name;
-                let pRightView = document.getElementById("pRightView");
-                pRightView.title = opponent.name + "\nTypes: ";
-                for (let type of opponent.types) {
-                    var t = type.charAt(0).toUpperCase() + type.slice(1)
-                    pRightView.title += t + " ";
-                }
-                pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
+                writePokemonTitle();
             } else
                 document.getElementById("leftName").innerHTML = p.name;
 
@@ -15740,11 +15753,12 @@ function Pearl() {
 
 function Potion() {
     this.name = "Potion";
-    this.description = "Restores 50% of the holder's HP on pickup.";
+    this.description = "Restores 50% of the holder's HP on pickup unless holder is KO.";
     this.img = 'resources/sprites/held_items/potion.webp';
     this.area = "";
     this.pickup = true;
-    this.effect = (p) => { p.currenthp = Math.min(p.maxhp, p.currenthp + Math.floor(.5 * p.maxhp)); }
+    this.consumed = true;
+    this.effect = (p) => { if (p.currenthp > 0) p.currenthp = Math.min(p.maxhp, p.currenthp + Math.floor(.5 * p.maxhp)); console.log(p); }
 }
 
 function AmuletCoin() {
@@ -17206,13 +17220,14 @@ function createReward(isItem, r1, r2, r3, next) {
                 this.reward1.item = item;
                 this.reward1.itemN = itemN;
                 this.reward1.onclick = function () {
+                    console.log(this.p);
                     if (!contains(foundItems, this.itemN))
                         foundItems.push(this.itemN);
                     team[this.p].items.push(this.item);
                     if (music)
                         playMusic('resources/sounds/sfx/button_click.mp3', false);
                     if (this.item.pickup != undefined)
-                        this.item.effect(this.p);
+                        this.item.effect(team[this.p]);
                     if (next == undefined)
                         nextEncounter();
                     else {
@@ -17319,6 +17334,7 @@ function checkGameOver() {
 
 function createEvent(eventS) {
     event = eventS != undefined ? eventS : Math.floor(Math.random() * 14);
+    event = 7;
     switch (event) {
         case 0:
             return new Event0();

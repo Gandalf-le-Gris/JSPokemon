@@ -802,6 +802,7 @@ button.start:hover {
     display: grid;
     grid-auto-flow: column;
     column-gap: .4vw;
+    padding-right: 1vh;
 }
 
 .held-items-pokemon {
