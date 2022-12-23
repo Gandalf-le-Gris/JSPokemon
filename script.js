@@ -4900,23 +4900,23 @@ function switchAegislash(p, shield) {
         if (shield && p.stance !== "shield") {
             var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
             img.className += " blink-transform1";
+            var temp = p.attack;
+            p.attack = p.defense;
+            p.defense = temp;
+            temp = p.spattack;
+            p.spattack = p.spdefense;
+            p.spdefense = temp;
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
+            p.stance = "shield";
+            writePokemonTitle();
             setTimeout(() => {
-                var temp = p.attack;
-                p.attack = p.defense;
-                p.defense = temp;
-                temp = p.spattack;
-                p.spattack = p.spdefense;
-                p.spdefense = temp;
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash.gif';
-                resizeSprites(p === team[activePokemon], p === opponent);
-                p.stance = "shield";
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
-                writePokemonTitle();
+                resizeSprites(p === team[activePokemon], p === opponent);
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             }, 100);
@@ -4926,22 +4926,23 @@ function switchAegislash(p, shield) {
         } else if (!shield && p.stance === "shield") {
             var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
             img.className += " blink-transform1";
+            var temp = p.attack;
+            p.attack = p.defense;
+            p.defense = temp;
+            temp = p.spattack;
+            p.spattack = p.spdefense;
+            p.spdefense = temp;
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
+            p.stance = "blade";
+            writePokemonTitle();
             setTimeout(() => {
-                var temp = p.attack;
-                p.attack = p.defense;
-                p.defense = temp;
-                temp = p.spattack;
-                p.spattack = p.spdefense;
-                p.spdefense = temp;
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/aegislash_blade.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/aegislash_blade.gif';
-                resizeSprites(p === team[activePokemon], p === opponent);
-                p.stance = "blade";
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
+                resizeSprites(p === team[activePokemon], p === opponent);
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             }, 100);
@@ -5454,17 +5455,17 @@ function switchMimikyu(p, disguise) {
         if (disguise && !p.disguise) {
             var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
             img.className += " blink-transform1";
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
+            p.disguise = true;
+            writePokemonTitle();
             setTimeout(() => {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu.gif';
                 resizeSprites(p === team[activePokemon], p === opponent);
-                p.disguise = true;
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
-                writePokemonTitle();
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
             }, 100);
@@ -5474,11 +5475,12 @@ function switchMimikyu(p, disguise) {
         } else if (!disguise && p.disguise) {
             var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
             img.className += " blink-transform1";
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
+            p.disguise = false;
+            writePokemonTitle();
             setTimeout(() => {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/mimikyu_busted.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/mimikyu_busted.gif';
                 resizeSprites(p === team[activePokemon], p === opponent);
-                p.disguise = false;
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
@@ -5599,68 +5601,75 @@ function switchDarmanitan(p, zen) {
     if (p.name === "Darmanitan") {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
-        setTimeout(() => {
-            if (zen && !p.zen) {
+        if (zen && !p.zen) {
+            p.types = ["fire", "psychic"];
+
+            p.attack *= 3 / 14;
+            p.defense *= 21 / 11;
+            p.spattack *= 14 / 3;
+            p.spdefense *= 21 / 11;
+            p.speed *= 11 / 19;
+            p.zen = true;
+
+            var temp = [].concat(p.moves);
+            p.moves = [].concat(p.moves2);
+            p.moves2 = temp;
+            var temp = [].concat(p.movepool);
+            p.movepool = [].concat(p.movepool2);
+            p.movepool2 = temp;
+
+            colorHeader(p);
+            initDeck(p);
+            drawMove(p, true);
+            writePokemonTitle();
+
+            setTimeout(() => {
                 p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan_zen.gif';
                 p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan_zen.gif';
-                resizeSprites(p === team[activePokemon], p === opponent);
-                p.types = ["fire", "psychic"];
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
-                p.attack *= 3 / 14;
-                p.defense *= 21 / 11;
-                p.spattack *= 14 / 3;
-                p.spdefense *= 21 / 11;
-                p.speed *= 11 / 19;
-                p.zen = true;
-
-                var temp = [].concat(p.moves);
-                p.moves = [].concat(p.moves2);
-                p.moves2 = temp;
-                var temp = [].concat(p.movepool);
-                p.movepool = [].concat(p.movepool2);
-                p.movepool2 = temp;
-
-                colorHeader(p);
-                initDeck(p);
-                drawMove(p, true);
-                writePokemonTitle();
+                resizeSprites(p === team[activePokemon], p === opponent);
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
-            } else if (!zen && p.zen) {
+            }, 100);
+        } else if (!zen && p.zen) {
+            p.types = ["fire"];
+
+            p.attack *= 14 / 3;
+            p.defense *= 11 / 21;
+            p.spattack *= 3 / 14;
+            p.spdefense *= 11 / 21;
+            p.speed *= 19 / 11;
+            p.zen = false;
+
+            var temp = [].concat(p.moves);
+            p.moves = [].concat(p.moves2);
+            p.moves2 = temp;
+            var temp = [].concat(p.movepool);
+            p.movepool = [].concat(p.movepool2);
+            p.movepool2 = temp;
+
+            colorHeader(p);
+            initDeck(p);
+            drawMove(p, true);
+
+            setTimeout(() => {
                 p.imgf = 'resources/sprites/pokemon_battle_icons/front/darmanitan.gif';
                 p.imgb = 'resources/sprites/pokemon_battle_icons/back/darmanitan.gif';
-                resizeSprites(p === team[activePokemon], p === opponent);
-                p.types = ["fire"];
                 if (team[activePokemon] === p) {
                     document.getElementById("leftSprite").src = p.imgb;
                 } else if (opponent === p) {
                     document.getElementById("rightSprite").src = p.imgf;
                 }
-                p.attack *= 14 / 3;
-                p.defense *= 11 / 21;
-                p.spattack *= 3 / 14;
-                p.spdefense *= 11 / 21;
-                p.speed *= 19 / 11;
-                p.zen = false;
+                resizeSprites(p === team[activePokemon], p === opponent);
 
-                var temp = [].concat(p.moves);
-                p.moves = [].concat(p.moves2);
-                p.moves2 = temp;
-                var temp = [].concat(p.movepool);
-                p.movepool = [].concat(p.movepool2);
-                p.movepool2 = temp;
-
-                colorHeader(p);
-                initDeck(p);
-                drawMove(p, true);
                 img.classList.remove("blink-transform1");
                 img.className += " unblink-transform1";
-            }
-        }, 100);
+            }, 100);
+        }
         setTimeout(() => {
             img.classList.remove("unblink-transform1");
             if (p.zen && p.currenthp > .5 * p.maxhp)
@@ -5712,7 +5721,7 @@ function Rotom() {
             this.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
             this.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
             this.types = ["electric", "ghost"];
-        }, 300);
+        }, 150);
     }
     this.unlocked = bossesDefeated >= 10;
     this.hint = "Defeat 10 bosses\n" + bossesDefeated + "/10";
@@ -5723,48 +5732,44 @@ function switchRotom(p, move) {
     if (p.name === "Rotom" && move !== undefined && !contains(p.types, move.type) && (move.type === "ghost" || move.type === "water" || move.type === "ice" || move.type === "fire" || move.type === "grass" || move.type === "flying")) {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
+        switch (move.type) {
+            case "ghost":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
+                p.types = ["electric", "ghost"];
+                break;
+            case "flying":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
+                p.types = ["electric", "flying"];
+                break;
+            case "ice":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
+                p.types = ["electric", "ice"];
+                break;
+            case "fire":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
+                p.types = ["electric", "fire"];
+                break;
+            case "grass":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
+                p.types = ["electric", "grass"];
+                break;
+            case "water":
+                p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
+                p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
+                p.types = ["electric", "water"];
+                break;
+            default:
+        }
+        writePokemonTitle();
         setTimeout(() => {
-            switch (move.type) {
-                case "ghost":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "ghost"];
-                    break;
-                case "flying":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_fan.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_fan.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "flying"];
-                    break;
-                case "ice":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_frost.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_frost.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "ice"];
-                    break;
-                case "fire":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_heat.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_heat.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "fire"];
-                    break;
-                case "grass":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_mow.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_mow.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "grass"];
-                    break;
-                case "water":
-                    p.imgf = 'resources/sprites/pokemon_battle_icons/front/rotom_wash.gif';
-                    p.imgb = 'resources/sprites/pokemon_battle_icons/back/rotom_wash.gif';
-                    resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["electric", "water"];
-                    break;
-                default:
-            }
+            resizeSprites(p === team[activePokemon], p === opponent);
             colorHeader(p);
-            writePokemonTitle();
+
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -5808,7 +5813,7 @@ function Castform() {
             this.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
             this.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
             this.types = ["normal"];
-        }, 300);
+        }, 150);
     }
     this.talentDesc = "Changes form depending on the current weather."
     this.unlocked = weatherChanged >= 50;
@@ -5821,14 +5826,14 @@ function switchCastform(p) {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
             img.className += " blink-transform1";
+            p.types = ["normal"];
+            writePokemonTitle();
             setTimeout(() => {
-                if (!contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
+                if (contains(p.types, "normal") && (weather == undefined || weather.name === "Air Lock" || weather.name === "Sandstorm")) {
                     p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform.gif';
                     p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform.gif';
                     resizeSprites(p === team[activePokemon], p === opponent);
-                    p.types = ["normal"];
                     colorHeader(p);
-                    writePokemonTitle();
                     img.classList.remove("blink-transform1");
                     img.className += " unblink-transform1";
                 }
@@ -5841,13 +5846,13 @@ function switchCastform(p) {
                 case "Sun":
                     if (!contains(p.types, "fire")) {
                         img.className += " blink-transform1";
+                        p.types = ["fire"];
+                        writePokemonTitle();
                         setTimeout(() => {
                             p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_sunny.gif';
                             p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_sunny.gif';
                             resizeSprites(p === team[activePokemon], p === opponent);
-                            p.types = ["fire"];
                             colorHeader(p);
-                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -5859,13 +5864,13 @@ function switchCastform(p) {
                 case "Rain":
                     if (!contains(p.types, "water")) {
                         img.className += " blink-transform1";
+                        p.types = ["water"];
+                        writePokemonTitle();
                         setTimeout(() => {
                             p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_rainy.gif';
                             p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_rainy.gif';
                             resizeSprites(p === team[activePokemon], p === opponent);
-                            p.types = ["water"];
                             colorHeader(p);
-                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -5877,13 +5882,13 @@ function switchCastform(p) {
                 case "Hail":
                     if (!contains(p.types, "ice")) {
                         img.className += " blink-transform1";
+                        p.types = ["ice"];
+                        writePokemonTitle();
                         setTimeout(() => {
                             p.imgf = 'resources/sprites/pokemon_battle_icons/front/castform_snowy.gif';
                             p.imgb = 'resources/sprites/pokemon_battle_icons/back/castform_snowy.gif';
                             resizeSprites(p === team[activePokemon], p === opponent);
-                            p.types = ["ice"];
                             colorHeader(p);
-                            writePokemonTitle();
                             img.classList.remove("blink-transform1");
                             img.className += " unblink-transform1";
                         }, 100);
@@ -6253,10 +6258,8 @@ function Morpeko() {
     this.talentDesc = "Changes form at the end of each turn."
     this.endTurn = function () { switchMorpeko(this); }
     this.endBattle = function () {
-        setTimeout(() => {
-            this.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko.gif';
-            this.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko.gif';
-        }, 300);
+        this.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko.gif';
+        this.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko.gif';
     }
     this.unlocked = berriesFound >= 8;
     this.hint = "Discover 8 different berries\n" + berriesFound + "/8";
@@ -6267,17 +6270,17 @@ function switchMorpeko(p) {
     if (p.name === "Morpeko") {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
+        if (!p.imgf.includes("morpeko_hangry")) {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko_hangry.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko_hangry.gif';
+        } else {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko.gif';
+        }
+        writePokemonTitle();
         setTimeout(() => {
-            if (!p.imgf.includes("morpeko_hangry")) {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko_hangry.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko_hangry.gif';
-            } else {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/morpeko.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/morpeko.gif';
-            }
             resizeSprites(p === team[activePokemon], p === opponent);
             colorHeader(p);
-            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6667,26 +6670,25 @@ function switchHoopa(p) {
     if (p.name === "Hoopa") {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
+        p.types = ["psychic", "dark"];
+        p.attack = Math.floor(p.attack * 16 / 11);
+        p.spattack = Math.floor(p.spattack * 17 / 15);
+        p.speed = Math.floor(p.speed * 8 / 7);
+        dealDamage(-.3 * p.maxhp, p);
+        p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
+        initDeck(p);
+        drawMove(p, true);
+        writePokemonTitle();
         setTimeout(() => {
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/hoopa_unbound.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/hoopa_unbound.gif';
             resizeSprites(p === team[activePokemon], p === opponent);
-            p.types = ["psychic", "dark"];
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
             } else if (opponent === p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
-            p.attack = Math.floor(p.attack * 16 / 11);
-            p.spattack = Math.floor(p.spattack * 17 / 15);
-            p.speed = Math.floor(p.speed * 8 / 7);
-            dealDamage(-.3 * p.maxhp, p);
-            p.moves = [createMove("hyperspace_fury"), createMove("hyperspace_fury"), createMove("gunk_shot"), createMove("hyperspace_hole"), createMove("hyperspace_hole"), createMove("drain_punch"), createMove("power_up_punch"), createMove("phantom_force"), createMove("fire_punch"), createMove("foul_play")];
-
             colorHeader(p);
-            initDeck(p);
-            drawMove(p, true);
-            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6816,6 +6818,19 @@ function switchGiratina(p) {
     if (p.name === "Giratina") {
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
+        var temp = p.attack;
+        p.attack = p.defense;
+        p.defense = temp;
+        temp = p.spattack;
+        p.spattack = p.spdefense;
+        p.spdefense = temp;
+        this.revenge = function (move, pD) { };
+        applyEffect("levitation", 99, p);
+        p.talent = "Levitation"
+        p.talentDesc = "Levitates above the ground, granting ground type immunity."
+        dealDamage(-.1 * p.maxhp, p);
+        p.origin = true;
+        writePokemonTitle();
         setTimeout(() => {
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/giratina_origin.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/giratina_origin.gif';
@@ -6825,19 +6840,6 @@ function switchGiratina(p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
             resizeSprites(p === team[activePokemon], p === opponent);
-            var temp = p.attack;
-            p.attack = p.defense;
-            p.defense = temp;
-            temp = p.spattack;
-            p.spattack = p.spdefense;
-            p.spdefense = temp;
-            this.revenge = function (move, pD) { };
-            applyEffect("levitation", 99, p);
-            p.talent = "Levitation"
-            p.talentDesc = "Levitates above the ground, granting ground type immunity."
-            dealDamage(-.1 * p.maxhp, p);
-            p.origin = true;
-            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -6982,6 +6984,16 @@ function switchZygarde(p) {
         p.complete = true;
         var img = p === opponent ? document.getElementById("rightSprite") : document.getElementById("leftSprite");
         img.className += " blink-transform1";
+        p.maxhp *= 2;
+        dealDamage(-p.currenthp, p);
+        p.spattack *= 91 / 81;
+        p.speed *= 81 / 91;
+        p.revenge = function (move, pD) { };
+        removeEffect(p, "Zygarde Cells");
+        p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
+        p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
+        p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
+        writePokemonTitle();
         setTimeout(() => {
             p.imgf = 'resources/sprites/pokemon_battle_icons/front/zygarde_complete.gif';
             p.imgb = 'resources/sprites/pokemon_battle_icons/back/zygarde_complete.gif';
@@ -6991,16 +7003,6 @@ function switchZygarde(p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
             resizeSprites(p === team[activePokemon], p === opponent);
-            p.maxhp *= 2;
-            dealDamage(-p.currenthp, p);
-            p.spattack *= 91 / 81;
-            p.speed *= 81 / 91;
-            p.revenge = function (move, pD) { };
-            removeEffect(p, "Zygarde Cells");
-            p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
-            p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
-            p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, new LandsWrath());
-            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
@@ -7050,39 +7052,40 @@ function switchCalyrex(p) {
             p.steed = "ice";
         else
             p.steed = (Math.random() < .5) ? "ice" : "shadow";
+
+        let statBalancer = 20 / 29;
+        if (p.steed === "ice") {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/calyrex_ice.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/calyrex_ice.gif';
+            p.attack = (oldSteed === "") ? p.attack * 165 / 80 * statBalancer : p.attack * 165 / 85;
+            p.defense = (oldSteed === "") ? p.defense * 150 / 80 * statBalancer : p.defense * 150 / 80;
+            p.spattack = (oldSteed === "") ? p.spattack * 85 / 80 * statBalancer : p.spattack * 85 / 165;
+            p.spdefense = (oldSteed === "") ? p.spdefense * 130 / 80 * statBalancer : p.spdefense * 130 / 100;
+            p.speed = (oldSteed === "") ? p.speed * 50 / 80 * statBalancer : p.speed * 50 / 150;
+            p.types = ["psychic", "ice"];
+            p.moves = [createMove("bullet_seed"), createMove("bullet_seed"), createMove("zen_headbutt"), createMove("zen_headbutt"), createMove("throat_chop"), createMove("glacial_lance"), createMove("glacial_lance"), createMove("icicle_spear"), createMove("icicle_crash"), createMove("high_horsepower")];
+        } else {
+            p.imgf = 'resources/sprites/pokemon_battle_icons/front/calyrex_shadow.gif';
+            p.imgb = 'resources/sprites/pokemon_battle_icons/back/calyrex_shadow.gif';
+            p.attack = (oldSteed === "") ? p.attack * 85 / 80 * statBalancer : p.attack * 85 / 165;
+            p.defense = (oldSteed === "") ? p.defense * 80 / 80 * statBalancer : p.defense * 80 / 150;
+            p.spattack = (oldSteed === "") ? p.spattack * 165 / 80 * statBalancer : p.spattack * 165 / 85;
+            p.spdefense = (oldSteed === "") ? p.spdefense * 100 / 80 * statBalancer : p.spdefense * 100 / 130;
+            p.speed = (oldSteed === "") ? p.speed * 150 / 80 * statBalancer : p.speed * 150 / 50;
+            p.types = ["psychic", "ghost"];
+            p.moves = [createMove("giga_drain"), createMove("giga_drain"), createMove("psyshock"), createMove("psychic"), createMove("future_sight"), createMove("astral_barrage"), createMove("astral_barrage"), createMove("shadow_ball"), createMove("hex"), createMove("draining_kiss")];
+        }
+        initDeck(p);
+        drawMove(p, true);
+        writePokemonTitle();
         setTimeout(() => {
-            let statBalancer = 20 / 29;
-            if (p.steed === "ice") {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/calyrex_ice.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/calyrex_ice.gif';
-                p.attack = (oldSteed === "") ? p.attack * 165 / 80 * statBalancer : p.attack * 165 / 85;
-                p.defense = (oldSteed === "") ? p.defense * 150 / 80 * statBalancer : p.defense * 150 / 80;
-                p.spattack = (oldSteed === "") ? p.spattack * 85 / 80 * statBalancer : p.spattack * 85 / 165;
-                p.spdefense = (oldSteed === "") ? p.spdefense * 130 / 80 * statBalancer : p.spdefense * 130 / 100;
-                p.speed = (oldSteed === "") ? p.speed * 50 / 80 * statBalancer : p.speed * 50 / 150;
-                p.types = ["psychic", "ice"];
-                p.moves = [createMove("bullet_seed"), createMove("bullet_seed"), createMove("zen_headbutt"), createMove("zen_headbutt"), createMove("throat_chop"), createMove("glacial_lance"), createMove("glacial_lance"), createMove("icicle_spear"), createMove("icicle_crash"), createMove("high_horsepower")];
-            } else {
-                p.imgf = 'resources/sprites/pokemon_battle_icons/front/calyrex_shadow.gif';
-                p.imgb = 'resources/sprites/pokemon_battle_icons/back/calyrex_shadow.gif';
-                p.attack = (oldSteed === "") ? p.attack * 85 / 80 * statBalancer : p.attack * 85 / 165;
-                p.defense = (oldSteed === "") ? p.defense * 80 / 80 * statBalancer : p.defense * 80 / 150;
-                p.spattack = (oldSteed === "") ? p.spattack * 165 / 80 * statBalancer : p.spattack * 165 / 85;
-                p.spdefense = (oldSteed === "") ? p.spdefense * 100 / 80 * statBalancer : p.spdefense * 100 / 130;
-                p.speed = (oldSteed === "") ? p.speed * 150 / 80 * statBalancer : p.speed * 150 / 50;
-                p.types = ["psychic", "ghost"];
-                p.moves = [createMove("giga_drain"), createMove("giga_drain"), createMove("psyshock"), createMove("psychic"), createMove("future_sight"), createMove("astral_barrage"), createMove("astral_barrage"), createMove("shadow_ball"), createMove("hex"), createMove("draining_kiss")];
-            }
             colorHeader(p);
-            initDeck(p);
-            drawMove(p, true);
             if (team[activePokemon] === p) {
                 document.getElementById("leftSprite").src = p.imgb;
             } else if (opponent === p) {
                 document.getElementById("rightSprite").src = p.imgf;
             }
             resizeSprites(p === team[activePokemon], p === opponent);
-            writePokemonTitle();
             img.classList.remove("blink-transform1");
             img.className += " unblink-transform1";
         }, 100);
