@@ -1018,6 +1018,15 @@ function pokemonSelector(name) {
                 tsc.className = "selector-count";
                 tsc.onclick = () => { };
                 this.className = "team-selector-element";
+
+                let newPSelected = [];
+                for (let i = 0; i < pSelected.length; i++) {
+                    if (pSelected[i] !== "")
+                        newPSelected.push(pSelected[i]);
+                }
+                while (newPSelected.length < pSelected.length)
+                    newPSelected.push("");
+                pSelected = JSON.parse(JSON.stringify(newPSelected));
             }
         }
     }
@@ -1073,6 +1082,15 @@ function randomSelector(n) {
             tsc.className = "selector-count";
             tsc.onclick = () => { };
             this.className = "team-selector-element";
+
+            let newPSelected = [];
+            for (let i = 0; i < pSelected.length; i++) {
+                if (pSelected[i] !== "")
+                    newPSelected.push(pSelected[i]);
+            }
+            while (newPSelected.length < pSelected.length)
+                newPSelected.push("");
+            pSelected = JSON.parse(JSON.stringify(newPSelected));
         }
     }
 }
