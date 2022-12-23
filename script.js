@@ -13870,7 +13870,8 @@ function applyEffect(type, stacks, p, extra) {
 
         var i = p.effects.findIndex(e => e.name === effect.name);
         if (i >= 0) {
-            p.effects[i].stacks += effect.stacks;
+            if (!p.effects[i].nonstackable || p.effects[i].stacks == 0)
+                p.effects[i].stacks += effect.stacks;
         } else {
             p.effects.push(effect);
         }
@@ -14074,6 +14075,7 @@ function Grounded(stacks) {
     this.description = "Grounded";
     this.icon = 'resources/sprites/ui_icons/debuff.png';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => { };
 }
 
@@ -14082,6 +14084,7 @@ function Immunity(stacks, type) {
     this.description = "Immunity (" + type + ")\nImmune to " + type + " type moves.";
     this.icon = 'resources/sprites/effect_icons/immunity.png';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => { };
 }
 
@@ -14090,6 +14093,7 @@ function IngrainE(stacks) {
     this.description = "Ingrain\nRestore 20HP at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/ingrain.webp';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => { dealDamage(-20, pA); };
 }
 
@@ -14201,6 +14205,7 @@ function StealthRockE(stacks) {
     this.description = "Stealth Rock\nDeals 20 rock type damage at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/stealth_rock.webp';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => {
         if (!hasBoots(pA))
             dealDamage(20 * effectiveMultiplier(new RockThrow(), pA), pA);
@@ -14212,6 +14217,7 @@ function StickyWebE(stacks) {
     this.description = "Sticky Web\nLower speed by one stage at the end of each turn if it hasn't been lowered already. Airborne Pokémon are immune.";
     this.icon = 'resources/sprites/effect_icons/sticky_web.webp';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => {
         if (pA.statchanges.speed >= 0 && isGrounded(pA) && !hasBoots(pA))
             boostStat(pA, "speed", -1);
@@ -14232,6 +14238,7 @@ function ThickFat(stacks) {
     this.description = "Thick Fat\nLowers the damage of incoming ice and fire type moves.";
     this.icon = 'resources/sprites/effect_icons/thick_fat.png';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => { };
 }
 
@@ -14264,6 +14271,7 @@ function Trap(stacks) {
     this.icon = 'resources/sprites/effect_icons/trap.png';
     this.stacks = stacks;
     this.trapped = true;
+    this.nonstackable = true;
     this.effect = (pA, pD) => { }
 }
 
@@ -14280,6 +14288,7 @@ function WishE(stacks) {
     this.description = "Wish\nRestores 20% of maximum HP once this effect ends. Remove 1 stack at the end of each turn.";
     this.icon = 'resources/sprites/effect_icons/wish.webp';
     this.stacks = stacks;
+    this.nonstackable = true;
     this.effect = (pA, pD) => {
         this.stacks--;
         if (this.stacks == 0)
@@ -17970,7 +17979,7 @@ function Event7() {
 }
 
 function Event8() {
-    this.description = "You finally come out of a large forest, only to realize the bridge you were about to cross has been destroyed. The current strong, and you don't see another passage nearby.";
+    this.description = "You finally come out of a large forest, only to realize the bridge you were about to cross has been destroyed. The current is strong, and you don't see another passage nearby.";
     this.options = [];
     this.options.push({
         text: "Go back on your steps",
