@@ -1498,7 +1498,7 @@ function pathSelector() {
 
 opponentList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp", "cinderace", "lucario", "volcarona", "eevee", "gardevoir", "dragonite", "ferrothorn", "blissey", "sableye", "scizor", "aegislash", "meowth", "metagross", "weavile", "zeraora", "omanyte", "tyranitar", "gyarados", "mew", "urshifu", "gengar", "shuckle", "mimikyu", "mamoswine", "darmanitan", "rotom", "kommo-o", "whimsicott", "nidoking", "ninetales_alola", "torterra", "delphox", "primarina", "yanmega", "rhyperior", "toxicroak", "aurorus", "dragapult", "morpeko", "gallade"];
 bossList = ["arceus", "heatran", "mewtwo", "hoopa", "groudon", "kyogre", "rayquaza", "giratina", "eternatus", "regigigas", "diancie", "zygarde", "calyrex", "zarude", "volcanion", "marshadow"];
-eventPokemonList = ["unown", "shedinja", "spiritomb", "zoroark"]; //"bidoof"
+eventPokemonList = ["unown", "shedinja", "spiritomb", "zoroark", "bidoof"];
 
 energy = 5;
 maxEnergy = 5;
@@ -17437,7 +17437,7 @@ function checkGameOver() {
 }
 
 function createEvent(eventS) {
-    event = eventS != undefined ? eventS : Math.floor(Math.random() * 14);
+    event = eventS != undefined ? eventS : Math.floor(Math.random() * 17);
     switch (event) {
         case 0:
             return new Event0();
@@ -17466,6 +17466,14 @@ function createEvent(eventS) {
         case 12:
             return new Event12();
         case 13:
+            return new Event13();
+        case 14:
+            return new Event14();
+        case 15:
+            return new Event15();
+        case 16:
+            return new Event16();
+        default:
             return new Event13();
     }
 }
@@ -17738,9 +17746,10 @@ function Event3() {
     this.options.push({
         text: "Examine the keystone",
         effect: () => {
-            for (let p of team)
+            for (let p of team) {
                 p.moves.push(new Cursed());
                 maxDeckSize = Math.max(maxDeckSize, p.moves.length);
+            }
             nextEncounter();
         },
         description: "You feel more and more unseasy as you approach the keystone. You didn't discover anything, but you have a bad feeling about this.",
@@ -18491,6 +18500,168 @@ function Event13c() {
             nextEncounter();
         },
         description: "You're no fool. You flee while you can before the dragon wakes up and obliterates you.",
+    })
+}
+
+function Event14() {
+    this.description = "As you explore an apparently empty old castle, you eventually enter a treasure room unexpectedly filled with riches. These sure look suspicious, but it would be a shame not to take a few items before leaving.";
+    this.options = [];
+    var reward = Math.random() < .5;
+    var dark = team.findIndex(e => contains(e.types, "dark"));
+    this.options.push({
+        text: dark < 0 ? "Open a gold chest" : "[Dark] Open a gold chest",
+        effect: () => {
+            if (dark >= 0 || reward) {
+                money += 800;
+                earnedMoney += 800;
+                nextEncounter();
+            } else {
+                for (let p of team) {
+                    p.moves.push(new Cursed());
+                    maxDeckSize = Math.max(maxDeckSize, p.moves.length);
+                }
+                nextEncounter();
+            }
+        },
+        description: dark < 0 && !reward ? "The chest happened to be a Gimmighoul! It is not happy to see a thief like you." : (dark < 0 ? "The chest is full of gold coins. You grab as many as you can before leaving." : "The chest happened to be a Gimmighoul! Luckily, " + team[dark].name + " scares it away and you can collect the gold coins it leaves behind."),
+        subdescription: dark < 0 && !reward ? "You have been cursed." : "You got " + String.fromCharCode(08381) + "800."
+    })
+    this.options.push({
+        text: "Open a gemstone chest",
+        effect: () => {
+            function getGemReward(n) {
+                return team[n].types.length == 1 ? team[n].types[0] + "_gem" : (Math.random() < .5 ? team[n].types[0] + "_gem" : team[n].types[1] + "_gem");
+            }
+            createReward(true, getGemReward(0), getGemReward(1), getGemReward(2));
+        },
+        description: "The chest is full of small colorful gems. You decide to grab one of them before you go.",
+    })
+    this.options.push({
+        text: "Take the equipment off of an armor stand",
+        effect: () => {
+            function getArmorReward() {
+                return Math.random() < 1 / 3 ? "auspicious_armor" : (Math.random() < .5 ? "malicious_armor" : "protective_pads");
+            }
+            createReward(true, getArmorReward(), getArmorReward(), getArmorReward());
+        },
+        description: "You carefully take some old and dusty equipment off of the armor stand. It could probably still be useful.",
+    })
+    var ghost = team.findIndex(e => contains(e.types, "ghost"));
+    if (ghost >= 0) {
+        this.options.push({
+            text: "[Ghost] Follow " + team[ghost].name + " to a plain looking wall",
+            effect: () => {
+                createReward(true, "soul_dew");
+            },
+            description: team[ghost].name + " leads you to an ordinary looking brick wall. Although you can't understand what's so special about it, your Pokémon reaches for something on the other side of it and hands it over to you.",
+        })
+    }
+}
+
+function Event15() {
+    this.description = "In the middle of a gloomy forest, a shine in a nearby bush catches your eye. You wonder what it could be.";
+    this.options = [];
+    var grass = team.findIndex(e => contains(e.types, "grass"));
+    var reward = Math.random() < .2 + .3 * (grass >= 0);
+    this.options.push({
+        text: grass < 0 ? "Reach out to the item in the brambles" : "[Grass] Reach to the item in the brambles",
+        effect: () => {
+            if (reward) {
+                function getBossReward() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (createHeldItem(item).area !== "boss")
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getBossReward(), getBossReward(), getBossReward());
+            } else {
+                for (let p of team)
+                    p.currenthp = Math.floor(Math.max(0, p.currenthp - .05 * p.maxhp));
+                runEvent(new Event15());
+            }
+        },
+        description: !reward ? "You can't reach the item and only manage to badly scratch your arm. Perhaps you should try again from a different angle." : (grass < 0 ? "You miraculously manage to extract the item without hurting yourself." : "With the help of " + team[grass].name + ", you manage to extract the item without hurting yourself."),
+        subdescription: !reward ? "Your Pokémon have taken slight damage." : undefined
+    })
+    var fire = team.findIndex(e => contains(e.types, "fire"));
+    if (fire >= 0) {
+        this.options.push({
+            text: "[Fire] Let " + team[fire].name + " burn the bush down",
+            effect: () => {
+                createReward(true, "charcoal");
+            },
+            description: team[fire].name + " lets out a large burst of scorching flames, burning the poor bush down to ashes. Whatever was inside is surely gone, but you might still be able to scavenge something.",
+        })
+    }
+    var gallade = team.findIndex(e => e.name === "Gallade");
+    if (gallade >= 0) {
+        this.options.push({
+            text: "[Gallade] Chop down the bush",
+            effect: () => {
+                function getMintReward() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes("_mint") && !item.includes("poison_barb"))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getMintReward(), getMintReward(), getMintReward());
+            },
+            description: "Gallade slices the thorns and branches in no time, revealing whatever was hidden inside.",
+        })
+    }
+    this.options.push({
+        text: "Keep going",
+        effect: () => {
+            nextEncounter();
+        },
+        description: "You'd rather keep your arm and leave the brambles be. It was probably nothing anyway.",
+    })
+}
+
+function Event16() {
+    this.description = "On the side of the road you're walking down, in the distance, you see a child waving at you. They seem to be a young trainer eager to test their skills against you.";
+    this.options = [];
+    this.options.push({
+        text: "Challenge them",
+        effect: () => {
+            battleEncounter("normal", "bidoof");
+        },
+        description: "That kid will be no match for your team. You might as well teach them a lesson.",
+    })
+    var highAttack = team.findIndex(e => e.attack > 130 || e.spattack > 130);
+    if (highAttack >= 0) {
+        this.options.push({
+            text: "[High attack] Intimidate the kid with your " + team[highAttack].name,
+            effect: () => {
+                money += 500;
+                earnedMoney += 500;
+                nextEncounter();
+            },
+            description: "A Pokémon such as " + team[highAttack].name + " is a force to reckon with, and the child immediately retreats when seeing it.",
+            subdescription: "You got " + String.fromCharCode(08381) + "500."
+        })
+    }
+    var pikachu = team.findIndex(e => e.name === "Pikachu");
+    if (pikachu >= 0) {
+        this.options.push({
+            text: "[Pikachu] Offer to play with your cute Pikachu instead",
+            effect: () => {
+                team[pikachu].maxhp = Math.floor(team[pikachu].maxhp * 1.2);
+                team[pikachu].hp = Math.floor(team[pikachu].hp * 1.2);
+                nextEncounter();
+            },
+            description: "The kid joyfully starts playing in the grass with your Pikachu. After a while, they come back with a large smile on their face.",
+            subdescription: "Your Pikachu has grown stronger."
+        })
+    }
+    this.options.push({
+        text: "Forfeit immediately",
+        effect: () => {
+            money = Math.max(money - 500, 0);
+            nextEncounter();
+        },
+        description: "Your Pokémon are too weak to battle. You'd rather forfeit straight away and avoid an unnecessary fight.",
+        subdescription: "You lost " + String.fromCharCode(08381) + "500."
     })
 }
 
