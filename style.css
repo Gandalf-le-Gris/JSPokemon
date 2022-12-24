@@ -430,6 +430,28 @@ button.start:hover {
         transform: scale(1.1);
     }
 
+.turnBanner {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    color: white;
+    font-weight: bold;
+    font-size: 5vh;
+    font-family: 'Copperplate Gothic';
+    padding: 2vh 8vh 2vh 8vh;
+    background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.6) 15%, rgba(0,0,0,.6) 85%, rgba(0,0,0,0) 100%);
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+}
+
+.animate {
+    visibility: visible;
+    animation: strafe 1.3s linear forwards;
+    -webkit-animation: strafe 1.3s linear forwards;
+    -moz-animation: strafe 1.3s linear forwards;
+    -o-animation: strafe 1.3s linear forwards;
+}
+
 .turn-header {
     color: white;
     font-size: 2vw;
@@ -1833,7 +1855,7 @@ input:checked + .slider:before {
 
     100% {
         opacity: 0;
-        transform: translateY(-3vh);
+        transform: translateY(-2vh);
     }
 }
 
@@ -1854,6 +1876,94 @@ input:checked + .slider:before {
 
     100% {
         opacity: 0;
-        transform: translateY(-3vh);
+        transform: translateY(-2vh);
+    }
+}
+
+@keyframes strafe {
+    0% {
+        opacity: 0;
+        transform: translate(-60%, -50%);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-56%, -50%);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-44%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-40%, -50%);
+    }
+}
+
+@-webkit-keyframes strafe {
+    0% {
+        opacity: 0;
+        transform: translate(-60%, -50%);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-56%, -50%);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-44%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-40%, -50%);
+    }
+}
+
+@-moz-keyframes strafe {
+    0% {
+        opacity: 0;
+        transform: translate(-60%, -50%);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-56%, -50%);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-44%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-40%, -50%);
+    }
+}
+
+@-o-keyframes strafe {
+    0% {
+        opacity: 0;
+        transform: translate(-60%, -50%);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-56%, -50%);
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-44%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-40%, -50%);
     }
 }

@@ -1861,6 +1861,17 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     document.body.appendChild(historyButton);
     historyButton.appendChild(historyIcon);
 
+    yourTurn = document.createElement('div');
+    yourTurn.id = "yourTurn";
+    yourTurn.innerHTML = "Your turn";
+    yourTurn.className = "turnBanner";
+    document.body.appendChild(yourTurn);
+    opponentsTurn = document.createElement('div');
+    opponentsTurn.id = "opponentsTurn";
+    opponentsTurn.innerHTML = "Opponent's turn";
+    opponentsTurn.className = "turnBanner";
+    document.body.appendChild(opponentsTurn);
+
     if (team[switchInd[0]].currenthp == 0)
         document.getElementById("switch1").classList.add("gray");
     else
@@ -1971,6 +1982,11 @@ function startTurn() {
     drawn = 0;
     healing = 0;
     battleHistory.push([]);
+
+    document.getElementById("yourTurn").classList.remove("animate");
+    document.getElementById("opponentsTurn").classList.remove("animate");
+    document.getElementById(player ? "yourTurn" : "opponentsTurn").classList.add("animate");
+
     if (player) {
         switchesLeft = 1;
         for (let p of team) {
