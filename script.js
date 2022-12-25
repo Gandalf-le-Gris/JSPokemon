@@ -3177,7 +3177,7 @@ function createOpponent(encounter, fixedOpponent) {
     if (!contains(encounteredPokemon, opponentN) && opponentN !== "nidoqueen")
         encounteredPokemon.push(opponentN);
 
-    adjustBST(opponent, 400 + 10 * area + 100 * world + 100 * (encounter === "boss"), (encounter === "boss"));
+    adjustBST(opponent, 370 + 10 * area + 110 * world + 100 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
         opponent.maxhp = 3 + 2 * world;
         opponent.currenthp = opponent.maxhp;
@@ -4370,7 +4370,8 @@ function Venusaur() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["grass", "poison"];
-    this.moves = [createMove("vine_whip"), createMove("mega_drain"), createMove("poison_powder"), createMove("sludge"), createMove("leech_seed"), createMove("sunny_day")];
+    //this.moves = [createMove("vine_whip"), createMove("mega_drain"), createMove("poison_powder"), createMove("sludge"), createMove("leech_seed"), createMove("sunny_day")];
+    this.moves = [createMove("vine_whip"), createMove("vine_whip"), createMove("vine_whip"), createMove("sludge"), createMove("giga_drain"), createMove("sludge_bomb")];
     this.movepool = ["vine_whip", "poison_powder", "leech_seed", "double_edge", "earthquake", "rest", "toxic", "mega_drain", "giga_drain", "sludge", "bulldoze", "bullet_seed", "curse", "energy_ball", "frenzy_plant", "growth", "hidden_power", "ingrain", "leaf_storm", "outrage", "power_whip", "razor_leaf", "sleep_powder", "sludge_bomb", "solar_beam", "substitute", "sunny_day", "synthesis", "venoshock", "weather_ball", "venom_drench", "toxic_spikes"];
     this.opponentMoves =
         [[createMove("vine_whip"), createMove("synthesis"), createMove("power_whip"), createMove("sunny_day"), createMove("solar_beam"), createMove("mega_drain"), createMove("growth"), createMove("energy_ball"), createMove("sludge_bomb"), createMove("double_edge")],
@@ -4403,7 +4404,8 @@ function Charizard() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire", "flying"];
-    this.moves = [createMove("ember"), createMove("heat_wave"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("roost"), createMove("sunny_day")];
+    //this.moves = [createMove("ember"), createMove("heat_wave"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("roost"), createMove("sunny_day")];
+    this.moves = [createMove("ember"), createMove("ember"), createMove("air_cutter"), createMove("air_cutter"), createMove("sunny_day"), createMove("heat_wave")];
     this.movepool = ["ember", "wing_attack", "flamethrower", "ancient_power", "crunch", "double_edge", "outrage", "roost", "sunny_day", "solar_beam", "swords_dance", "weather_ball", "air_cutter", "air_slash", "blast_burn", "breaking_swipe", "brick_break", "defog", "dragon_claw", "dragon_dance", "dragon_pulse", "dual_wingbeat", "fire_blast", "fire_spin", "flame_charge", "flare_blitz", "focus_blast", "heat_wave", "hurricane", "inferno", "overheat", "scale_shot", "scorching_sands", "shadow_claw", "will_o_wisp"];
     this.opponentMoves =
         [[createMove("ember"), createMove("blast_burn"), createMove("flamethrower"), createMove("sunny_day"), createMove("solar_beam"), createMove("weather_ball"), createMove("air_cutter"), createMove("dragon_pulse"), createMove("heat_wave"), createMove("hurricane")],
@@ -4436,7 +4438,8 @@ function Blastoise() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["water"];
-    this.moves = [createMove("water_gun"), createMove("ice_beam"), createMove("water_pulse"), createMove("brick_break"), createMove("flip_turn"), createMove("rain_dance"),];
+    //this.moves = [createMove("water_gun"), createMove("ice_beam"), createMove("water_pulse"), createMove("brick_break"), createMove("flip_turn"), createMove("rain_dance")];
+    this.moves = [createMove("water_gun"), createMove("water_gun"), createMove("water_gun"), createMove("water_pulse"), createMove("flip_turn"), createMove("rain_dance")];
     this.movepool = ["water_gun", "rapid_spin", "flash_cannon", "aura_sphere", "brick_break", "curse", "earthquake", "focus_blast", "power_up_punch", "rest", "waterfall", "weather_ball", "avalanche", "blizzard", "brine", "bubble_beam", "dark_pulse", "dive", "dynamic_punch", "flip_turn", "gyro_ball", "hydro_cannon", "hydro_pump", "ice_beam", "iron_defense", "iron_tail", "liquidation", "rain_dance", "rock_slide", "scald", "seismic_toss", "shell_smash", "skull_bash", "surf", "water_pulse", "water_spout", "whirlpool"];
     this.opponentMoves =
         [[createMove("water_gun"), createMove("water_pulse"), createMove("rain_dance"), createMove("flip_turn"), createMove("weather_ball"), createMove("earthquake"), createMove("shell_smash"), createMove("brine"), createMove("hydro_pump"), createMove("ice_beam")],
@@ -4469,7 +4472,8 @@ function Pikachu() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric"];
-    this.moves = [createMove("thunder_shock"), createMove("nuzzle"), createMove("quick_attack"), createMove("volt_switch"), createMove("fake_out"), createMove("electroweb")];
+    //this.moves = [createMove("thunder_shock"), createMove("nuzzle"), createMove("quick_attack"), createMove("volt_switch"), createMove("fake_out"), createMove("electroweb")];
+    this.moves = [createMove("thunder_shock"), createMove("thunder_shock"), createMove("thunder_shock"), createMove("volt_switch"), createMove("nuzzle"), createMove("electro_ball")];
     this.movepool = ["thunder_shock", "quick_attack", "nuzzle", "detect", "extreme_speed", "rollout", "seismic_toss", "spark", "surf", "volt_switch", "agility", "calm_mind", "charge", "charge_beam", "discharge", "double_kick", "draining_kiss", "electro_ball", "electroweb", "facade", "fake_out", "grass_knot", "iron_tail", "last_resort", "magnet_rise", "mimic", "nasty_plot", "play_rough", "shock_wave", "swagger", "thunder", "thunderbolt", "thunder_punch", "volt_tackle", "wild_charge", "wish", "zap_cannon"];
     this.opponentMoves =
         [[createMove("thunder_shock"), createMove("nasty_plot"), createMove("charge"), createMove("charge_beam"), createMove("agility"), createMove("electro_ball"), createMove("thunderbolt"), createMove("grass_knot"), createMove("discharge"), createMove("electroweb")],
@@ -4503,7 +4507,8 @@ function Garchomp() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dragon", "ground"];
-    this.moves = [createMove("bulldoze"), createMove("sand_tomb"), createMove("dual_chop"), createMove("dragon_claw"), createMove("hone_claws"), createMove("rock_slide")];
+    //this.moves = [createMove("bulldoze"), createMove("sand_tomb"), createMove("dual_chop"), createMove("dragon_claw"), createMove("hone_claws"), createMove("rock_slide")];
+    this.moves = [createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("dragon_claw"), createMove("bulldoze"), createMove("sand_tomb")];
     this.movepool = ["dual_chop", "sand_tomb", "crunch", "breaking_swipe", "double_edge", "dragon_claw", "dragon_pulse", "earthquake", "facade", "fire_blast", "bulldoze", "iron_tail", "outrage", "rock_slide", "scale_shot", "scorching_sands", "shadow_claw", "stomping_tantrum", "swords_dance", "twister", "aqua_tail", "dig", "draco_meteor", "dragon_rush", "dragon_tail", "earth_power", "fire_fang", "giga_impact", "hone_claws", "iron_head", "poison_jab", "sandstorm", "stealth_rock", "stone_edge", "thrash"];
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("outrage"), createMove("dragon_claw"), createMove("dual_chop"), createMove("dragon_rush"), createMove("dragon_tail"), createMove("earthquake"), createMove("scale_shot"), createMove("rock_slide"), createMove("iron_tail")],
@@ -4537,7 +4542,8 @@ function Cinderace() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire"];
-    this.moves = [createMove("fire_punch"), createMove("fire_fang"), createMove("quick_attack"), createMove("double_kick"), createMove("u_turn"), createMove("pyro_ball")];
+    //this.moves = [createMove("fire_punch"), createMove("fire_fang"), createMove("quick_attack"), createMove("double_kick"), createMove("u_turn"), createMove("pyro_ball")];
+    this.moves = [createMove("fire_fang"), createMove("fire_fang"), createMove("fire_fang"), createMove("double_kick"), createMove("iron_head"), createMove("pyro_ball")];
     this.movepool = ["tackle", "ember", "quick_attack", "pyro_ball", "assurance", "double_edge", "double_kick", "facade", "fire_fang", "flame_charge", "flare_blitz", "giga_impact", "iron_head", "agility", "sunny_day", "baton_pass", "blaze_kick", "bounce", "fire_punch", "gunk_shot", "high_jump_kick", "low_sweep", "mega_kick", "reversal", "sucker_punch", "u_turn", "zen_headbutt", "bulk_up", "protect", "super_fang", "ally_switch"];
     this.opponentMoves =
         [[createMove("fire_punch"), createMove("fire_fang"), createMove("pyro_ball"), createMove("flame_charge"), createMove("flare_blitz"), createMove("blaze_kick"), createMove("sunny_day"), createMove("double_edge"), createMove("iron_head"), createMove("bounce")],
@@ -4578,7 +4584,8 @@ function Lucario() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fighting", "steel"];
-    this.moves = [createMove("steel_beam"), createMove("rock_smash"), createMove("vacuum_wave"), createMove("flash_cannon"), createMove("drain_punch"), createMove("life_dew")];
+    //this.moves = [createMove("steel_beam"), createMove("rock_smash"), createMove("vacuum_wave"), createMove("flash_cannon"), createMove("drain_punch"), createMove("life_dew")];
+    this.moves = [createMove("rock_smash"), createMove("rock_smash"), createMove("metal_claw"), createMove("metal_claw"), createMove("flash_cannon"), createMove("aura_sphere")];
     this.movepool = ["rock_smash", "metal_claw", "aura_sphere", "blaze_kick", "brick_break", "bulk_up", "bulldoze", "bullet_punch", "calm_mind", "dark_pulse", "dragon_pulse", "extreme_speed", "facade", "flash_cannon", "focus_blast", "fury_cutter", "heal_pulse", "high_jump_kick", "hone_claws", "iron_defense", "iron_tail", "low_sweep", "nasty_plot", "poison_jab", "power_up_punch", "psychic", "reversal", "rock_slide", "shadow_ball", "stone_edge", "bone_rush", "close_combat", "cross_chop", "drain_punch", "focus_punch", "force_palm", "life_dew", "meteor_mash", "steel_beam", "vacuum_wave"];
     this.opponentMoves =
         [[createMove("rock_smash"), createMove("metal_claw"), createMove("brick_break"), createMove("bulk_up"), createMove("bullet_punch"), createMove("extreme_speed"), createMove("high_jump_kick"), createMove("meteor_mash"), createMove("iron_tail"), createMove("bone_rush")],
@@ -4612,7 +4619,8 @@ function Volcarona() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire", "bug"];
-    this.moves = [createMove("ember"), createMove("gust"), createMove("struggle_bug"), createMove("quiver_dance"), createMove("fiery_dance"), createMove("silver_wind")];
+    //this.moves = [createMove("ember"), createMove("gust"), createMove("struggle_bug"), createMove("quiver_dance"), createMove("fiery_dance"), createMove("silver_wind")];
+    this.moves = [createMove("ember"), createMove("ember"), createMove("struggle_bug"), createMove("struggle_bug"), createMove("fiery_dance"), createMove("quiver_dance")];
     this.movepool = ["ember", "struggle_bug", "gust", "fiery_dance", "calm_mind", "defog", "fire_blast", "fire_spin", "flamethrower", "giga_drain", "heat_wave", "hidden_power", "hurricane", "hyper_beam", "overheat", "protect", "psychic", "roost", "solar_beam", "sunny_day", "u_turn", "will_o_wisp", "absorb", "amnesia", "bug_buzz", "morning_sun", "mystical_fire", "quiver_dance", "string_shot", "signal_beam", "silver_wind"];
     this.opponentMoves =
         [[createMove("quiver_dance"), createMove("struggle_bug"), createMove("giga_drain"), createMove("fiery_dance"), createMove("bug_buzz"), createMove("signal_beam"), createMove("silver_wind"), createMove("hurricane"), createMove("psychic"), createMove("flamethrower")],
@@ -4646,7 +4654,8 @@ function Eevee() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("tackle"), createMove("facade"), createMove("quick_attack"), createMove("wish"), createMove("baton_pass"), createMove("hidden_power")];
+    //this.moves = [createMove("tackle"), createMove("facade"), createMove("quick_attack"), createMove("wish"), createMove("baton_pass"), createMove("hidden_power")];
+    this.moves = [createMove("tackle"), createMove("tackle"), createMove("tackle"), createMove("quick_attack"), createMove("facade"), createMove("hidden_power")];
     this.movepool = ["quick_attack", "last_resort", "double_edge", "baton_pass", "bite", "echoed_voice", "facade", "hidden_power", "mimic", "protect", "shadow_ball", "skull_bash", "wish", "psychic", "flamethrower", "ice_beam", "thunderbolt", "hydro_pump", "extreme_evoboost", "stored_power", "body_slam", "charm", "fake_tears", "flail", "headbutt", "heal_bell", "hyper_voice", "iron_tail", "tickle", "leaf_blade", "moonblast", "snarl"];
     this.opponentMoves =
         [[createMove("extreme_evoboost"), createMove("quick_attack"), createMove("double_edge"), createMove("tackle"), createMove("shadow_ball"), createMove("skull_bash"), createMove("echoed_voice"), createMove("bite"), createMove("stored_power"), createMove("hyper_voice")],
@@ -4680,7 +4689,8 @@ function Gardevoir() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["psychic", "fairy"];
-    this.moves = [createMove("confusion"), createMove("psychic"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("calm_mind"), createMove("hypnosis")];
+    //this.moves = [createMove("confusion"), createMove("psychic"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("calm_mind"), createMove("hypnosis")];
+    this.moves = [createMove("confusion"), createMove("confusion"), createMove("disarming_voice"), createMove("disarming_voice"), createMove("dazzling_gleam"), createMove("psychic")];
     this.movepool = ["confusion", "disarming_voice", "hypnosis", "dazzling_gleam", "ally_switch", "calm_mind", "charge_beam", "draining_kiss", "dream_eater", "echoed_voice", "energy_ball", "focus_blast", "grass_knot", "heal_pulse", "hidden_power", "hyper_beam", "hyper_voice", "moonblast", "psychic", "shadow_ball", "shock_wave", "signal_beam", "stored_power", "thunderbolt", "will_o_wisp", "wish", "confuse_ray", "future_sight", "magical_leaf", "memento", "psych_up", "thunder_wave", "psybeam"];
     this.opponentMoves =
         [[createMove("calm_mind"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("psychic"), createMove("dazzling_gleam"), createMove("moonblast"), createMove("shadow_ball"), createMove("confusion"), createMove("draining_kiss")],
@@ -4720,7 +4730,8 @@ function Dragonite() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dragon", "flying"];
-    this.moves = [createMove("aerial_ace"), createMove("thunder_punch"), createMove("wing_attack"), createMove("twister"), createMove("ice_punch"), createMove("fire_punch")];
+    //this.moves = [createMove("aerial_ace"), createMove("thunder_punch"), createMove("wing_attack"), createMove("twister"), createMove("ice_punch"), createMove("fire_punch")];
+    this.moves = [createMove("aerial_ace"), createMove("aerial_ace"), createMove("aerial_ace"), createMove("breaking_swipe"), createMove("dragon_claw"), createMove("dragon_rush")];
     this.movepool = ["wing_attack", "air_cutter", "air_slash", "aqua_jet", "aqua_tail", "breaking_swipe", "brick_break", "bulldoze", "defog", "draco_meteor", "dragon_claw", "dragon_dance", "dragon_pulse", "dragon_rush", "dragon_tail", "dual_wingbeat", "earthquake", "extreme_speed", "fire_punch", "hone_claws", "hurricane", "hydro_pump", "iron_tail", "outrage", "rain_dance", "rock_slide", "roost", "scale_shot", "stone_edge", "superpower", "surf", "twister", "waterfall", "aerial_ace", "fly", "ice_punch", "steel_wing", "thunder_punch"];
     this.opponentMoves =
         [[createMove("dragon_dance"), createMove("breaking_swipe"), createMove("dragon_claw"), createMove("dragon_rush"), createMove("dragon_tail"), createMove("draco_meteor"), createMove("extreme_speed"), createMove("hone_claws"), createMove("earthquake"), createMove("wing_attack")],
@@ -4754,7 +4765,8 @@ function Ferrothorn() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["grass", "steel"];
-    this.moves = [createMove("gyro_ball"), createMove("seed_bomb"), createMove("vine_whip"), createMove("metal_claw"), createMove("leech_seed"), createMove("spikes")];
+    //this.moves = [createMove("gyro_ball"), createMove("seed_bomb"), createMove("vine_whip"), createMove("metal_claw"), createMove("leech_seed"), createMove("spikes")];
+    this.moves = [createMove("metal_claw"), createMove("metal_claw"), createMove("vine_whip"), createMove("vine_whip"), createMove("leech_seed"), createMove("gyro_ball")];
     this.movepool = ["vine_whip", "metal_claw", "leech_seed", "assurance", "body_press", "brutal_swing", "bullet_seed", "curse", "facade", "gyro_ball", "hone_claws", "ingrain", "iron_defense", "iron_head", "payback", "pin_missile", "poison_jab", "power_whip", "protect", "rest", "rock_polish", "rollout", "sandstorm", "shadow_claw", "stealth_rock", "swagger", "swords_dance", "thunder_wave", "toxic", "explosion", "heavy_slam", "revenge", "seed_bomb", "spikes"];
     this.opponentMoves =
         [[createMove("curse"), createMove("leech_seed"), createMove("iron_defense"), createMove("body_press"), createMove("gyro_ball"), createMove("protect"), createMove("stealth_rock"), createMove("ingrain"), createMove("spikes"), createMove("vine_whip")],
@@ -4788,7 +4800,8 @@ function Blissey() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("echoed_voice"), createMove("toxic"), createMove("soft_boiled"), createMove("heal_pulse"), createMove("heal_bell"), createMove("teleport")];
+    //this.moves = [createMove("echoed_voice"), createMove("toxic"), createMove("soft_boiled"), createMove("heal_pulse"), createMove("heal_bell"), createMove("teleport")];
+    this.moves = [createMove("echoed_voice"), createMove("echoed_voice"), createMove("echoed_voice"), createMove("heal_pulse"), createMove("heal_bell"), createMove("soft_boiled")];
     this.movepool = ["echoed_voice", "soft_boiled", "heal_pulse", "toxic", "blizzard", "bubble_beam", "calm_mind", "charge_beam", "charm", "dazzling_gleam", "disarming_voice", "flamethrower", "focus_blast", "grass_knot", "heal_bell", "hyper_voice", "ice_beam", "life_dew", "metronome", "mimic", "protect", "psychic", "shadow_ball", "stealth_rock", "substitute", "thunderbolt", "thunder_wave", "toxic", "water_pulse", "wish", "rain_dance", "sunny_day", "hail", "sandstorm", "sing", "sweet_kiss", "teleport", "tri_attack", "uproar"];
     this.opponentMoves =
         [[createMove("soft_boiled"), createMove("wish"), createMove("heal_pulse"), createMove("calm_mind"), createMove("charge_beam"), createMove("echoed_voice"), createMove("focus_blast"), createMove("hyper_voice"), createMove("toxic"), createMove("psychic")]];
@@ -4817,7 +4830,7 @@ function Blissey() {
 function Sableye() {
     this.name = "Sableye";
     this.id = "sableye"
-    this.description = "A utility Pokémon with a large array of options, capable of using countless status moves and hitting hard occasionally."
+    this.description = "A utility Pokémon with a large array of options, capable of using countless status moves and hitting hard crippled foes."
     this.hp = 50;
     this.attack = 75;
     this.defense = 75;
@@ -4827,7 +4840,8 @@ function Sableye() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dark", "ghost"];
-    this.moves = [createMove("will_o_wisp"), createMove("hex"), createMove("detect"), createMove("recover"), createMove("foul_play"), createMove("spite")];
+    //this.moves = [createMove("will_o_wisp"), createMove("hex"), createMove("detect"), createMove("recover"), createMove("foul_play"), createMove("spite")];
+    this.moves = [createMove("shadow_sneak"), createMove("shadow_sneak"), createMove("detect"), createMove("recover"), createMove("hex"), createMove("foul_play")];
     this.movepool = ["shadow_sneak", "detect", "toxic", "ally_switch", "brick_break", "calm_mind", "confuse_ray", "dark_pulse", "dazzling_gleam", "fake_out", "hone_claws", "metronome", "mimic", "nasty_plot", "payback", "poison_jab", "protect", "psych_up", "recover", "rest", "seismic_toss", "shadow_ball", "shadow_claw", "snarl", "substitute", "sucker_punch", "swagger", "taunt", "tickle", "will_o_wisp", "zen_headbutt", "astonish", "disable", "flatter", "foul_play", "hex", "lash_out", "mean_look", "moonlight", "night_shade", "poltergeist", "power_gem", "spite"];
     this.opponentMoves =
         [[createMove("detect"), createMove("toxic"), createMove("will_o_wisp"), createMove("confuse_ray"), createMove("swagger"), createMove("hex"), createMove("foul_play"), createMove("flatter"), createMove("taunt"), createMove("disable")],
@@ -4865,7 +4879,8 @@ function Scizor() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["bug", "steel"];
-    this.moves = [createMove("metal_claw"), createMove("bullet_punch"), createMove("fury_cutter"), createMove("wing_attack"), createMove("x_scissor"), createMove("u_turn")];
+    //this.moves = [createMove("metal_claw"), createMove("bullet_punch"), createMove("fury_cutter"), createMove("wing_attack"), createMove("x_scissor"), createMove("u_turn")];
+    this.moves = [createMove("bullet_punch"), createMove("bullet_punch"), createMove("fury_cutter"), createMove("fury_cutter"), createMove("x_scissor"), createMove("iron_head")];
     this.movepool = ["metal_claw", "fury_cutter", "wing_attack", "aerial_ace", "agility", "assurance", "baton_pass", "brick_break", "bullet_punch", "cross_poison", "curse", "defog", "dual_wingbeat", "facade", "fling", "iron_defense", "iron_head", "morning_sun", "night_slash", "reversal", "rock_smash", "roost", "sand_tomb", "slash", "steel_wing", "superpower", "swords_dance", "u_turn", "bug_bite", "psycho_cut", "x_scissor"];
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("metal_claw"), createMove("bullet_punch"), createMove("iron_defense"), createMove("iron_head"), createMove("steel_wing"), createMove("x_scissor"), createMove("fury_cutter"), createMove("wing_attack"), createMove("slash")],
@@ -4900,6 +4915,7 @@ function Aegislash() {
     this.currenthp = 0;
     this.types = ["steel", "ghost"];
     this.moves = [createMove("metal_claw"), createMove("shadow_sneak"), createMove("swords_dance"), createMove("kings_shield"), createMove("sacred_sword"), createMove("shadow_ball")];
+    this.moves = [createMove("metal_claw"), createMove("metal_claw"), createMove("shadow_sneak"), createMove("shadow_sneak"), createMove("swords_dance"), createMove("kings_shield")];
     this.movepool = ["metal_claw", "shadow_sneak", "swords_dance", "kings_shield", "kings_shield", "kings_shield", "kings_shield", "air_slash", "brick_break", "close_combat", "flash_cannon", "fury_cutter", "gyro_ball", "hyper_beam", "iron_defense", "iron_head", "magnet_rise", "night_slash", "psycho_cut", "reversal", "rock_slide", "shadow_ball", "shadow_claw", "shock_wave", "slash", "spite", "steel_beam", "swagger", "toxic", "autotomize", "brutal_swing", "head_smash", "metal_sound", "sacred_sword", "solar_blade"];
     this.opponentMoves =
         [[createMove("kings_shield"), createMove("kings_shield"), createMove("swords_dance"), createMove("metal_claw"), createMove("shadow_sneak"), createMove("sacred_sword"), createMove("gyro_ball"), createMove("iron_head"), createMove("shadow_claw"), createMove("rock_slide")],
@@ -5016,7 +5032,8 @@ function Meowth() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("scratch"), createMove("assurance"), createMove("pay_day"), createMove("fury_swipes"), createMove("feint"), createMove("fake_out")];
+    //this.moves = [createMove("scratch"), createMove("assurance"), createMove("pay_day"), createMove("fury_swipes"), createMove("feint"), createMove("fake_out")];
+    this.moves = [createMove("scratch"), createMove("scratch"), createMove("pay_day"), createMove("pay_day"), createMove("fury_swipes"), createMove("fake_out")];
     this.movepool = ["pay_day", "fury_swipes", "assurance", "bite", "bubble_beam", "charm", "dark_pulse", "dig", "double_edge", "echoed_voice", "facade", "fake_out", "flail", "foul_play", "gunk_shot", "happy_hour", "hone_claws", "hyper_voice", "hypnosis", "iron_tail", "lash_out", "last_resort", "nasty_plot", "night_slash", "payback", "scratch", "seed_bomb", "shadow_claw", "slash", "swagger", "taunt", "thunderbolt", "uproar", "u_turn", "water_pulse", "feint", "happy_hour", "screech"];
     this.opponentMoves =
         [[createMove("scratch"), createMove("fury_swipes"), createMove("fake_out"), createMove("bite"), createMove("flail"), createMove("gunk_shot"), createMove("hone_claws"), createMove("night_slash"), createMove("slash"), createMove("feint")],
@@ -5050,7 +5067,8 @@ function Metagross() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["steel", "psychic"];
-    this.moves = [createMove("metal_claw"), createMove("hammer_arm"), createMove("confusion"), createMove("bullet_punch"), createMove("meteor_mash"), createMove("giga_impact")];
+    //this.moves = [createMove("metal_claw"), createMove("hammer_arm"), createMove("confusion"), createMove("bullet_punch"), createMove("meteor_mash"), createMove("giga_impact")];
+    this.moves = [createMove("metal_claw"), createMove("metal_claw"), createMove("confusion"), createMove("confusion"), createMove("meteor_mash"), createMove("zen_headbutt")];
     this.movepool = ["metal_claw", "confusion", "bullet_punch", "hammer_arm", "agility", "body_press", "brutal_swing", "bulldoze", "double_edge", "dynamic_punch", "earthquake", "explosion", "flash_cannon", "giga_impact", "gyro_ball", "headbutt", "hone_claws", "iron_defense", "iron_head", "magnet_rise", "meteor_mash", "power_up_punch", "psychic", "psycho_cut", "rest", "rock_slide", "sandstorm", "shadow_ball", "sludge_bomb", "stealth_rock", "steel_beam", "stomping_tantrum", "zen_headbutt", "meteor_beam"];
     this.opponentMoves =
         [[createMove("gyro_ball"), createMove("metal_claw"), createMove("bullet_punch"), createMove("iron_defense"), createMove("iron_head"), createMove("meteor_mash"), createMove("zen_headbutt"), createMove("dynamic_punch"), createMove("body_press"), createMove("giga_impact")],
@@ -5091,7 +5109,8 @@ function Weavile() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dark", "ice"];
-    this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("assurance"), createMove("beat_up"), createMove("hail"), createMove("feint")];
+    //this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("assurance"), createMove("beat_up"), createMove("hail"), createMove("feint")];
+    this.moves = [createMove("ice_shard"), createMove("ice_shard"), createMove("beat_up"), createMove("beat_up"), createMove("hail"), createMove("icicle_crash")];
     this.movepool = ["ice_shard", "assurance", "beat_up", "assurance", "avalanche", "bite", "brick_break", "detect", "double_edge", "fake_out", "fake_tears", "feint", "fling", "focus_punch", "foul_play", "fury_cutter", "fury_swipes", "hail", "hone_claws", "ice_punch", "iron_tail", "lash_out", "low_kick", "metal_claw", "night_slash", "payback", "poison_jab", "psycho_cut", "revenge", "shadow_claw", "slash", "swords_dance", "taunt", "x_scissor", "crush_claw", "icicle_crash", "icicle_spear", "throat_chop", "triple_axel"];
     this.opponentMoves =
         [[createMove("ice_shard"), createMove("avalanche"), createMove("hail"), createMove("ice_punch"), createMove("icicle_crash"), createMove("icicle_spear"), createMove("triple_axel"), createMove("assurance"), createMove("foul_play"), createMove("night_slash")],
@@ -5125,7 +5144,8 @@ function Zeraora() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric"];
-    this.moves = [createMove("plasma_fists"), createMove("volt_switch"), createMove("spark"), createMove("power_up_punch"), createMove("bulk_up"), createMove("charge")];
+    //this.moves = [createMove("plasma_fists"), createMove("volt_switch"), createMove("spark"), createMove("power_up_punch"), createMove("bulk_up"), createMove("charge")];
+    this.moves = [createMove("shock_wave"), createMove("shock_wave"), createMove("shock_wave"), createMove("charge"), createMove("plasma_fists"), createMove("spark")];
     this.movepool = ["spark", "power_up_punch", "volt_switch", "aerial_ace", "assurance", "aura_sphere", "blaze_kick", "bounce", "bulk_up", "calm_mind", "charge", "close_combat", "discharge", "drain_punch", "dual_chop", "electro_ball", "electroweb", "focus_blast", "focus_punch", "grass_knot", "hone_claws", "iron_tail", "low_kick", "outrage", "plasma_fists", "play_rough", "revenge", "shock_wave", "slash", "throat_chop", "thunder", "thunderbolt", "thunder_punch", "thunder_wave", "wild_charge"];
     this.opponentMoves =
         [[createMove("plasma_fists"), createMove("spark"), createMove("power_up_punch"), createMove("bulk_up"), createMove("blaze_kick"), createMove("throat_chop"), createMove("play_rough"), createMove("drain_punch"), createMove("thunder_punch"), createMove("wild_charge")],
@@ -5159,7 +5179,8 @@ function Omanyte() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["rock", "water"];
-    this.moves = [createMove("water_gun"), createMove("icy_wind"), createMove("rollout"), createMove("ancient_power"), createMove("bubble_beam"), createMove("withdraw")];
+    //this.moves = [createMove("water_gun"), createMove("icy_wind"), createMove("rollout"), createMove("ancient_power"), createMove("bubble_beam"), createMove("withdraw")];
+    this.moves = [createMove("water_gun"), createMove("water_gun"), createMove("water_gun"), createMove("ancient_power"), createMove("hydro_pump"), createMove("meteor_beam")];
     this.movepool = ["water_gun", "rollout", "ancient_power", "aurora_beam", "blizzard", "brine", "bubble_beam", "earth_power", "hail", "hidden_power", "hydro_pump", "ice_beam", "iron_defense", "meteor_beam", "rain_dance", "rest", "rock_polish", "scald", "shell_smash", "spikes", "stealth_rock", "surf", "toxic_spikes", "water_gun", "water_pulse", "whirlpool", "haze", "icy_wind", "muddy_water", "withdraw"];
     this.opponentMoves =
         [[createMove("rain_dance"), createMove("water_gun"), createMove("ancient_power"), createMove("brine"), createMove("bubble_beam"), createMove("hydro_pump"), createMove("meteor_beam"), createMove("scald"), createMove("water_pulse"), createMove("stealth_rock")],
@@ -5196,7 +5217,8 @@ function Tyranitar() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["rock", "dark"];
-    this.moves = [createMove("rock_blast"), createMove("stomping_tantrum"), createMove("rock_throw"), createMove("payback"), createMove("crunch"), createMove("dragon_dance")];
+    //this.moves = [createMove("rock_blast"), createMove("stomping_tantrum"), createMove("rock_throw"), createMove("payback"), createMove("crunch"), createMove("dragon_dance")];
+    this.moves = [createMove("rock_throw"), createMove("rock_throw"), createMove("rock_throw"), createMove("rock_blast"), createMove("crunch"), createMove("stone_edge")];
     this.movepool = ["rock_throw", "payback", "stomping_tantrum", "aqua_tail", "assurance", "avalanche", "bite", "body_press", "breaking_swipe", "brutal_swing", "crunch", "dragon_claw", "dragon_tail", "dragon_dance", "dynamic_punch", "earthquake", "fire_fang", "fling", "foul_play", "giga_impact", "heavy_slam", "hone_claws", "ice_fang", "iron_defense", "iron_head", "lash_out", "outrage", "payback", "revenge", "rock_polish", "rock_slide", "sandstorm", "sand_tomb", "shadow_claw", "stealth_rock", "stone_edge", "superpower", "thrash", "thunder_fang", "rock_blast", "rock_tomb", "smack_down"];
     this.opponentMoves =
         [[createMove("sandstorm"), createMove("rock_throw"), createMove("dragon_dance"), createMove("rock_slide"), createMove("stone_edge"), createMove("rock_blast"), createMove("rock_tomb"), createMove("stealth_rock"), createMove("crunch"), createMove("stomping_tantrum")],
@@ -5230,7 +5252,8 @@ function Gyarados() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["water", "flying"];
-    this.moves = [createMove("aqua_tail"), createMove("bite"), createMove("waterfall"), createMove("rain_dance"), createMove("splash"), createMove("bounce")];
+    //this.moves = [createMove("aqua_tail"), createMove("bite"), createMove("waterfall"), createMove("rain_dance"), createMove("splash"), createMove("bounce")];
+    this.moves = [createMove("aqua_tail"), createMove("aqua_tail"), createMove("waterfall"), createMove("rain_dance"), createMove("splash"), createMove("flail")];
     this.movepool = ["bite", "waterfall", "rain_dance", "aqua_tail", "avalanche", "body_slam", "bounce", "bulldoze", "brutal_swing", "crunch", "dive", "double_edge", "dragon_dance", "dragon_tail", "earthquake", "flail", "giga_impact", "headbutt", "ice_fang", "iron_head", "iron_tail", "lash_out", "payback", "power_whip", "rock_smash", "scale_shot", "stone_edge", "thrash", "scary_face", "splash"];
     this.opponentMoves =
         [[createMove("rain_dance"), createMove("waterfall"), createMove("aqua_tail"), createMove("dive"), createMove("dragon_dance"), createMove("flail"), createMove("power_whip"), createMove("bounce"), createMove("ice_fang"), createMove("thrash")],
@@ -5318,7 +5341,8 @@ function Mew() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["psychic"];
-    this.moves = [createMove("aura_sphere"), createMove("psychic"), createMove("ancient_power"), createMove("metronome"), createMove("nasty_plot"), createMove("life_dew")];
+    //this.moves = [createMove("aura_sphere"), createMove("psychic"), createMove("ancient_power"), createMove("metronome"), createMove("nasty_plot"), createMove("life_dew")];
+    this.moves = [createMove("confusion"), createMove("confusion"), createMove("confusion"), createMove("metronome"), createMove("psychic"), createMove("zen_headbutt")];
     this.movepool = movesList;
     this.opponentMoves = [[]];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/mew.gif';
@@ -5356,7 +5380,8 @@ function Urshifu() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fighting", "dark"];
-    this.moves = [createMove("rock_smash"), createMove("wicked_blow"), createMove("surging_strikes"), createMove("detect"), createMove("close_combat"), createMove("beat_up")];
+    //this.moves = [createMove("rock_smash"), createMove("wicked_blow"), createMove("surging_strikes"), createMove("detect"), createMove("close_combat"), createMove("beat_up")];
+    this.moves = [createMove("rock_smash"), createMove("rock_smash"), createMove("rock_smash"), createMove("beat_up"), createMove("close_combat"), createMove("wicked_blow")];
     this.movepool = ["rock_smash", "wicked_blow", "surging_strikes", "detect", "aqua_jet", "sucker_punch", "assurance", "beat_up", "body_press", "brick_break", "bulk_up", "close_combat", "crunch", "drain_punch", "dynamic_punch", "facade", "fire_punch", "fling", "focus_punch", "foul_play", "ice_punch", "iron_defense", "iron_head", "lash_out", "low_kick", "payback", "poison_jab", "revenge", "reversal", "rock_tomb", "scary_face", "stone_edge", "superpower", "throat_chop", "thunder_punch", "u_turn", "zen_headbutt", "darkest_lariat"];
     this.opponentMoves =
         [[createMove("wicked_blow"), createMove("sucker_punch"), createMove("assurance"), createMove("crunch"), createMove("foul_play"), createMove("darkest_lariat"), createMove("bulk_up"), createMove("drain_punch"), createMove("zen_headbutt"), createMove("rock_smash")],
@@ -5389,7 +5414,8 @@ function Gengar() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["ghost", "poison"];
-    this.moves = [createMove("shadow_ball"), createMove("confuse_ray"), createMove("hypnosis"), createMove("dream_eater"), createMove("sludge_wave"), createMove("poison_gas")];
+    //this.moves = [createMove("shadow_ball"), createMove("confuse_ray"), createMove("hypnosis"), createMove("dream_eater"), createMove("sludge_wave"), createMove("poison_gas")];
+    this.moves = [createMove("night_shade"), createMove("night_shade"), createMove("sludge"), createMove("sludge"), createMove("sludge_wave"), createMove("shadow_ball")];
     this.movepool = ["shadow_ball", "hypnosis", "dream_eater", "ally_switch", "confuse_ray", "curse", "dark_pulse", "dazzling_gleam", "energy_ball", "focus_blast", "giga_drain", "haze", "hex", "hyper_beam", "icy_wind", "lick", "mega_drain", "metronome", "nasty_plot", "night_shade", "poison_gas", "psychic", "scary_face", "shadow_ball", "sludge_bomb", "spite", "swagger", "taunt", "thunder", "thunderbolt", "toxic", "venoshock", "will_o_wisp", "zap_cannon", "clear_smog", "sludge_wave", "smog"];
     this.opponentMoves =
         [[createMove("shadow_ball"), createMove("hypnosis"), createMove("hypnosis"), createMove("dream_eater"), createMove("dark_pulse"), createMove("hex"), createMove("hex"), createMove("sludge_bomb"), createMove("toxic"), createMove("will_o_wisp")],
@@ -5423,7 +5449,8 @@ function Shuckle() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["bug", "rock"];
-    this.moves = [createMove("rollout"), createMove("struggle_bug"), createMove("sticky_web"), createMove("rest"), createMove("stealth_rock"), createMove("infestation")];
+    //this.moves = [createMove("rollout"), createMove("struggle_bug"), createMove("sticky_web"), createMove("rest"), createMove("stealth_rock"), createMove("infestation")];
+    this.moves = [createMove("rollout"), createMove("rollout"), createMove("rollout"), createMove("rest"), createMove("stealth_rock"), createMove("sticky_web")];
     this.movepool = ["rollout", "struggle_bug", "sticky_web", "rest", "ancient_power", "curse", "iron_defense", "mimic", "protect", "rock_polish", "sandstorm", "stealth_rock", "string_shot", "substitute", "swagger", "toxic", "withdraw", "acupressure", "bind", "infestation", "skitter_smack"];
     this.opponentMoves =
         [[createMove("struggle_bug"), createMove("rollout"), createMove("sticky_web"), createMove("rock_polish"), createMove("sandstorm"), createMove("string_shot"), createMove("swagger"), createMove("stealth_rock"), createMove("infestation"), createMove("rest")]];
@@ -5455,7 +5482,8 @@ function Mimikyu() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["ghost", "fairy"];
-    this.moves = [createMove("shadow_claw"), createMove("shadow_sneak"), createMove("play_rough"), createMove("swords_dance"), createMove("drain_punch"), createMove("astonish")];
+    //this.moves = [createMove("shadow_claw"), createMove("shadow_sneak"), createMove("play_rough"), createMove("swords_dance"), createMove("drain_punch"), createMove("astonish")];
+    this.moves = [createMove("shadow_sneak"), createMove("shadow_sneak"), createMove("astonish"), createMove("astonish"), createMove("shadow_claw"), createMove("play_rough")];
     this.movepool = ["shadow_sneak", "play_rough", "swords_dance", "astonish", "beat_up", "bulk_up", "charm", "curse", "drain_punch", "facade", "fling", "hone_claws", "last_resort", "mimic", "payback", "protect", "screech", "shadow_claw", "spite", "swagger", "toxic", "x_scissor", "slash", "taunt", "leech_life", "phantom_force", "wood_hammer", "feint_attack"];
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("play_rough"), createMove("shadow_claw"), createMove("bulk_up"), createMove("drain_punch"), createMove("leech_life"), createMove("wood_hammer"), createMove("phantom_force"), createMove("astonish"), createMove("feint_attack")],
@@ -5543,7 +5571,8 @@ function Mamoswine() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["ice", "ground"];
-    this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("earthquake"), createMove("ancient_power"), createMove("bulldoze"), createMove("heavy_slam")];
+    //this.moves = [createMove("icicle_crash"), createMove("ice_shard"), createMove("earthquake"), createMove("ancient_power"), createMove("bulldoze"), createMove("heavy_slam")];
+    this.moves = [createMove("ice_shard"), createMove("ice_shard"), createMove("ice_shard"), createMove("sand_tomb"), createMove("earthquake"), createMove("icicle_crash")];
     this.movepool = ["ice_shard", "earthquake", "ancient_power", "amnesia", "avalanche", "bite", "body_press", "bulldoze", "curse", "detect", "dig", "double_edge", "facade", "flail", "giga_impact", "hail", "headbutt", "heavy_slam", "ice_fang", "icicle_crash", "icicle_spear", "iron_head", "rock_blast", "rock_slide", "rock_tomb", "sandstorm", "sand_tomb", "stealth_rock", "stomping_tantrum", "stone_edge", "superpower", "thrash", "high_horsepower"];
     this.opponentMoves =
         [[createMove("hail"), createMove("ice_shard"), createMove("avalanche"), createMove("icicle_crash"), createMove("icicle_spear"), createMove("earthquake"), createMove("giga_impact"), createMove("double_edge"), createMove("bulldoze"), createMove("body_press")],
@@ -5577,8 +5606,10 @@ function Darmanitan() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire"];
-    this.moves = [createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("belly_drum"), createMove("bite"), createMove("rock_tomb")];
-    this.moves2 = [createMove("ember"), createMove("fire_blast"), createMove("fire_spin"), createMove("future_sight"), createMove("psychic"), createMove("grass_knot")];
+    //this.moves = [createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("belly_drum"), createMove("bite"), createMove("rock_tomb")];
+    this.moves = [createMove("fire_fang"), createMove("fire_fang"), createMove("fire_fang"), createMove("flame_charge"), createMove("belly_drum"), createMove("flare_blitz")];
+    //this.moves2 = [createMove("ember"), createMove("fire_blast"), createMove("fire_spin"), createMove("future_sight"), createMove("psychic"), createMove("grass_knot")];
+    this.moves2 = [createMove("ember"), createMove("ember"), createMove("ember"), createMove("extrasensory"), createMove("psychic"), createMove("fire_blast")];
     this.movepool = ["bite", "body_press", "body_slam", "earthquake", "fire_fang", "fire_punch", "flame_charge", "flare_blitz", "focus_punch", "giga_impact", "hammer_arm", "lash_out", "payback", "rock_tomb", "stone_edge", "superpower", "thrash", "zen_headbutt", "u_turn", "belly_drum"];
     this.movepool2 = ["ember", "fire_blast", "fire_spin", "flamethrower", "focus_blast", "future_sight", "grass_knot", "heat_wave", "mystical_fire", "overheat", "psychic", "rest", "solar_beam", "uproar", "hidden_power", "hyper_beam", "burning_jealousy", "extrasensory"];
     this.opponentMoves = [[createMove("flare_blitz"), createMove("fire_fang"), createMove("flame_charge"), createMove("bite"), createMove("rock_tomb"), createMove("hammer_arm"), createMove("earthquake"), createMove("stone_edge"), createMove("zen_headbutt"), createMove("body_slam")]];
@@ -5727,7 +5758,8 @@ function Rotom() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric", "ghost"];
-    this.moves = [createMove("shadow_ball"), createMove("hurricane"), createMove("blizzard"), createMove("overheat"), createMove("leaf_storm"), createMove("hydro_pump"), createMove("thunderbolt"), createMove("nasty_plot")];
+    //this.moves = [createMove("shadow_ball"), createMove("hurricane"), createMove("blizzard"), createMove("overheat"), createMove("leaf_storm"), createMove("hydro_pump"), createMove("thunderbolt"), createMove("nasty_plot")];
+    this.moves = [createMove("shadow_ball"), createMove("hurricane"), createMove("blizzard"), createMove("overheat"), createMove("leaf_storm"), createMove("hydro_pump"), createMove("shock_wave"), createMove("shock_wave")];
     this.movepool = ["hurricane", "blizzard", "overheat", "leaf_storm", "hydro_pump", "charge", "charge_beam", "confuse_ray", "defog", "dark_pulse", "disarming_voice", "discharge", "electroweb", "hex", "hidden_power", "nasty_plot", "shadow_ball", "shock_wave", "swagger", "thunder", "thunder_shock", "thunderbolt", "thunder_wave", "toxic", "volt_switch", "will_o_wisp", "electro_ball", "hyper_voice", "spite", "eerie_impulse", "ominous_wind", "signal_beam"];
     this.opponentMoves =
         [[createMove("hurricane"), createMove("hurricane"), createMove("hurricane"), createMove("thunderbolt"), createMove("thunder"), createMove("shadow_ball"), createMove("hex"), createMove("thunder_wave"), createMove("ominous_wind"), createMove("shock_wave")],
@@ -5826,7 +5858,8 @@ function Castform() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["normal"];
-    this.moves = [createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("sunny_day"), createMove("hail"), createMove("hydro_pump"), createMove("fire_blast"), createMove("blizzard")];
+    //this.moves = [createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("sunny_day"), createMove("hail"), createMove("hydro_pump"), createMove("fire_blast"), createMove("blizzard")];
+    this.moves = [createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("sunny_day"), createMove("hail"), createMove("weather_ball")];
     this.movepool = ["amnesia", "blizzard", "avalanche", "body_slam", "clear_smog", "defog", "headbutt", "ember", "energy_ball", "facade", "fire_blast", "flamethrower", "future_sight", "hex", "hidden_power", "hurricane", "hydro_pump", "ice_beam", "icy_wind", "ominous_wind", "mimic", "scald", "shadow_ball", "toxic", "shock_wave", "solar_beam", "thunder", "thunderbolt", "water_gun", "water_pulse", "weather_ball", "hail", "rain_dance", "sunny_day", "sandstorm"];
     this.opponentMoves =
         [[createMove("weather_ball"), createMove("weather_ball"), createMove("rain_dance"), createMove("rain_dance"), createMove("hydro_pump"), createMove("thunder"), createMove("thunderbolt"), createMove("water_pulse"), createMove("hurricane"), createMove("scald")],
@@ -5950,7 +5983,8 @@ function KommoO() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dragon", "fighting"];
-    this.moves = [createMove("clangorous_soul"), createMove("clanging_scales"), createMove("boomburst"), createMove("close_combat"), createMove("dragon_claw"), createMove("drain_punch")];
+    //this.moves = [createMove("clangorous_soul"), createMove("clanging_scales"), createMove("boomburst"), createMove("close_combat"), createMove("dragon_claw"), createMove("drain_punch")];
+    this.moves = [createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("brick_break"), createMove("brick_break"), createMove("clanging_scales"), createMove("clangorous_soul")];
     this.movepool = ["aqua_tail", "aura_sphere", "autotomize", "belly_drum", "body_press", "boomburst", "breaking_swipe", "brick_break", "bulk_up", "bulldoze", "clanging_scales", "clangorous_soul", "close_combat", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_pulse", "dragon_tail", "drain_punch", "dual_chop", "earthquake", "flamethrower", "flash_cannon", "focus_blast", "focus_punch", "hyper_voice", "iron_tail", "low_kick", "outrage", "payback", "poison_jab", "reversal", "rock_slide", "scale_shot", "shadow_claw", "superpower", "x_scissor", "fire_punch", "ice_punch", "thunder_punch", "uproar", "water_pulse", "shock_wave", "echoed_voice"];
     this.opponentMoves =
         [[createMove("clangorous_soul"), createMove("clanging_scales"), createMove("clanging_scales"), createMove("boomburst"), createMove("focus_blast"), createMove("aura_sphere"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("dragon_pulse"), createMove("aura_sphere")],
@@ -5984,7 +6018,8 @@ function Nidoking(gender) {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["poison", "ground"];
-    this.moves = [createMove("drill_run"), createMove("earth_power"), createMove("toxic_spikes"), createMove("poison_jab"), createMove("toxic"), createMove("megahorn")];
+    //this.moves = [createMove("drill_run"), createMove("earth_power"), createMove("toxic_spikes"), createMove("poison_jab"), createMove("toxic"), createMove("megahorn")];
+    this.moves = [createMove("sludge"), createMove("sludge"), createMove("sludge"), createMove("earth_power"), createMove("bulldoze"), createMove("poison_jab")];
     this.movepool = ["aqua_tail", "blizzard", "body_slam", "bulldoze", "curse", "dig", "double_edge", "double_kick", "drill_run", "earth_power", "earthquake", "flamethrower", "fire_punch", "giga_impact", "head_smash", "hex", "high_horsepower", "hone_claws", "ice_beam", "ice_punch", "iron_tail", "megahorn", "poison_jab", "poison_sting", "poison_tail", "rock_blast", "rock_slide", "sandstorm", "sand_tomb", "scorching_sands", "shadow_claw", "sludge_bomb", "sludge_wave", "stealth_rock", "stomping_tantrum", "stone_edge", "sucker_punch", "surf", "thunderbolt", "thunder_punch", "toxic", "toxic_spikes", "venom_drench", "venoshock"];
     this.opponentMoves =
         [[createMove("poison_jab"), createMove("toxic_spikes"), createMove("toxic"), createMove("poison_tail"), createMove("poison_sting"), createMove("venoshock"), createMove("venom_drench"), createMove("earthquake"), createMove("earth_power"), createMove("flamethrower")],
@@ -6018,7 +6053,8 @@ function Whimsicott() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["grass", "fairy"];
-    this.moves = [createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("fairy_wind"), createMove("gust"), createMove("sunny_day"), createMove("leech_seed"), createMove("cotton_spore")];
+    //this.moves = [createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("fairy_wind"), createMove("gust"), createMove("sunny_day"), createMove("leech_seed"), createMove("cotton_spore")];
+    this.moves = [createMove("mega_drain"), createMove("mega_drain"), createMove("fairy_wind"), createMove("leech_seed"), createMove("dazzling_gleam"), createMove("energy_ball")];
     this.movepool = ["absorb", "beat_up", "charm", "cotton_guard", "cotton_spore", "dazzling_gleam", "defog", "energy_ball", "fairy_wind", "fling", "giga_drain", "grass_knot", "growth", "gust", "hurricane", "leech_seed", "mega_drain", "memento", "moonblast", "play_rough", "poison_powder", "psychic", "rest", "razor_leaf", "seed_bomb", "solar_beam", "shadow_ball", "stun_spore", "sunny_day", "swagger", "taunt", "toxic", "tickle", "u_turn", "fake_tears", "grass_whistle", "hidden_power"];
     this.opponentMoves =
         [[createMove("absorb"), createMove("mega_drain"), createMove("giga_drain"), createMove("dazzling_gleam"), createMove("solar_beam"), createMove("sunny_day"), createMove("growth"), createMove("leech_seed"), createMove("charm"), createMove("fake_tears")],
@@ -6056,7 +6092,8 @@ function AlolanNinetales() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["ice", "fairy"];
-    this.moves = [createMove("aurora_beam"), createMove("blizzard"), createMove("ice_beam"), createMove("hail"), createMove("moonblast"), createMove("dazzling_gleam"), createMove("extrasensory"), createMove("calm_mind")];
+    //this.moves = [createMove("aurora_beam"), createMove("blizzard"), createMove("ice_beam"), createMove("hail"), createMove("moonblast"), createMove("dazzling_gleam"), createMove("extrasensory"), createMove("calm_mind")];
+    this.moves = [createMove("aurora_beam"), createMove("aurora_beam"), createMove("aurora_beam"), createMove("freeze_dry"), createMove("moonblast"), createMove("ice_beam")];
     this.movepool = ["agility", "aurora_beam", "blizzard", "calm_mind", "charm", "confuse_ray", "dark_pulse", "dazzling_gleam", "extrasensory", "dream_eater", "freeze_dry", "frost_breath", "hail", "hex", "heal_bell", "hypnosis", "ice_beam", "ice_shard", "icy_wind", "moonblast", "nasty_plot", "psych_up", "rest", "stored_power", "swagger", "triple_axel", "weather_ball", "hidden_power", "hyper_beam", "spite"];
     this.opponentMoves =
         [[createMove("hail"), createMove("blizzard"), createMove("aurora_beam"), createMove("icy_wind"), createMove("ice_beam"), createMove("frost_breath"), createMove("freeze_dry"), createMove("moonblast"), createMove("extrasensory"), createMove("nasty_plot")],
@@ -6090,7 +6127,8 @@ function Torterra() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["grass", "ground"];
-    this.moves = [createMove("mega_drain"), createMove("giga_drain"), createMove("leech_seed"), createMove("absorb"), createMove("wood_hammer"), createMove("earthquake"), createMove("bulldoze"), createMove("earth_power")];
+    //this.moves = [createMove("mega_drain"), createMove("giga_drain"), createMove("leech_seed"), createMove("absorb"), createMove("wood_hammer"), createMove("earthquake"), createMove("bulldoze"), createMove("earth_power")];
+    this.moves = [createMove("mega_drain"), createMove("mega_drain"), createMove("absorb"), createMove("bulldoze"), createMove("wood_hammer"), createMove("razor_leaf")];
     this.movepool = ["absorb", "amnesia", "bite", "body_slam", "bulldoze", "bullet_seed", "crunch", "curse", "double_edge", "earth_power", "earthquake", "frenzy_plant", "giga_drain", "grass_knot", "growth", "heavy_slam", "iron_head", "iron_tail", "leaf_storm", "leech_seed", "mega_drain", "razor_leaf", "rest", "rock_polish", "rock_slide", "solar_beam", "rock_tomb", "sandstorm", "sand_tomb", "seed_bomb", "solar_beam", "stealth_rock", "stomping_tantrum", "stone_edge", "sunny_day", "synthesis", "withdraw", "wood_hammer"];
     this.opponentMoves =
         [[createMove("absorb"), createMove("mega_drain"), createMove("giga_drain"), createMove("absorb"), createMove("absorb"), createMove("giga_drain"), createMove("mega_drain"), createMove("stone_edge"), createMove("earthquake"), createMove("synthesis")],
@@ -6123,7 +6161,8 @@ function Delphox() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["fire", "psychic"];
-    this.moves = [createMove("ember"), createMove("ember"), createMove("flamethrower"), createMove("future_sight"), createMove("psyshock"), createMove("psychic"), createMove("flame_charge"), createMove("blast_burn")];
+    //this.moves = [createMove("ember"), createMove("ember"), createMove("flamethrower"), createMove("future_sight"), createMove("psyshock"), createMove("psychic"), createMove("flame_charge"), createMove("blast_burn")];
+    this.moves = [createMove("ember"), createMove("ember"), createMove("ember"), createMove("future_sight"), createMove("flamethrower"), createMove("psychic")];
     this.movepool = ["ally_switch", "blast_burn", "calm_mind", "dazzling_gleam", "dream_eater", "echoed_voice", "ember", "fire_blast", "fire_spin", "flame_charge", "flamethrower", "foul_play", "future_sight", "grass_knot", "heat_wave", "hidden_power", "hyper_beam", "hypnosis", "incinerate", "mystical_fire", "overheat", "psybeam", "psychic", "psyshock", "shadow_ball", "signal_beam", "solar_beam", "sunny_day", "toxic", "will_o_wisp", "wish", "swagger", "substitute", "shock_wave"];
     this.opponentMoves =
         [[createMove("ember"), createMove("ember"), createMove("flamethrower"), createMove("flamethrower"), createMove("future_sight"), createMove("future_sight"), createMove("hypnosis"), createMove("hyper_beam"), createMove("shadow_ball"), createMove("future_sight")],
@@ -6156,7 +6195,8 @@ function Primarina() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["water", "fairy"];
-    this.moves = [createMove("water_gun"), createMove("round"), createMove("round"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("sparkling_aria"), createMove("draining_kiss"), createMove("moonblast")];
+    //this.moves = [createMove("water_gun"), createMove("round"), createMove("round"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("sparkling_aria"), createMove("draining_kiss"), createMove("moonblast")];
+    this.moves = [createMove("draining_kiss"), createMove("draining_kiss"), createMove("echoed_voice"), createMove("echoed_voice"), createMove("hyper_voice"), createMove("moonblast")];
     this.movepool = ["amnesia", "aqua_jet", "aqua_tail", "blizzard", "bubble_beam", "charm", "dazzling_gleam", "disarming_voice", "echoed_voice", "energy_ball", "calm_mind", "draining_kiss", "flip_turn", "hydro_cannon", "hydro_pump", "hyper_voice", "ice_beam", "icy_wind", "life_dew", "liquidation", "moonblast", "play_rough", "psychic", "rain_dance", "round", "scald", "shadow_ball", "sparkling_aria", "surf", "uproar", "water_gun", "water_pulse", "weather_ball", "whirlpool"];
     this.opponentMoves =
         [[createMove("round"), createMove("round"), createMove("round"), createMove("hyper_voice"), createMove("hyper_voice"), createMove("uproar"), createMove("energy_ball"), createMove("moonblast"), createMove("calm_mind"), createMove("disarming_voice")],
@@ -6196,7 +6236,8 @@ function Toxicroak() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["poison", "fighting"];
-    this.moves = [createMove("poison_jab"), createMove("poison_sting"), createMove("toxic"), createMove("venom_drench"), createMove("drain_punch"), createMove("close_combat"), createMove("knock_off"), createMove("cross_poison")];
+    //this.moves = [createMove("poison_jab"), createMove("poison_sting"), createMove("toxic"), createMove("venom_drench"), createMove("drain_punch"), createMove("close_combat"), createMove("knock_off"), createMove("cross_poison")];
+    this.moves = [createMove("poison_sting"), createMove("poison_sting"), createMove("brick_break"), createMove("brick_break"), createMove("drain_punch"), createMove("poison_jab")];
     this.movepool = ["acupressure", "assurance", "belch", "bounce", "brick_break", "bulk_up", "bulldoze", "bullet_punch", "cross_chop", "cross_poison", "drain_punch", "dynamic_punch", "earthquake", "fling", "feint", "focus_punch", "foul_play", "gunk_shot", "ice_punch", "knock_off", "lash_out", "low_kick", "low_sweep", "payback", "poison_jab", "poison_sting", "power_up_punch", "revenge", "rock_smash", "rock_tomb", "sludge_bomb", "sludge_wave", "sucker_punch", "swords_dance", "throat_chop", "thunder_punch", "toxic", "vacuum_wave", "venom_drench", "venoshock"];
     this.opponentMoves =
         [[createMove("toxic"), createMove("toxic"), createMove("poison_jab"), createMove("poison_jab"), createMove("earthquake"), createMove("fire_punch"), createMove("poison_sting"), createMove("venom_drench"), createMove("cross_poison"), createMove("cross_poison")],
@@ -6234,7 +6275,8 @@ function Dragapult() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["dragon", "ghost"];
-    this.moves = [createMove("astonish"), createMove("shadow_ball"), createMove("phantom_force"), createMove("draco_meteor"), createMove("breaking_swipe"), createMove("dragon_darts"), createMove("dragon_claw"), createMove("thunderbolt")];
+    //this.moves = [createMove("astonish"), createMove("shadow_ball"), createMove("phantom_force"), createMove("draco_meteor"), createMove("breaking_swipe"), createMove("dragon_darts"), createMove("dragon_claw"), createMove("thunderbolt")];
+    this.moves = [createMove("astonish"), createMove("astonish"), createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("shadow_ball"), createMove("dragon_darts")];
     this.movepool = ["agility", "astonish", "beat_up", "bite", "body_slam", "breaking_swipe", "brine", "confuse_ray", "curse", "disable", "dive", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_darts", "dragon_pulse", "dragon_rush", "dragon_tail", "fire_blast", "flamethrower", "hex", "hydro_pump", "outrage", "phantom_force", "psychic_fangs", "scald", "shadow_ball", "solar_beam", "steel_wing", "sucker_punch", "surf", "thunder", "thunderbolt", "thunder_wave", "tri_attack", "u_turn", "will_o_wisp"];
     this.opponentMoves =
         [[createMove("astonish"), createMove("astonish"), createMove("phantom_force"), createMove("phantom_force"), createMove("dragon_dance"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("will_o_wisp"), createMove("hex"), createMove("dragon_pulse")],
@@ -6275,7 +6317,8 @@ function Morpeko() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["electric", "dark"];
-    this.moves = [createMove("agility"), createMove("aura_wheel"), createMove("electroweb"), createMove("electro_ball"), createMove("crunch"), createMove("bite"), createMove("foul_play"), createMove("stomping_tantrum")];
+    //this.moves = [createMove("agility"), createMove("aura_wheel"), createMove("electroweb"), createMove("electro_ball"), createMove("crunch"), createMove("bite"), createMove("foul_play"), createMove("stomping_tantrum")];
+    this.moves = [createMove("thunder_shock"), createMove("thunder_shock"), createMove("bite"), createMove("bite"), createMove("aura_wheel"), createMove("crunch")];
     this.movepool = ["agility", "assurance", "aura_wheel", "bite", "brick_break", "bullet_seed", "charge", "crunch", "dark_pulse", "electro_ball", "electroweb", "fake_out", "fling", "foul_play", "lash_out", "outrage", "payback", "power_trip", "psychic_fangs", "quick_attack", "rapid_spin", "revenge", "seed_bomb", "spark", "stomping_tantrum", "substitute", "super_fang", "swagger", "taunt", "thrash", "thunder", "thunderbolt", "thunder_fang", "thunder_punch", "thunder_wave", "thunder_shock", "volt_switch", "wild_charge"];
     this.opponentMoves =
         [[createMove("agility"), createMove("aura_wheel"), createMove("aura_wheel"), createMove("electro_ball"), createMove("electro_ball"), createMove("electroweb"), createMove("thunder_fang"), createMove("bullet_seed"), createMove("seed_bomb"), createMove("crunch")],
@@ -6337,7 +6380,8 @@ function Yanmega() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["bug", "flying"];
-    this.moves = [createMove("tailwind"), createMove("protect"), createMove("quick_attack"), createMove("air_cutter"), createMove("air_slash"), createMove("defog"), createMove("bug_buzz"), createMove("struggle_bug")];
+    //this.moves = [createMove("tailwind"), createMove("protect"), createMove("quick_attack"), createMove("air_cutter"), createMove("air_slash"), createMove("defog"), createMove("bug_buzz"), createMove("struggle_bug")];
+    this.moves = [createMove("air_cutter"), createMove("air_cutter"), createMove("air_cutter"), createMove("struggle_bug"), createMove("air_slash"), createMove("tailwind")];
     this.movepool = ["aerial_ace", "air_cutter", "air_slash", "baton_pass", "ancient_power", "bug_bite", "bug_buzz", "defog", "feint", "feint_attack", "giga_drain", "hidden_power", "leech_life", "night_slash", "ominous_wind", "protect", "psychic", "quick_attack", "roost", "signal_beam", "shadow_ball", "silver_wind", "steel_wing", "struggle_bug", "substitute", "supersonic", "swagger", "swift", "tailwind", "u_turn", "wing_attack", "string_shot", "solar_beam", "round", "dual_wingbeat"];
     this.opponentMoves =
         [[createMove("tailwind"), createMove("defog"), createMove("quick_attack"), createMove("air_slash"), createMove("air_slash"), createMove("air_cutter"), createMove("air_cutter"), createMove("giga_drain"), createMove("leech_life"), createMove("bug_buzz")],
@@ -6371,7 +6415,8 @@ function Aurorus() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["rock", "ice"];
-    this.moves = [createMove("ancient_power"), createMove("aurora_beam"), createMove("hail"), createMove("ice_beam"), createMove("blizzard"), createMove("hyper_voice"), createMove("meteor_beam"), createMove("earth_power")];
+    //this.moves = [createMove("ancient_power"), createMove("aurora_beam"), createMove("hail"), createMove("ice_beam"), createMove("blizzard"), createMove("hyper_voice"), createMove("meteor_beam"), createMove("earth_power")];
+    this.moves = [createMove("ancient_power"), createMove("ancient_power"), createMove("aurora_beam"), createMove("aurora_beam"), createMove("blizzard"), createMove("hyper_voice")];
     this.movepool = ["ancient_power", "aurora_beam", "avalanche", "blizzard", "body_slam", "calm_mind", "charge_beam", "dark_pulse", "discharge", "earth_power", "echoed_voice", "flash_cannon", "freeze_dry", "frost_breath", "hail", "haze", "hyper_beam", "hyper_voice", "ice_beam", "icy_wind", "meteor_beam", "psychic", "rock_blast", "rock_polish", "rock_tomb", "rock_slide", "rock_throw", "sandstorm", "stealth_rock", "stone_edge", "thunderbolt", "weather_ball", "take_down", "water_pulse", "icicle_spear"];
     this.opponentMoves =
         [[createMove("ancient_power"), createMove("meteor_beam"), createMove("meteor_beam"), createMove("ancient_power"), createMove("earth_power"), createMove("rock_tomb"), createMove("sandstorm"), createMove("rock_blast"), createMove("hyper_voice"), createMove("psychic")],
@@ -6413,7 +6458,8 @@ function Gallade() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["psychic", "fighting"];
-    this.moves = [createMove("slash"), createMove("psycho_cut"), createMove("night_slash"), createMove("close_combat"), createMove("drain_punch"), createMove("heal_pulse"), createMove("zen_headbutt"), createMove("aerial_ace")];
+    //this.moves = [createMove("slash"), createMove("psycho_cut"), createMove("night_slash"), createMove("close_combat"), createMove("drain_punch"), createMove("heal_pulse"), createMove("zen_headbutt"), createMove("aerial_ace")];
+    this.moves = [createMove("brick_break"), createMove("brick_break"), createMove("brick_break"), createMove("slash"), createMove("zen_headbutt"), createMove("psycho_cut")];
     this.movepool = ["aerial_ace", "air_slash", "aqua_cutter", "brick_break", "bulk_up", "bulldoze", "close_combat", "confuse_ray", "drain_punch", "earthquake", "facade", "fire_punch", "fling", "fury_cutter", "heal_pulse", "ice_punch", "knock_off", "leaf_blade", "life_dew", "low_kick", "low_sweep", "night_slash", "poison_jab", "psycho_cut", "reversal", "rock_slide", "rock_tomb", "sacred_sword", "shadow_claw", "shadow_sneak", "slash", "stone_edge", "swords_dance", "thunder_punch", "x_scissor", "zen_headbutt"];
     this.opponentMoves =
         [[createMove("psycho_cut"), createMove("psycho_cut"), createMove("sacred_sword"), createMove("sacred_sword"), createMove("zen_headbutt"), createMove("zen_headbutt"), createMove("slash"), createMove("leaf_blade"), createMove("swords_dance"), createMove("poison_jab")],
@@ -6447,7 +6493,8 @@ function Rhyperior() {
     this.maxhp = 0;
     this.currenthp = 0;
     this.types = ["ground", "rock"];
-    this.moves = [createMove("earthquake"), createMove("drill_run"), createMove("fissure"), createMove("sandstorm"), createMove("rock_wrecker"), createMove("smack_down"), createMove("rock_slide"), createMove("giga_impact")];
+    //this.moves = [createMove("earthquake"), createMove("drill_run"), createMove("fissure"), createMove("sandstorm"), createMove("rock_wrecker"), createMove("smack_down"), createMove("rock_slide"), createMove("giga_impact")];
+    this.moves = [createMove("rock_throw"), createMove("rock_throw"), createMove("rock_throw"), createMove("earthquake"), createMove("drill_run"), createMove("smack_down")];
     this.movepool = ["avalanche", "body_press", "body_slam", "brick_break", "bulldoze", "crunch", "dig", "double_edge", "dragon_rush", "drill_run", "dynamic_punch", "earthquake", "facade", "fire_punch", "fissure", "focus_punch", "giga_impact", "hammer_arm", "heat_crash", "heavy_slam", "high_horsepower", "ice_punch", "iron_head", "iron_tail", "megahorn", "mega_kick", "payback", "outrage", "power_up_punch", "reversal", "rock_blast", "rock_polish", "rock_slide", "rock_throw", "rock_tomb", "rock_wrecker", "rollout", "sandstorm", "smack_down", "stealth_rock", "stomping_tantrum", "stone_edge", "superpower", "thunder_punch"];
     this.opponentMoves =
         [[createMove("earthquake"), createMove("earthquake"), createMove("drill_run"), createMove("high_horsepower"), createMove("smack_down"), createMove("smack_down"), createMove("heavy_slam"), createMove("heat_crash"), createMove("bulldoze"), createMove("iron_head")],
@@ -13132,8 +13179,9 @@ function Swagger() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 1;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) { boostStat(pD, "attack", 2); applyEffect("confusion", 2, pD); };
-    this.description = "Raises target's attack by 2 stages and applies 2 stacks of confusion to it.";
+    this.description = "Raises target's attack by 2 stages and applies 2 stacks of confusion to it. Exhaust.";
     this.priority = function (pA, pD) { return 0; }
 }
 
