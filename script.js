@@ -892,13 +892,19 @@ function drawTeamSelection() {
 
     var modifier1 = document.createElement('img');
     modifier1.className = "modifier-icon";
-    modifiersDisplay.appendChild(modifier1);
+    var modifierDiv1 = document.createElement('div');
+    modifierDiv1.appendChild(modifier1);
+    modifiersDisplay.appendChild(modifierDiv1);
     var modifier2 = document.createElement('img');
     modifier2.className = "modifier-icon";
-    modifiersDisplay.appendChild(modifier2);
+    var modifierDiv2 = document.createElement('div');
+    modifierDiv2.appendChild(modifier2);
+    modifiersDisplay.appendChild(modifierDiv2);
     var modifier3 = document.createElement('img');
     modifier3.className = "modifier-icon";
-    modifiersDisplay.appendChild(modifier3);
+    var modifierDiv3 = document.createElement('div');
+    modifierDiv3.appendChild(modifier3);
+    modifiersDisplay.appendChild(modifierDiv3);
 
     var refreshDiv = document.createElement('div');
     refreshDiv.className = "modifier-icon-div";
@@ -913,9 +919,9 @@ function drawTeamSelection() {
         modifier1.src = modifiers[0].icon;
         modifier2.src = modifiers[1].icon;
         modifier3.src = modifiers[2].icon;
-        modifier1.title = modifiers[0].name + "\n" + modifiers[0].description;
-        modifier2.title = modifiers[1].name + "\n" + modifiers[1].description;
-        modifier3.title = modifiers[2].name + "\n" + modifiers[2].description;
+        modifierDiv1.setAttribute("data-mod-title", modifiers[0].name + "\n" + modifiers[0].description);
+        modifierDiv2.setAttribute("data-mod-title", modifiers[1].name + "\n" + modifiers[1].description);
+        modifierDiv3.setAttribute("data-mod-title", modifiers[2].name + "\n" + modifiers[2].description);
     }
 
     modifiers = [];
@@ -927,9 +933,9 @@ function drawTeamSelection() {
             modifier1.src = modifiers[0].icon;
             modifier2.src = modifiers[1].icon;
             modifier3.src = modifiers[2].icon;
-            modifier1.title = modifiers[0].name + "\n" + modifiers[0].description;
-            modifier2.title = modifiers[1].name + "\n" + modifiers[1].description;
-            modifier3.title = modifiers[2].name + "\n" + modifiers[2].description;
+            modifierDiv1.setAttribute("data-mod-title", modifiers[0].name + "\n" + modifiers[0].description);
+            modifierDiv2.setAttribute("data-mod-title", modifiers[1].name + "\n" + modifiers[1].description);
+            modifierDiv3.setAttribute("data-mod-title", modifiers[2].name + "\n" + modifiers[2].description);
             modifiersDisplay.style.visibility = "visible";
             refresh.style.visibility = "visible";
         } else {
@@ -1032,14 +1038,16 @@ function pokemonSelector(name) {
     }
 
     if (this.cell.p.unlocked) {
-        this.cell.title = this.cell.p.name + "\n" + this.cell.p.description + "\nTypes: ";
+        let dataTitle = "";
+        dataTitle = this.cell.p.name + "\n" + this.cell.p.description + "\nTypes: ";
         for (let type of this.cell.p.types) {
             var t = type.charAt(0).toUpperCase() + type.slice(1)
-            this.cell.title += t + " ";
+            dataTitle += t + " ";
         }
-        this.cell.title += "\nTalent: " + this.cell.p.talent + "\n" + this.cell.p.talentDesc;
+        dataTitle += "\nTalent: " + this.cell.p.talent + "\n" + this.cell.p.talentDesc;
+        this.cell.setAttribute("data-pokemon-title", dataTitle);
     } else {
-        this.cell.title = this.cell.p.hint;
+        this.cell.setAttribute("data-pokemon-title", this.cell.p.hint);
     }
 }
 
@@ -1711,11 +1719,11 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
     for (let i of opponent.items) {
         var wrapper = document.createElement('div');
         wrapper.className = "wrapper-padded";
+        wrapper.setAttribute("data-effect-title", i.name + "\n" + i.description);
         rightItems.appendChild(wrapper);
         var pImage = new Image();
         pImage.src = i.img;
         pImage.className = "item-sprite-pokemon-displayer";
-        pImage.title = i.name + "\n" + i.description;
         wrapper.appendChild(pImage);
     }
 
@@ -1904,12 +1912,12 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
         for (let i of p.items) {
             var wrapper = document.createElement('div');
             wrapper.className = "wrapper";
+            wrapper.setAttribute("data-item-top-title", i.name + "\n" + i.description);
             itemSubsection.appendChild(wrapper);
 
             var pImage = new Image();
             pImage.src = i.img;
             pImage.className = "item-sprite";
-            pImage.title = i.name + "\n" + i.description;
             wrapper.appendChild(pImage);
         }
     }
@@ -1958,8 +1966,8 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
 
     startTurn();
 
-    switch1.title = getMoveDescription(team[switchInd[0]]);
-    switch2.title = getMoveDescription(team[switchInd[1]]);
+    switch1.setAttribute("data-switch-title", getMoveDescription(team[switchInd[0]]));
+    switch2.setAttribute("data-switch-title", getMoveDescription(team[switchInd[1]]));
 
     for (let p of team) {
         colorHeader(p);
@@ -2100,19 +2108,19 @@ function writeDrawDiscard() {
     for (let m of team[activePokemon].draw)
         deckNames.push(m.name);
     shuffle(deckNames);
-    let deckTitle = deckNames.length + " move" + (deckNames.length > 1 ? "s" : "") + " in draw pile\n";
+    let deckTitle = deckNames.length + " move" + (deckNames.length > 1 ? "s" : "") + " in draw pile" + (deckNames.length > 0 ? ":" : "") + "\n";
     for (let m of deckNames)
         deckTitle += m + "\n";
-    deckCount.title = deckTitle;
+    deckCount.setAttribute("data-draw-discard-title", deckTitle);
 
     let discardCount = document.getElementById("discardCount");
     let discardNames = [];
     for (let m of team[activePokemon].discard)
         discardNames.push(m.name);
-    let discardTitle = discardNames.length + " move" + (discardNames.length > 1 ? "s" : "") + " in discard pile\n";
+    let discardTitle = discardNames.length + " move" + (discardNames.length > 1 ? "s" : "") + " in discard pile" + (discardNames.length > 0 ? ":" : "") + "\n";
     for (let m of discardNames)
         discardTitle += m + "\n";
-    discardCount.title = discardTitle;
+    discardCount.setAttribute("data-draw-discard-title", discardTitle);
 }
 
 function colorHeader(p) {
@@ -2135,13 +2143,15 @@ function colorHeader(p) {
 
 function writePokemonTitle() {
     let pRightView = document.getElementById("pRightView");
-    pRightView.title = opponent.name + "\nTypes: ";
+    let pTitle = "";
+    pTitle = opponent.name + "\nTypes: ";
     let pTypes = opponent.illusion === undefined ? opponent.types : opponent.illusion.types;
     for (let type of pTypes) {
         var t = type.charAt(0).toUpperCase() + type.slice(1)
-        pRightView.title += t + " ";
+        pTitle += t + " ";
     }
-    pRightView.title += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
+    pTitle += "\nTalent: " + opponent.talent + "\n" + opponent.talentDesc;
+    pRightView.setAttribute("data-pokemon-battle-title", pTitle);
 }
 
 function drawConsumedItems() {
@@ -2178,7 +2188,7 @@ function drawEffects(side) {
         if (effect.stacks > 0) {
             var grid = document.createElement('div');
             grid.className = "effect-cell";
-            grid.title = effect.description;
+            grid.setAttribute("data-effect-title", effect.description);
             effects.appendChild(grid);
             var image = new Image();
             image.src = effect.icon;
@@ -2206,7 +2216,7 @@ function drawStats(side) {
     if (p.statchanges.attack != 0) {
         var grid = document.createElement('div');
         grid.className = "effect-cell";
-        grid.title = "Attack";
+        grid.setAttribute("data-stats-title", "Attack");
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.attack > 0)
@@ -2224,7 +2234,7 @@ function drawStats(side) {
     if (p.statchanges.defense != 0) {
         var grid = document.createElement('div');
         grid.className = "effect-cell";
-        grid.title = "Defense";
+        grid.setAttribute("data-stats-title", "Defense");
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.defense > 0)
@@ -2242,7 +2252,7 @@ function drawStats(side) {
     if (p.statchanges.spattack != 0) {
         var grid = document.createElement('div');
         grid.className = "effect-cell";
-        grid.title = "Special Attack";
+        grid.setAttribute("data-stats-title", "Special Attack");
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.spattack > 0)
@@ -2260,7 +2270,7 @@ function drawStats(side) {
     if (p.statchanges.spdefense != 0) {
         var grid = document.createElement('div');
         grid.className = "effect-cell";
-        grid.title = "Special Defense";
+        grid.setAttribute("data-stats-title", "Special Defense");
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.spdefense > 0)
@@ -2278,7 +2288,7 @@ function drawStats(side) {
     if (p.statchanges.speed != 0) {
         var grid = document.createElement('div');
         grid.className = "effect-cell";
-        grid.title = "Speed";
+        grid.setAttribute("data-stats-title", "Speed");
         stats.appendChild(grid);
         var image = new Image();
         if (p.statchanges.speed > 0)
@@ -2307,19 +2317,19 @@ function drawEnvironment() {
     if (weather != undefined) {
         var txt = document.createElement('div');
         txt.innerHTML = weather.name + " - " + weather.turns + " turns";
-        txt.title = weather.description;
+        txt.setAttribute("data-environment-title", weather.description);
         grid.appendChild(txt);
     }
     if (terrain != undefined) {
         var txt = document.createElement('div');
         txt.innerHTML = terrain.name + " - " + terrain.turns + " turns";
-        txt.title = terrain.description;
+        txt.setAttribute("data-environment-title", terrain.description);
         grid.appendChild(txt);
     }
     for (let e of environment) {
         var txt = document.createElement('div');
         txt.innerHTML = e.name + " - " + e.turns + " turns";
-        txt.title = e.description;
+        txt.setAttribute("data-environment-title", e.description);
         grid.appendChild(txt);
     }
 }
@@ -2345,7 +2355,7 @@ function switchPokemon(ind) {
             document.getElementById("switchHP" + n).value = pS.currenthp;
             document.getElementById("switchHP" + n).max = pS.maxhp;
             document.getElementById("switchHPText" + n).innerHTML = pS.currenthp + "/" + pS.maxhp;
-            document.getElementById("switch" + n).title = getMoveDescription(pS);
+            document.getElementById("switch" + n).setAttribute("data-switch-title", getMoveDescription(pS));
 
             document.getElementById("leftSprite").src = pA.imgb;
             document.getElementById("leftName").innerHTML = pA.name;
@@ -2496,9 +2506,9 @@ function drawMove(p, newHand) {
             }
         }
         if (p === team[switchInd[0]])
-            document.getElementById("switch1").title = getMoveDescription(p);
+            document.getElementById("switch1").setAttribute("data-switch-title", getMoveDescription(p));
         else if (p === team[switchInd[1]])
-            document.getElementById("switch2").title = getMoveDescription(p);
+            document.getElementById("switch2").setAttribute("data-switch-title", getMoveDescription(p));
     }
     drawHand();
     if (contains(team, p))
@@ -4497,7 +4507,7 @@ function Pikachu() {
 function Garchomp() {
     this.name = "Garchomp";
     this.id = "garchomp"
-    this.description = "A well-rounded physical attacker with decent bulk, with powerful dragon type moves."
+    this.description = "A well-rounded physical attacker with decent bulk and powerful dragon type moves."
     this.hp = 108;
     this.attack = 130;
     this.defense = 95;
@@ -6237,7 +6247,7 @@ function Toxicroak() {
     this.currenthp = 0;
     this.types = ["poison", "fighting"];
     //this.moves = [createMove("poison_jab"), createMove("poison_sting"), createMove("toxic"), createMove("venom_drench"), createMove("drain_punch"), createMove("close_combat"), createMove("knock_off"), createMove("cross_poison")];
-    this.moves = [createMove("poison_sting"), createMove("poison_sting"), createMove("brick_break"), createMove("brick_break"), createMove("drain_punch"), createMove("poison_jab")];
+    this.moves = [createMove("poison_sting"), createMove("brick_break"), createMove("brick_break"), createMove("brick_break"), createMove("drain_punch"), createMove("poison_jab")];
     this.movepool = ["acupressure", "assurance", "belch", "bounce", "brick_break", "bulk_up", "bulldoze", "bullet_punch", "cross_chop", "cross_poison", "drain_punch", "dynamic_punch", "earthquake", "fling", "feint", "focus_punch", "foul_play", "gunk_shot", "ice_punch", "knock_off", "lash_out", "low_kick", "low_sweep", "payback", "poison_jab", "poison_sting", "power_up_punch", "revenge", "rock_smash", "rock_tomb", "sludge_bomb", "sludge_wave", "sucker_punch", "swords_dance", "throat_chop", "thunder_punch", "toxic", "vacuum_wave", "venom_drench", "venoshock"];
     this.opponentMoves =
         [[createMove("toxic"), createMove("toxic"), createMove("poison_jab"), createMove("poison_jab"), createMove("earthquake"), createMove("fire_punch"), createMove("poison_sting"), createMove("venom_drench"), createMove("cross_poison"), createMove("cross_poison")],

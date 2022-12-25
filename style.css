@@ -225,6 +225,10 @@ button.start:hover {
     padding-right: 5vw;
 }
 
+.modifiers-grid > div {
+    display: flex;
+}
+
 .modifier-icon {
     margin: auto;
     max-width: 80%;
@@ -669,6 +673,9 @@ button.start:hover {
     background: rgba(0, 0, 0, .4);
     padding: .5vh;
     border-radius: 1vh;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
 }
 
 .fainted {
@@ -698,6 +705,9 @@ button.start:hover {
     padding-left: 1vh;
     border-top-left-radius: 1.5vh;
     border-bottom-left-radius: 1.5vh;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
 }
 
 .gameover-grid {
@@ -1535,6 +1545,317 @@ input:checked + .slider:before {
     border-radius: .25vw;
 }
 
+[data-pokemon-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-pokemon-title]:after {
+    content: attr(data-pokemon-title);
+    position: absolute;
+    width: 90%;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #666;
+    -webkit-box-shadow: 0px 0px 4px #666;
+    box-shadow: 0px 0px 4px #666;
+    background-color: black;
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .6vw;
+    font-family: Verdana;
+    text-align: left;
+}
+
+[data-pokemon-title] {
+    position: relative;
+}
+
+[data-mod-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-mod-title]:after {
+    content: attr(data-mod-title);
+    position: absolute;
+    width: 20vw;
+    top: 50%;
+    right: 8vh;
+    transform: translateY(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #666;
+    -webkit-box-shadow: 0px 0px 4px #666;
+    box-shadow: 0px 0px 4px #666;
+    background-color: black;
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .8vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+}
+
+[data-mod-title] {
+    position: relative;
+}
+
+[data-item-top-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-item-top-title]:after {
+    content: attr(data-item-top-title);
+    position: absolute;
+    width: 20vw;
+    top: 110%;
+    right: 0;
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .8vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+}
+
+[data-item-top-title] {
+    position: relative;
+}
+
+[data-effect-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-effect-title]:after {
+    content: attr(data-effect-title);
+    position: absolute;
+    width: 20vw;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+    -webkit-text-stroke: initial;
+    font-weight: normal;
+}
+
+[data-effect-title] {
+    position: relative;
+}
+
+[data-stats-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-stats-title]:after {
+    content: attr(data-stats-title);
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: center;
+    line-height: initial;
+    -webkit-text-stroke: initial;
+    font-weight: normal;
+}
+
+[data-stats-title] {
+    position: relative;
+}
+
+[data-pokemon-battle-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-pokemon-battle-title]:after {
+    content: attr(data-pokemon-battle-title);
+    position: absolute;
+    width: 20vw;
+    top: 40%;
+    right: 100%;
+    transform: translateY(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+}
+
+[data-switch-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-switch-title]:after {
+    content: attr(data-switch-title);
+    position: absolute;
+    min-width: 5vw;
+    top: 50%;
+    left: 102%;
+    transform: translateY(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+}
+
+[data-draw-discard-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-draw-discard-title]:after {
+    content: attr(data-draw-discard-title);
+    position: absolute;
+    min-width: 9vw;
+    bottom: 102%;
+    left: 7%;
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+    -webkit-text-stroke: initial;
+    font-weight: normal;
+}
+
+[data-environment-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+
+[data-environment-title]:after {
+    content: attr(data-environment-title);
+    position: absolute;
+    width: 20vw;
+    top: 50%;
+    right: 105%;
+    transform: translateY(-50%);
+    padding: 4px 4px 4px 8px;
+    white-space: pre-line;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 4px #222;
+    -webkit-box-shadow: 0px 0px 4px #222;
+    box-shadow: 0px 0px 4px #222;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    color: white;
+    font-size: .7vw;
+    font-family: Verdana;
+    text-align: left;
+    line-height: initial;
+    -webkit-text-stroke: initial;
+    font-weight: normal;
+}
 
 
 
