@@ -9757,6 +9757,7 @@ function DragonTail() {
         if (i >= 0) {
             pA.hand.push(pA.discard[i]);
             pA.discard.splice(i, 1);
+            drawHand();
         }
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Fetches the first dragon type move in the user's discard pile and places it into its hand.";
