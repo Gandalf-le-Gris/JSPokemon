@@ -1739,7 +1739,7 @@ input:checked + .slider:before {
     top: 110%;
     left: 50%;
     transform: translateX(-50%);
-    padding: 4px 4px 4px 8px;
+    padding: 4px 8px 4px 8px;
     white-space: pre-line;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -1805,7 +1805,7 @@ input:checked + .slider:before {
 [data-switch-title]:after {
     content: attr(data-switch-title);
     position: absolute;
-    min-width: 5vw;
+    min-width: 6vw;
     top: 50%;
     left: 102%;
     transform: translateY(-50%);

@@ -881,6 +881,8 @@ function unlockAll() {
     window.localStorage.setItem('berriesFound', JSON.stringify(8));
     window.localStorage.setItem('maxSpeed', JSON.stringify(1));
     window.localStorage.setItem('totalFreezes', JSON.stringify(20));
+
+    loadProgress();
 }
 
 function drawTeamSelection() {
