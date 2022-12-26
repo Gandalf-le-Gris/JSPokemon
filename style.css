@@ -1213,17 +1213,19 @@ button.launch-tuto {
 }
 
 .event-option {
-    transition: color .2s;
+    transition: all .2s;
+    width: fit-content;
 }
 
     .event-option:hover {
         color: darkgoldenrod;
+        transform: scale(1.1);
         cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
     }
 
 .event-option-grid {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-rows: max-content;
     row-gap: 3vh;
     column-gap: 2vw;
     font-size: 2vw;
@@ -1231,6 +1233,8 @@ button.launch-tuto {
     font-family: 'Copperplate Gothic';
     color: white;
     text-align: left;
+    width: fit-content;
+    margin: auto;
 }
 
 .pokedex-option {

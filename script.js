@@ -17267,16 +17267,12 @@ function runEvent(event) {
         grid.appendChild(options);
         for (let i = 1; i <= event.options.length; i++) {
             var o = event.options[i - 1];
-            var num = document.createElement('div');
-            num.innerHTML = i + ".";
-            num.style.textAlign = "right";
-            options.appendChild(num);
 
             function optionDiv() {
                 this.div = document.createElement('div');
                 this.div.o = o;
                 this.div.className = "event-option";
-                this.div.innerHTML = o.text;
+                this.div.innerHTML = i + ".   " + o.text;
                 this.div.onclick = function () {
                     if (music)
                         playMusic('resources/sounds/sfx/button_click.mp3', false);
@@ -17382,7 +17378,6 @@ function createReward(isItem, r1, r2, r3, next) {
                 this.reward1.item = item;
                 this.reward1.itemN = itemN;
                 this.reward1.onclick = function () {
-                    console.log(this.p);
                     if (!contains(foundItems, this.itemN))
                         foundItems.push(this.itemN);
                     team[this.p].items.push(this.item);
@@ -17495,7 +17490,7 @@ function checkGameOver() {
 }
 
 function createEvent(eventS) {
-    event = eventS != undefined ? eventS : Math.floor(Math.random() * 17);
+    event = eventS != undefined ? eventS : Math.floor(Math.random() * 18);
     switch (event) {
         case 0:
             return new Event0();
@@ -17531,6 +17526,8 @@ function createEvent(eventS) {
             return new Event15();
         case 16:
             return new Event16();
+        case 17:
+            return new Event17();
         default:
             return new Event13();
     }
@@ -18723,6 +18720,58 @@ function Event16() {
     })
 }
 
+function Event17() {
+    this.description = "As you arrive at a ravine, you realize the bridge you planned on crossing is completely blocked by a slumbering Snorlax.";
+    this.options = [];
+    this.options.push({
+        text: "Look for another bridge",
+        effect: () => {
+            area = Math.max(0, area - 2);
+            nextEncounter();
+        },
+        description: "Trying to wake up the sleeping Snorlax is pointless and you know it. Better look for another way to cross the ravine.",
+        subdescription: "You have moved back."
+    })
+    this.options.push({
+        text: "Wait for it to wake up",
+        effect: () => {
+            runEvent(new Event17());
+        },
+        description: "After a few long hours, the Pokémon still hasn't budged.",
+    })
+    var incense = team.findIndex(e => e.items.findIndex(i => i.name.includes("Incense")) >= 0);
+    var incenseName = incense < 0 ? undefined : team[incense].items[team[incense].items.findIndex(i => i.name.includes("Incense"))].name;
+    var sound = team.findIndex(e => e.moves.findIndex(i => isSoundBased(i)) >= 0);
+    var soundName = sound < 0 ? undefined : team[sound].moves[team[sound].moves.findIndex(i => isSoundBased(i))].name;
+    if (incense >= 0 || sound >= 0) {
+        this.options.push({
+            text: incense >= 0 ? "[Incense] Use the smell of your " + incenseName + " to wake it up" : "[Sound] Use " + soundName + " to wake it up",
+            effect: () => {
+                function getBerry() {
+                    var item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    while (!item.includes('_berry') || item.includes('aguav_berry'))
+                        item = heldItems[Math.floor(Math.random() * heldItems.length)];
+                    return item;
+                }
+                createReward(true, getBerry(), getBerry(), getBerry());
+            },
+            description: "The Snorlax looks a bit surprised at first, but then simply walks away to go back to sleep under a nearby tree, leaving behind a few berries it didn't eat.",
+        })
+    }
+    var fighting = team.findIndex(e => contains(e.types, "fighting"));
+    if (fighting >= 0) {
+        this.options.push({
+            text: "[Fighting] Let " + team[fighting].name + " try to push the Snorlax aside",
+            effect: () => {
+                team[fighting].attack = Math.floor(team[fighting].attack * 1.15);
+                nextEncounter();
+            },
+            description: team[fighting].name + " somehow manages to clear the way. What's more, all that workout seems to have worked in its favor.",
+            subdescription: team[fighting].name + "'s attack has increased."
+        })
+    }
+}
+
 
 
 
@@ -18764,8 +18813,11 @@ function drawBattleExplanations() {
                                             filter.onclick = () => {
                                                 instruct.innerHTML = "Once you're out of options, click the end turn button. You will get new cards, a fresh switch and more energy the next turn."
                                                 filter.onclick = () => {
-                                                    instruct.innerHTML = "Now that you know how to battle, try to take down that nasty " + opponent.name + "!"
-                                                    filter.onclick = () => { document.body.removeChild(filter); }
+                                                    instruct.innerHTML = "If you're ever unsure about what something means or does, simply hover over it."
+                                                    filter.onclick = () => {
+                                                        instruct.innerHTML = "Now that you know how to battle, try to take down that nasty " + opponent.name + "!"
+                                                        filter.onclick = () => { document.body.removeChild(filter); }
+                                                    }
                                                 }
                                             }
                                         }
