@@ -4592,7 +4592,7 @@ function Garchomp() {
     this.currenthp = 0;
     this.types = ["dragon", "ground"];
     //this.moves = [createMove("bulldoze"), createMove("sand_tomb"), createMove("dual_chop"), createMove("dragon_claw"), createMove("hone_claws"), createMove("rock_slide")];
-    this.moves = [createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("dragon_claw"), createMove("bulldoze"), createMove("sand_tomb")];
+    this.moves = [createMove("dragon_tail"), createMove("dragon_tail"), createMove("dragon_tail"), createMove("dragon_claw"), createMove("bulldoze"), createMove("sand_tomb")];
     this.movepool = ["dual_chop", "sand_tomb", "crunch", "breaking_swipe", "double_edge", "dragon_claw", "dragon_pulse", "earthquake", "facade", "fire_blast", "bulldoze", "iron_tail", "outrage", "rock_slide", "scale_shot", "scorching_sands", "shadow_claw", "stomping_tantrum", "swords_dance", "twister", "aqua_tail", "dig", "draco_meteor", "dragon_rush", "dragon_tail", "earth_power", "fire_fang", "giga_impact", "hone_claws", "iron_head", "poison_jab", "sandstorm", "stealth_rock", "stone_edge", "thrash"];
     this.opponentMoves =
         [[createMove("swords_dance"), createMove("outrage"), createMove("dragon_claw"), createMove("dual_chop"), createMove("dragon_rush"), createMove("dragon_tail"), createMove("earthquake"), createMove("scale_shot"), createMove("rock_slide"), createMove("iron_tail")],
@@ -6360,7 +6360,7 @@ function Dragapult() {
     this.currenthp = 0;
     this.types = ["dragon", "ghost"];
     //this.moves = [createMove("astonish"), createMove("shadow_ball"), createMove("phantom_force"), createMove("draco_meteor"), createMove("breaking_swipe"), createMove("dragon_darts"), createMove("dragon_claw"), createMove("thunderbolt")];
-    this.moves = [createMove("astonish"), createMove("astonish"), createMove("breaking_swipe"), createMove("breaking_swipe"), createMove("shadow_ball"), createMove("dragon_darts")];
+    this.moves = [createMove("astonish"), createMove("astonish"), createMove("dragon_tail"), createMove("dragon_tail"), createMove("shadow_ball"), createMove("dragon_darts")];
     this.movepool = ["agility", "astonish", "beat_up", "bite", "body_slam", "breaking_swipe", "brine", "confuse_ray", "curse", "disable", "dive", "draco_meteor", "dragon_breath", "dragon_claw", "dragon_dance", "dragon_darts", "dragon_pulse", "dragon_rush", "dragon_tail", "fire_blast", "flamethrower", "hex", "hydro_pump", "outrage", "phantom_force", "psychic_fangs", "scald", "shadow_ball", "solar_beam", "steel_wing", "sucker_punch", "surf", "thunder", "thunderbolt", "thunder_wave", "tri_attack", "u_turn", "will_o_wisp"];
     this.opponentMoves =
         [[createMove("astonish"), createMove("astonish"), createMove("phantom_force"), createMove("phantom_force"), createMove("dragon_dance"), createMove("shadow_ball"), createMove("shadow_ball"), createMove("will_o_wisp"), createMove("hex"), createMove("dragon_pulse")],
@@ -12363,7 +12363,6 @@ function Rollout() {
     this.cat = "physical";
     this.bp = 40;
     this.cost = 1;
-    this.exhaust = true;
     this.postEffect = function (move, pA, pD) {
         this.bp += 20;
         this.description = "Deals " + this.bp + " base power damage to the opponent. Base power increases with each use.";
@@ -16803,7 +16802,7 @@ function RazorFang() {
 
 function ProtectivePads() {
     this.name = "Protective Pads";
-    this.description = "Protects user from contact effects.";
+    this.description = "Protects holder from contact effects.";
     this.img = 'resources/sprites/held_items/protective_pads.webp';
     this.area = "";
 }
