@@ -79,6 +79,7 @@ function loadResources() {
     imgs.push("resources/sprites/battle_backgrounds/forest.png");
     imgs.push("resources/sprites/battle_backgrounds/cave3.png");
     imgs.push("resources/sprites/battle_backgrounds/beach2.png");
+    imgs.push("resources/sprites/battle_backgrounds/victory_confetti.gif");
 
     for (let e of effectList) {
         imgs.push(createEffect(e, 0).icon);
@@ -3478,6 +3479,11 @@ function victoryScreen() {
     fadeInTransition();
     var gArea = new gameArea('resources/teamscreen.webp', () => { });
     gArea.start();
+
+    var confetti = document.createElement('img');
+    confetti.src = "resources/sprites/battle_backgrounds/victory_confetti.gif";
+    confetti.className = "confetti";
+    document.body.appendChild(confetti);
 
     var title = document.createElement('div');
     title.className = "centered-title";
@@ -15531,7 +15537,7 @@ function RockyHelmet() {
     this.area = "";
     this.revenge = true;
     this.effectR = (move, pA, pD) => {
-        if (move != undefined && move.cat === "physical")
+        if (move != undefined && move.cat === "physical" && !isPadded(pD))
             dealDamage(10, pD);
     };
 }
