@@ -793,9 +793,6 @@ function checkForUnlocks() {
     let oldUnlocked = unlockState;
     unlockState = newUnlocked;
 
-    console.log(newUnlocked);
-    console.log(oldUnlocked);
-
     function displayUnlockAsync(list) {
         if (list.length > 0) {
             let p = list.shift();
@@ -15989,7 +15986,7 @@ function Potion() {
     this.area = "";
     this.pickup = true;
     this.consumed = true;
-    this.effect = (p) => { if (p.currenthp > 0) p.currenthp = Math.min(p.maxhp, p.currenthp + Math.floor(.5 * p.maxhp)); console.log(p); }
+    this.effect = (p) => { if (p.currenthp > 0) p.currenthp = Math.min(p.maxhp, p.currenthp + Math.floor(.5 * p.maxhp)); }
 }
 
 function AmuletCoin() {
