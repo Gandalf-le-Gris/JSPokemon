@@ -662,6 +662,7 @@ const pokemonList = ["venusaur", "charizard", "blastoise", "pikachu", "garchomp"
 var cSelected = 0;
 var pSelected = ["", "", ""];
 var tuto = false;
+var unlockState = [];
 
 function loadProgress() {
     defeatedPokemon = window.localStorage.getItem('defeatedPokemon') != null ? parseInt(JSON.parse(window.localStorage.getItem('defeatedPokemon'))) : 0;
@@ -719,9 +720,11 @@ function loadProgress() {
     for (let p of pokemonList)
         if (createPokemon(p).unlocked && !contains(encounteredPokemon, p) && p !== "nidoqueen")
             encounteredPokemon.push(p);
+
+    unlockState = getUnlockedPokemon();
 }
 
-function saveProgress() {
+function saveProgress(checkUnlocks) {
     if (berriesFound < 8) {
         berriesFound = 0;
         for (let i of foundItems) {
@@ -772,6 +775,72 @@ function saveProgress() {
     window.localStorage.setItem('berriesFound', JSON.stringify(berriesFound));
     window.localStorage.setItem('maxSpeed', JSON.stringify(maxSpeed));
     window.localStorage.setItem('totalFreezes', JSON.stringify(totalFreezes));
+
+    if (checkUnlocks)
+        checkForUnlocks();
+}
+
+function getUnlockedPokemon() {
+    let res = [];
+    for (let p of pokemonList)
+        if (createPokemon(p).unlocked)
+            res.push(p);
+    return res;
+}
+
+function checkForUnlocks() {
+    let newUnlocked = getUnlockedPokemon();
+    let oldUnlocked = unlockState;
+    unlockState = newUnlocked;
+
+    console.log(newUnlocked);
+    console.log(oldUnlocked);
+
+    function displayUnlockAsync(list) {
+        if (list.length > 0) {
+            let p = list.shift();
+            if (!contains(oldUnlocked, p)) {
+                displayUnlock(p);
+                setTimeout(() => displayUnlockAsync(list), 4000);
+            } else
+                displayUnlockAsync(list);
+        }
+    }
+
+    function displayUnlock(p) {
+        let poke = createPokemon(p);
+
+        let unlockTile = document.createElement('div');
+        unlockTile.className = "unlock-tile";
+
+        let iconWrapper = document.createElement('div');
+        iconWrapper.style.display = "flex";
+        iconWrapper.style.height = "13.4vh";
+        unlockTile.appendChild(iconWrapper);
+        let icon = document.createElement('img');
+        icon.src = "resources/sprites/pokemon_icons/" + poke.id + ".png";
+        iconWrapper.appendChild(icon);
+
+        let textSection = document.createElement('div');
+        unlockTile.appendChild(textSection);
+        let name = document.createElement('div');
+        name.innerHTML = poke.name;
+        name.style.fontSize = "3.8vh";
+        name.style.fontWeight = "bold";
+        textSection.appendChild(name);
+        let unlocked = document.createElement('div');
+        unlocked.innerHTML = "New Pokémon!";
+        unlocked.style.lineHeight = "5vh";
+        textSection.appendChild(unlocked);
+
+        document.body.appendChild(unlockTile);
+
+        setTimeout(() => document.body.removeChild(unlockTile), 4000);
+    }
+
+    displayUnlockAsync(newUnlocked);
+
+    unlockState = newUnlocked;
 }
 
 function unlockAll() {
@@ -3338,7 +3407,7 @@ function drawHistory() {
 }
 
 function nextEncounter() {
-    saveProgress();
+    saveProgress(false);
 
     if (!checkGameOver()) {
         fadeOutTransition(1);
@@ -3445,7 +3514,7 @@ function victoryScreen() {
                 helixQuest++;
         }
     }
-    saveProgress();
+    saveProgress(true);
 }
 
 
@@ -4184,7 +4253,7 @@ function gameOver() {
     if (area == 1 && world == 1)
         area1loss++;
 
-    saveProgress();
+    saveProgress(true);
 }
 
 

@@ -1343,6 +1343,40 @@ button.launch-tuto {
     -webkit-animation: zoom-animation 1.2s ease infinite;
 }
 
+.unlock-tile {
+    position: absolute;
+    height: 15vh;
+    width: 25vw;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    background: rgb(255,226,0);
+    background: linear-gradient(164deg, rgba(255,226,0,1) 0%, rgba(255,183,0,1) 100%);
+    animation: unlock-animation 4s ease forwards;
+    -moz-animation: unlock-animation 4s ease forwards;
+    -webkit-animation: unlock-animation 4s ease forwards;
+    -o-animation: unlock-animation 4s ease forwards;
+    border: .8vh solid;
+    border-color: darkgoldenrod;
+    display: grid;
+    grid-template-columns: 15vh auto;
+}
+
+    .unlock-tile > div > img {
+        height: 13.4vh;
+        margin: auto;
+    }
+
+    .unlock-tile > div {
+        display: grid;
+        grid-template-rows: 7.5vh 7.5vh;
+        font-size: 2.7vh;
+        color: black;
+        font-family: 'Copperplate Gothic';
+        text-align: center;
+        line-height: 9vh;
+    }
+
 
 /* The switch - the box around the slider */
 .switch {
@@ -2290,5 +2324,77 @@ input:checked + .slider:before {
     100% {
         opacity: 0;
         transform: translate(-40%, -50%);
+    }
+}
+
+@keyframes unlock-animation {
+    0% {
+        transform: translate(-50%, -100%);
+    }
+
+    15% {
+        transform: translate(-50%, 0%);
+    }
+
+    85% {
+        transform: translate(-50%, 0%);
+    }
+
+    100% {
+        transform: translate(-50%, -100%);
+    }
+}
+
+@-moz-keyframes unlock-animation {
+    0% {
+        transform: translate(-50%, -100%);
+    }
+
+    15% {
+        transform: translate(-50%, 0%);
+    }
+
+    85% {
+        transform: translate(-50%, 0%);
+    }
+
+    100% {
+        transform: translate(-50%, -100%);
+    }
+}
+
+@-webkit-keyframes unlock-animation {
+    0% {
+        transform: translate(-50%, -100%);
+    }
+
+    15% {
+        transform: translate(-50%, 0%);
+    }
+
+    85% {
+        transform: translate(-50%, 0%);
+    }
+
+    100% {
+        transform: translate(-50%, -100%);
+    }
+}
+
+@-o-keyframes unlock-animation {
+    0% {
+        transform: translate(-50%, -100%);
+    }
+
+    15% {
+        transform: translate(-50%, 0%);
+    }
+
+    85% {
+        transform: translate(-50%, 0%);
+    }
+
+    100% {
+        transform: translate(-50%, -100%);
     }
 }
