@@ -11194,7 +11194,7 @@ function Judgment() {
     this.name = "Judgment";
     this.type = "normal";
     this.cat = "special";
-    this.bp = 100;
+    this.bp = 115;
     this.cost = 2;
     this.preEffect = function (move, pA, pD) { this.type = pA.types[0]; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Changes type on use to match that of the user.";

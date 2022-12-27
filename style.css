@@ -1588,7 +1588,7 @@ input:checked + .slider:before {
         position: absolute;
         width: 11.44vw;
         min-height: 9.7vh;
-        -webkit-mask: linear-gradient(-60deg,#0000 30%,#0005,#0000 70%) right/500% 100%;
+        -webkit-mask: linear-gradient(-60deg,#0000 30%,#0008,#0000 70%) right/500% 100%;
         background-repeat: no-repeat;
         animation: shimmer 3s infinite;
         background: #FAF3E0;
