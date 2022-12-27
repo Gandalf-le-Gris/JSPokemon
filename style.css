@@ -534,9 +534,11 @@ button.start:hover {
     border: solid;
     border-color: black;
     color: black;
+    border-width: .18vw;
     font-size: 2.3vh;
     font-family: 'Copperplate Gothic';
     background-color: lightslategrey;
+    background: linear-gradient(164deg, #778899 0%, #9fafbf 100%);
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
@@ -550,10 +552,12 @@ button.start:hover {
     grid-template-columns: auto;
     border: solid;
     border-color: #dd0000;
+    border-width: .18vw;
     color: #dd0000;
     font-size: 2.3vh;
     font-family: 'Copperplate Gothic';
     background-color: lightslategrey;
+    background: linear-gradient(164deg, #778899 0%, #9fafbf 100%);
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
@@ -608,14 +612,17 @@ button.start:hover {
     font-weight: bold;
     font-family: 'Copperplate Gothic';
     background-color: lightslategrey;
+    /*background: linear-gradient(164deg, #778899 0%, #9fafbf 100%);*/
     border: solid;
+    border-width: .18vw;
     justify-self: right;
     border-radius: 1vh;
-    transition: color .2s, background-color .2s, font-size .2s;
+    transition: all .2s;
 }
 
     .end-turn:hover {
         color: #dd0000;
+        background: none;
         background-color: #ffd0d0;
         font-size: 3.1vh;
         cursor: url('resources/sprites/ui_icons/pointer.cur'), default;
@@ -806,6 +813,7 @@ button.start:hover {
     font-size: 2.3vh;
     font-family: 'Copperplate Gothic';
     background-color: lightslategrey;
+    background: linear-gradient(164deg, #778899 0%, #9fafbf 100%);
     justify-self: center;
     vertical-align: middle;
     border-radius: 1vh;
@@ -1571,6 +1579,22 @@ input:checked + .slider:before {
     font-family: 'Copperplate Gothic';
     text-align: right;
 }
+
+.shimmer {
+    background: linear-gradient(160deg, rgba(238,193,71,1) 0%, rgba(240,222,174,1) 100%);
+}
+
+    .shimmer:after {
+        position: absolute;
+        width: 11.44vw;
+        min-height: 9.7vh;
+        -webkit-mask: linear-gradient(-60deg,#0000 30%,#0005,#0000 70%) right/500% 100%;
+        background-repeat: no-repeat;
+        animation: shimmer 3s infinite;
+        background: #FAF3E0;
+        content: "";
+        border-radius: inherit;
+    }
 
 
 
@@ -2404,5 +2428,73 @@ input:checked + .slider:before {
 
     100% {
         transform: translate(-50%, -100%);
+    }
+}
+
+@keyframes animate-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@-moz-keyframes animate-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@-webkit-keyframes animate-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@-o-keyframes animate-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        -webkit-mask-position: left
+    }
+}
+
+@-webkit-keyframes shimmer {
+    100% {
+        -webkit-mask-position: left
     }
 }

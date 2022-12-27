@@ -2093,46 +2093,54 @@ function drawHand() {
             function moveCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "move-card";
+                if (isSpecialMove(move))
+                    this.card.className += " shimmer";
                 this.card.onclick = function () {
-                    if (this.className === "move-card")
+                    if (this.className.includes("move-card"))
                         document.addEventListener("click", (evt) => {
                             const flyoutEl = this;
                             let targetEl = evt.target;
                             do {
                                 if (targetEl == flyoutEl) {
-                                    if (this.className === "move-card") {
-                                        this.className = "selected-move";
+                                    if (this.className.includes("move-card")) {
+                                        this.classList.remove("move-card");
+                                        this.classList.add("selected-move");
                                         previewMove(move);
                                         document.addEventListener("click", (evt) => {
                                             const flyoutEl = this;
                                             let targetEl = evt.target;
                                             do {
                                                 if (targetEl == flyoutEl) {
-                                                    if (this.className === "move-card") {
-                                                        this.className = "selected-move";
+                                                    if (this.className.includes("move-card")) {
+                                                        this.classList.remove("move-card");
+                                                        this.classList.add("selected-move");
                                                         previewMove(move);
                                                     } else {
                                                         document.getElementById("movePreview").innerHTML = "";
                                                         useMove(move);
-                                                        this.className = "move-card";
+                                                        this.classList.add("move-card");
+                                                        this.classList.remove("selected-move");
                                                     }
                                                     return;
                                                 }
                                                 targetEl = targetEl.parentNode;
                                             } while (targetEl);
-                                            this.className = "move-card";
+                                            this.classList.add("move-card");
+                                            this.classList.remove("selected-move");
                                             hidePreview();
                                         }, { once: true });
                                     } else {
                                         useMove(move);
-                                        this.className = "move-card";
+                                        this.classList.add("move-card");
+                                        this.classList.remove("selected-move");
                                         hidePreview();
                                     }
                                     return;
                                 }
                                 targetEl = targetEl.parentNode;
                             } while (targetEl);
-                            this.className = "move-card";
+                            this.classList.add("move-card");
+                            this.classList.remove("selected-move");
                             hidePreview();
                         }, { once: true });
                 }
@@ -3339,6 +3347,8 @@ function drawHistory() {
                 function makeCard(move) {
                     this.card = document.createElement('div');
                     this.card.className = "static-move-card";
+                    if (isSpecialMove(move))
+                        this.card.className += " shimmer";
 
                     var top = document.createElement('div');
                     top.className = "move-top";
@@ -3569,6 +3579,8 @@ function rewardScreen() {
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
+                if (isSpecialMove(move))
+                    this.card.className += " shimmer";
 
                 var top = document.createElement('div');
                 top.className = "move-top";
@@ -3934,6 +3946,8 @@ function pokemartEncounter() {
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
+                if (isSpecialMove(move))
+                    this.card.className += " shimmer";
 
                 var top = document.createElement('div');
                 top.className = "move-top";
@@ -4140,6 +4154,8 @@ function drawRemoveCard() {
                 function makeCard(move) {
                     this.card = document.createElement('div');
                     this.card.className = "static-move-card";
+                    if (isSpecialMove(move))
+                        this.card.className += " shimmer";
 
                     var top = document.createElement('div');
                     top.className = "move-top";
@@ -7543,6 +7559,13 @@ movesList = ["ancient_power", "assurance", "aura_sphere", "beat_up", "bite", "bu
     "freeze_dry", "dragon_breath", "incinerate", "psyshock", "round", "sparkling_aria", "belch", "knock_off", "dragon_darts", "psychic_fangs", "aura_wheel",
     "swift", "tailwind", "supersonic", "aqua_cutter", "fissure", "rock_wrecker", "core_enforcer", "lands_wrath", "thousand_arrows", "thousand_waves",
     "glacial_lance", "astral_barrage", "jungle_healing", "steam_eruption", "spectral_thief", "take_down", "power_trip"];
+specialMoves = ["Judgment", "Magma Storm", "Psytrike", "Hyperspace Fury", "Hyperspace Hole", "Precipice Blades", "Origin Pulse", "Dragon Ascent",
+    "V-create", "Shadow Force", "Eternabeam", "Dynamax Cannon", "Crush Grip", "Diamond Storm", "Core Enforcer", "Thousand Waves", "Thousand Arrows",
+    "Land's Wrath", "Glacial Lance", "Astral Barrage", "Jungle Healing", "Steam Eruption", "Spectral Thief"];
+
+function isSpecialMove(move) {
+    return contains(specialMoves, move.name) || move.name.includes("*");
+}
 
 function createMove(move) {
     switch (move) {
@@ -13646,7 +13669,7 @@ function VacuumWave() {
 }
 
 function VCreate() {
-    this.name = "V-Create";
+    this.name = "V-create";
     this.type = "fire";
     this.cat = "physical";
     this.bp = 170;
@@ -17485,6 +17508,8 @@ function createReward(isItem, r1, r2, r3, next) {
                 function makeCard(move) {
                     this.card = document.createElement('div');
                     this.card.className = "static-move-card";
+                    if (isSpecialMove(move))
+                        this.card.className += " shimmer";
 
                     var top = document.createElement('div');
                     top.className = "move-top";
@@ -19241,6 +19266,8 @@ function drawPokedexMoves() {
         function makeCard(move) {
             this.card = document.createElement('div');
             this.card.className = "static-move-card";
+            if (isSpecialMove(move))
+                this.card.className += " shimmer";
 
             var top = document.createElement('div');
             top.className = "move-top";
