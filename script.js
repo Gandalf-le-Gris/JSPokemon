@@ -3576,6 +3576,8 @@ function rewardScreen() {
 
             moveN = getFromMovepool(p);
             move1 = createMove(moveN);
+            if (Math.random() < .02)
+                upgradeMove(move1);
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
@@ -3943,6 +3945,8 @@ function pokemartEncounter() {
 
             moveN = getFromMovepool(p);
             move1 = createMove(moveN);
+            if (Math.random() < .05)
+                upgradeMove(move1);
             function makeCard(move) {
                 this.card = document.createElement('div');
                 this.card.className = "static-move-card";
@@ -8426,6 +8430,7 @@ function AerialAce() {
     };
     this.description = "Deals 35 base power damage to the opponent. Draw a card. Base power increases if it was the last card in the draw pile.";
     this.priority = function (pA, pD) { return 3 * (pA.draw.length == 1); }
+    this.upgradeBan = "bp";
 }
 
 function Agility() {
@@ -8453,6 +8458,7 @@ function AirCutter() {
     this.effect = function (move, pA, pD) { this.crit = drawn > 0; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if an extra card was drawn this turn.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0) * drawn > 0; }
+    this.upgradeBan = "crit";
 }
 
 function AirSlash() {
@@ -8531,6 +8537,7 @@ function AquaCutter() {
     this.effect = function (move, pA, pD) { this.crit = (weather !== undefined && weather.name === "Rain") || pA.statchanges.attack > 0; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit in the rain or if the user's attack was raised.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "crit";
 }
 
 function AquaJet() {
@@ -8574,6 +8581,7 @@ function Assurance() {
     this.effect = function (move, pA, pD) { if (pA.currenthp <= pA.maxhp / 2) this.bp = 120; else this.bp = 60; };
     this.description = "Deals 60 base power damage to the opponent. Power doubles if user's HP is below 50%.";
     this.priority = function (pA, pD) { return -1 + 5 * (pA.currenthp <= pA.maxhp / 2); }
+    this.upgradeBan = "bp";
 }
 
 function Astonish() {
@@ -8701,6 +8709,7 @@ function Avalanche() {
     this.effect = function (move, pA, pD) { if (pA.currenthp <= pA.maxhp / 2) this.bp = 120; else this.bp = 60; };
     this.description = "Deals 60 base power damage to the opponent. Power doubles if user's HP is below 50%.";
     this.priority = function (pA, pD) { return -1 + 5 * (pA.currenthp <= pA.maxhp / 2); }
+    this.upgradeBan = "bp";
 }
 
 function BatonPass() {
@@ -8855,6 +8864,7 @@ function BlazeKick() {
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of burn to the target in the sun. Always results in a critical hit if the user's attack or special attack have been raised at least twice in total.";
     this.priority = function (pA, pD) { return 2 * (weather != undefined && weather.name === "Sun") + 2 * (pA.statchanges.attack + pA.statchanges.spattack >= 2); }
+    this.upgradeBan = "crit";
 }
 
 function Blizzard() {
@@ -8881,6 +8891,7 @@ function BodyPress() {
     };
     this.description = "Deals 75 base power damage to the opponent. Base power varies with user's defense stat changes. Raises user's defense by 1 stage if hasn't been raised already.";
     this.priority = function (pA, pD) { return pA.statchanges.defense; }
+    this.upgradeBan = "bp";
 }
 
 function BodySlam() {
@@ -8976,6 +8987,7 @@ function BrickBreak() {
     };
     this.description = "Deals 45 base power damage to the opponent. Super effective attacks deal extra damage.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function Brine() {
@@ -8992,6 +9004,7 @@ function Brine() {
     };
     this.description = "Deals 60 base power damage to the opponent. Base power doubles against targets below 50% of maximum HP.";
     this.priority = function (pA, pD) { return 3 * (pD.currenthp < .5 * pD.maxhp); }
+    this.upgradeBan = "bp";
 }
 
 function BrutalSwing() {
@@ -9049,6 +9062,7 @@ function BugBite() {
     };
     this.description = "Deals 30 base power damage to the opponent. Base power increases with each bug type move in the user's deck. Heals user for 15HP for each berry held by the target.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function BugBuzz() {
@@ -9088,6 +9102,7 @@ function Bulldoze() {
     this.postEffect = function (move, pA, pD) { boostStat(pD, "speed", -1); };
     this.description = "Deals 65 base power damage to the opponent. Lowers target's speed by 1 stage. Deals extra damage to grounded targets.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function BulletPunch() {
@@ -9124,6 +9139,7 @@ function BulletSeed() {
     this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (pD.effects.findIndex(e => e.name === "Leech Seed") >= 0); };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Seeded targets are hit twice more.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "multi";
 }
 
 function BurningJealousy() {
@@ -9135,6 +9151,7 @@ function BurningJealousy() {
     this.effect = function (move, pA, pD) { this.bp = 20 * (1 + Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); };
     this.description = "Deals 20 base power damage to the opponent, plus 20 additional base power for each stat raise on the opponent.";
     this.priority = function (pA, pD) { return -2 + (Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); }
+    this.upgradeBan = "bp";
 }
 
 function CalmMind() {
@@ -9277,13 +9294,14 @@ function Confusion() {
     this.effect = function (move, pA, pD) { this.bp = 35 + 5 * pA.draw.length; };
     this.description = "Deals 35 base power damage to the opponent. Base power increases with each card in the user's draw pile.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function CoreEnforcer() {
     this.name = "Core Enforcer";
     this.type = "dragon";
     this.cat = "special";
-    this.bp = 70;
+    this.bp = 75;
     this.cost = 2;
     this.postEffect = function (move, pA, pD) {
         if (pD.statchanges.attack > 0) pD.statchanges.attack = 0;
@@ -9329,6 +9347,7 @@ function CrossChop() {
     this.effect = function (move, pA, pD) { this.crit = pA.currenthp < .4 * pA.maxhp; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if user's HP is below 40% of maximum HP.";
     this.priority = function (pA, pD) { return 3 * (pA.currenthp < .4 * pA.maxhp); }
+    this.upgradeBan = "crit";
 }
 
 function CrossPoison() {
@@ -9346,6 +9365,7 @@ function CrossPoison() {
     }
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and applies 6 stacks of poison to the target if it is poisoned.";
     this.priority = function (pA, pD) { return 3 * (isPoisoned(pD)); }
+    this.upgradeBan = "crit";
 }
 
 function Crunch() {
@@ -9357,6 +9377,7 @@ function Crunch() {
     this.effect = function (move, pA, pD) { this.bp = 70 + 10 * pA.discard.length; };
     this.description = "Deals 70 base power damage to the opponent. Damage increases with each card in the user's discard pile.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function CrushClaw() {
@@ -9380,6 +9401,7 @@ function CrushGrip() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, 125 * pD.currenthp / pD.maxhp); };
     this.description = "Deals up to 125 base power damage to the opponent, depending on how high its HP is.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pD.currenthp / pD.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function Curse() {
@@ -9416,6 +9438,7 @@ function DarkestLariat() {
     this.effect = function (move, pA, pD) { this.bp = 85 * statsChangeMultiplier ** pD.statchanges.defense; };
     this.description = "Deals 85 base power damage to the opponent. Base power varies with the target's defense stat changes.";
     this.priority = function (pA, pD) { return pA.statchanges.defense; }
+    this.upgradeBan = "bp";
 }
 
 function DarkPulse() {
@@ -9427,6 +9450,7 @@ function DarkPulse() {
     this.effect = function (move, pA, pD) { if (isScared(pD)) this.bp = 120; else this.bp = 80; };
     this.description = "Deals 80 base power damage to the opponent. Damage increases against frightened foes.";
     this.priority = function (pA, pD) { return 3 * isScared(pD); }
+    this.upgradeBan = "bp";
 }
 
 function DazzlingGleam() {
@@ -9534,6 +9558,7 @@ function DisarmingVoice() {
     this.effect = function (move, pA, pD) { this.bp = 40 + 20 * (healing > 0); };
     this.description = "Deals 40 base power damage to the opponent. Damage increases if the user was healed this turn.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function Discharge() {
@@ -9553,6 +9578,7 @@ function Discharge() {
     this.postEffect = function (move, pA, pD) { if (this.doPost) applyEffect("paralysis", 1, pD); }
     this.description = "Deals 50 base power damage per energy point left to the opponent. Consumes all energy left. Applies 1 stack of paralysis to the target is at least 3 energy has been used.";
     this.priority = function (pA, pD) { return 3 * (energy >= 3); }
+    this.upgradeBan = "bp";
 }
 
 function Dive() {
@@ -9687,6 +9713,7 @@ function DragonClaw() {
     };
     this.description = "Deals 70 base power damage to the opponent. Base damage increases by 10 for each dragon move in the user's deck.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function DragonDance() {
@@ -9726,6 +9753,7 @@ function DragonDarts() {
         }
         return c - .8;
     }
+    this.upgradeBan = "multi";
 }
 
 function DragonPulse() {
@@ -9776,14 +9804,14 @@ function DragonTail() {
     this.bp = 45;
     this.cost = 1;
     this.postEffect = function (move, pA, pD) {
-        var i = pA.discard.findIndex(e => e.type === "dragon");
+        var i = pA.discard.findIndex(e => e.type === "dragon" && e !== this);
         if (i >= 0) {
             pA.hand.push(pA.discard[i]);
             pA.discard.splice(i, 1);
             drawHand();
         }
     };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Fetches the first dragon type move in the user's discard pile and places it into its hand.";
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Fetches the first other dragon type move in the user's discard pile and places it into its hand.";
     this.priority = function (pA, pD) { return 0; }
 }
 
@@ -9797,6 +9825,7 @@ function DrillRun() {
     this.effect = function (move, pA, pD) { this.crit = (pA.speed < pD.speed); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's base speed is lower than its foe's.";
     this.priority = function (pA, pD) { return 3 * (pA.speed < pD.speed); }
+    this.upgradeBan = "crit";
 }
 
 function DrainingKiss() {
@@ -9853,6 +9882,7 @@ function DualChop() {
     this.effect = function (move, pA, pD) { this.bp = 35 + 20 * (pA.discard.length > 0 && pA.discard[pA.discard.length - 1].type === "dragon")};
     this.description = "Deals 35 base power damage to the opponent twice. Base power increases if the last move in the user's discard pile is dragon type.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function DualWingbeat() {
@@ -9865,6 +9895,7 @@ function DualWingbeat() {
     this.effect = function (move, pA, pD) { this.multihit = 2 + (drawn >= 2); };
     this.description = "Deals " + this.bp + " base power damage to the opponent twice. Hits an extra time if the user drew at least 2 extra cards this turn.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "multi";
 }
 
 function DynamaxCannon() {
@@ -9876,6 +9907,7 @@ function DynamaxCannon() {
     this.effect = function (move, pA, pD) { this.bp = 90 + 40 * (pD.currenthp > .9 * pD.maxhp); };
     this.description = "Deals 90 base power damage to the opponent. Base power increases against healthy foes.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pD.currenthp / pD.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function DynamicPunch() {
@@ -9919,6 +9951,7 @@ function Earthquake() {
     this.effect = function (move, pA, pD) { this.bp = 120 + 60 * (pD.effects.findIndex(e => e.name === "Grounded") >= 0); };
     this.description = "Deals 120 base power damage to the opponent. Damage increases significantly against grounded targets.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function EchoedVoice() {
@@ -9956,6 +9989,7 @@ function ElectroBall() {
     this.effect = function (move, pA, pD) { this.bp = Math.min(125, Math.max(25, 25 * (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1) / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
     this.description = "Deals between 25 and 125 base power damage to the opponent, depending on how fast the user is compared to the target.";
     this.priority = function (pA, pD) { return -2 + Math.round((pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1) / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1)); }
+    this.upgradeBan = "bp";
 }
 
 function Electroweb() {
@@ -10080,6 +10114,7 @@ function Facade() {
     };
     this.description = "Deals 70 base power damage to the opponent. Base power doubles if user is poisoned or burned.";
     this.priority = function (pA, pD) { return 3 * (isBurned(pA) || isPoisoned(pA)); }
+    this.upgradeBan = "bp";
 }
 
 function FairyWind() {
@@ -10089,7 +10124,7 @@ function FairyWind() {
     this.bp = 40;
     this.cost = 1;
     this.effect = function (move, pA, pD) { dealDamage(-20, pA); };
-    this.description = "Deals 40 base power damage to the opponent. User recovers 20HP if this attack is super effective.";
+    this.description = "Deals " + this.bp + " base power damage to the opponent. User recovers 20HP if this attack is super effective.";
     this.priority = function (pA, pD) { return 3 * (effectiveMultiplier(this, pD) > 1); }
 }
 
@@ -10237,6 +10272,7 @@ function Flail() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, 100 * (1 - pA.currenthp / pA.maxhp)); };
     this.description = "Deals up to 100 base power damage to the opponent, depending on how low user's HP is.";
     this.priority = function (pA, pD) { return -2 + Math.round(6 * (1 - pA.currenthp / pA.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function FlameCharge() {
@@ -10271,6 +10307,7 @@ function Flamethrower() {
     };
     this.description = "Deals 70 base power damage to the opponent. Discards all the cards in the user's draw pile and deals extra damage for each discarded card.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function FlareBlitz() {
@@ -10290,6 +10327,7 @@ function FlareBlitz() {
     };
     this.description = "Deals 80 base power damage to the opponent. Discards all the cards in the user's draw pile and deals significant extra damage for each discarded card. 33% recoil.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function FlashCannon() {
@@ -10323,8 +10361,9 @@ function Fling() {
     this.cost = 1;
     this.multihit = 0;
     this.effect = function (move, pA, pD) { this.multihit = pA.items.length; };
-    this.description = "Deals 35 base power damage to the opponent for each of the user's held items.";
+    this.description = "Deals " + this.bp + " base power damage to the opponent for each of the user's held items.";
     this.priority = function (pA, pD) { return pA.items.length; }
+    this.upgradeBan = "multi";
 }
 
 function FlipTurn() {
@@ -10428,6 +10467,7 @@ function FoulPlay() {
     this.effect = function (move, pA, pD) { this.bp = 90 * 1.2 ** pD.statchanges.attack; };
     this.description = "Deals 90 base power damage to the opponent. Base power varies with target's attack stat changes.";
     this.priority = function (pA, pD) { return pD.statchanges.attack; }
+    this.upgradeBan = "bp";
 }
 
 function FreezeDry() {
@@ -10439,6 +10479,7 @@ function FreezeDry() {
     this.effect = function (move, pA, pD) { this.bp = 85 + 85 * contains(pD.types, "water"); };
     this.description = "Deals 85 base power damage to the opponent. Base power increases drastically against water type foes.";
     this.priority = function (pA, pD) { return 3 * contains(pD.types, "water"); }
+    this.upgradeBan = "bp";
 }
 
 function FrenzyPlant() {
@@ -10466,6 +10507,7 @@ function FrostBreath() {
     this.effect = function (move, pA, pD) { this.crit = weather !== undefined && weather.name === "Hail"; };
     this.description = "Deals 40 base power damage to the opponent. Always results in a critical hit in the hail.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function FuryCutter() {
@@ -10492,6 +10534,7 @@ function FurySwipes() {
     this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (pA.currenthp < .3 * pA.maxhp); };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits twice more if user's HP is below 30%.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "multi";
 }
 
 function FutureSight() {
@@ -10576,6 +10619,7 @@ function GrassKnot() {
     };
     this.description = "Deals up to 115 base power damage to the opponent depending on how slow it is. Applies 1 stack of leech seed to slower targets.";
     this.priority = function (pA, pD) { return -2 + Math.round(180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1)); }
+    this.upgradeBan = "bp";
 }
 
 function GrassWhistle() {
@@ -10614,8 +10658,9 @@ function GunkShot() {
         if (!isPoisoned(pD))
             applyEffect("poison", 2, pD);
     };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Increased base power against poisoned foes. Applies 2 stacks of poison to healthy foes.";
+    this.description = "Deals 120 base power damage to the opponent. Increased base power against poisoned foes. Applies 2 stacks of poison to healthy foes.";
     this.priority = function (pA, pD) { return 3 * isPoisoned(pD); }
+    this.upgradeBan = "bp";
 }
 
 function Gust() {
@@ -10638,6 +10683,7 @@ function GyroBall() {
     this.effect = function (move, pA, pD) { this.bp = Math.min(125, Math.max(25, 25 * (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1) / (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1))) };
     this.description = "Deals between 25 and 125 base power damage to the opponent, depending on how slow the user is compared to the target.";
     this.priority = function (pA, pD) { return -2 + Math.round((pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1) / (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1)); }
+    this.upgradeBan = "bp";
 }
 
 function Hail() {
@@ -10661,6 +10707,7 @@ function HammerArm() {
     this.postEffect = function (move, pA, pD) { boostStat(pA, "speed", -1); };
     this.description = "Deals 90 base power damage to the opponent. Base power increases if user's speed is lower than its target's. Lowers user's speed by one stage.";
     this.priority = function (pA, pD) { return 3 * (pD.speed * statsChangeMultiplier ** pD.statchanges.speed > pA.speed * statsChangeMultiplier ** pA.statchanges.speed); }
+    this.upgradeBan = "bp";
 }
 
 function HappyHour() {
@@ -10781,6 +10828,7 @@ function HeatCrash() {
     }
     this.description = "Deals 80 base power damage to the opponent. Base power increases in the sun. Ends rain and hail.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sun"); }
+    this.upgradeBan = "bp";
 }
 
 function HeatWave() {
@@ -10797,6 +10845,7 @@ function HeatWave() {
     };
     this.description = "Deals 70 base power damage to the opponent. Base power increases under the sun.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sun"); }
+    this.upgradeBan = "bp";
 }
 
 function HeavySlam() {
@@ -10808,6 +10857,7 @@ function HeavySlam() {
     this.effect = function (move, pA, pD) { this.bp = Math.min(250, Math.max(50, 50 * (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1) / (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1))) };
     this.description = "Deals between 50 and 250 base power damage to the opponent, depending on how slow the user is compared to the target.";
     this.priority = function (pA, pD) { return -2 + Math.round((pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1) / (pA.speed * statsChangeMultiplier ** pA.statchanges.speed + 1)); }
+    this.upgradeBan = "bp";
 }
 
 function Hex() {
@@ -10819,6 +10869,7 @@ function Hex() {
     this.effect = function (move, pA, pD) { this.bp = 70 + 50 * (isParalyzed(pD) || isBurned(pD) || isAsleep(pD) || isPoisoned(pD) || isFrozen(pD)); };
     this.description = "Deals 70 base power damage to the opponent. Base power increases against targets affected by status conditions.";
     this.priority = function (pA, pD) { return 3 * (isParalyzed(pD) || isBurned(pD) || isAsleep(pD) || isPoisoned(pD) || isFrozen(pD)); }
+    this.upgradeBan = "bp";
 }
 
 function HiddenPower() {
@@ -10925,6 +10976,7 @@ function HydroPump() {
     this.effect = function (move, pA, pD) { if (weather != undefined && weather.name === "Rain") this.bp = 180; else this.bp = 130; };
     this.description = "Deals 110 base power damage to the opponent. Base power increases in the rain.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Rain"); }
+    this.upgradeBan = "bp";
 }
 
 function HyperBeam() {
@@ -11065,6 +11117,7 @@ function IcicleCrash() {
     };
     this.description = "Deals 90 base power damage to the opponent. Applies 1 stack of fear to the target in the hail. Base power decreases in other weathers.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Hail"); }
+    this.upgradeBan = "bp";
 }
 
 function IcicleSpear() {
@@ -11077,6 +11130,7 @@ function IcicleSpear() {
     this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (weather != undefined && weather.name === "Hail"); };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits 2 extra times in the hail.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Hail"); }
+    this.upgradeBan = "multi";
 }
 
 function IcyWind() {
@@ -11236,6 +11290,7 @@ function KnockOff() {
     this.effect = function (move, pA, pD) { this.bp = 60 + 18 * pD.items.length; };
     this.description = "Deals 60 base power damage to the opponent. Base power increases for each item held by the target.";
     this.priority = function (pA, pD) { return -2 + pD.items.length; }
+    this.upgradeBan = "bp";
 }
 
 function LandsWrath() {
@@ -11267,6 +11322,7 @@ function LashOut() {
     };
     this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of negative stat changes on the user.";
     this.priority = function (pA, pD) { return -2 - (Math.min(0, pA.statchanges.attack) + Math.min(0, pA.statchanges.defense) + Math.min(0, pA.statchanges.spattack) + Math.min(0, pA.statchanges.spdefense) + Math.min(0, pA.statchanges.speed)); }
+    this.upgradeBan = "bp";
 }
 
 function LastResort() {
@@ -11302,6 +11358,7 @@ function LeafBlade() {
     this.effect = function (move, pA, pD) { this.crit = healing > 0; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if user has been healed ths turn.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function LeafStorm() {
@@ -11326,6 +11383,7 @@ function LeechLife() {
     this.effect = function (move, pA, pD) { this.bp = 65 + 15 * (!contains(pD.types, "poison") && !contains(pD.types, "steel") && !contains(pD.types, "ghost")); };
     this.description = "Deals 65 base power damage to the opponent. Heals user for 50% of damage dealt. Damage increases against non poison, steel or ghost types.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function LeechSeed() {
@@ -11348,6 +11406,7 @@ function LowKick() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, Math.min(125, 25 * 180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1))) };
     this.description = "Deals up to 125 base power damage to the opponent depending on how slow it is.";
     this.priority = function (pA, pD) { return -2 + Math.round(180 / (pD.speed * statsChangeMultiplier ** pD.statchanges.speed + 1)); }
+    this.upgradeBan = "bp";
 }
 
 function LowSweep() {
@@ -11420,6 +11479,7 @@ function MagicalLeaf() {
     this.effect = function (move, pA, pD) { this.bp = 40 + 15 * Math.max(0, pA.statchanges.spattack); };
     this.description = "Deals 40 base power damage to the opponent. Base power increases with user's special attack boosts.";
     this.priority = function (pA, pD) { return Math.max(0, pA.statchanges.spattack); }
+    this.upgradeBan = "bp";
 }
 
 function MagmaStorm() {
@@ -11452,9 +11512,10 @@ function MeanLook() {
     this.type = "normal";
     this.cat = "status";
     this.bp = 0;
-    this.cost = 0;
+    this.cost = 3;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) { applyEffect("trap", 1, pD); };
-    this.description = "Target can no longer switch out.";
+    this.description = "Target can no longer switch out. Exhaust.";
     this.priority = function (pA, pD) { return 0; }
 }
 
@@ -11587,9 +11648,10 @@ function Metronome() {
     this.effect = function (move, pA, pD) {
         var m = createMove(movesList[Math.floor(Math.random() * movesList.length)])
         m.cost = Math.max(0, m.cost - 1);
+        upgradeMove(m);
         pA.hand.push(m);
     };
-    this.description = "Adds a random move to the user's hand and lowers its cost by 1.";
+    this.description = "Adds a random upgraded move to the user's hand and lowers its cost by 1.";
     this.priority = function (pA, pD) { return 10 * doesBlock(pD); }
 }
 
@@ -11720,6 +11782,7 @@ function NightSlash() {
     this.effect = function (move, pA, pD) { this.crit = pA.discard.length >= 5; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's discard pile contains at least 5 cards.";
     this.priority = function (pA, pD) { return 3 * (pA.discard.length >= 5); }
+    this.upgradeBan = "crit";
 }
 
 function Nuzzle() {
@@ -11804,6 +11867,7 @@ function Payback() {
     };
     this.description = "Deals 40 base power damage to the opponent. Deals 50% extra damage if the user is slower than its foe.";
     this.priority = function (pA, pD) { return 3 * (pA.speed * statsChangeMultiplier ** pA.statchanges.speed < pD.speed * statsChangeMultiplier ** pD.statchanges.speed); }
+    this.upgradeBan = "bp";
 }
 
 function PayDay() {
@@ -11866,6 +11930,7 @@ function PinMissile() {
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent once for each bug type move in the user's deck.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "multi";
 }
 
 function PlasmaFists() {
@@ -11968,6 +12033,7 @@ function PoisonTail() {
     this.postEffect = function (move, pA, pD) { if (this.crit) applyEffect("poison", 4, pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and applies 4 stacks of poison to the target if it's poisoned already.";
     this.priority = function (pA, pD) { return 3 * isPoisoned(pD); }
+    this.upgradeBan = "crit";
 }
 
 function Poltergeist() {
@@ -11991,6 +12057,7 @@ function PowerGem() {
     this.effect = function (move, pA, pD) { this.bp = 85 + ((weather != undefined && weather.name === "Sandstorm") ? weather.turns * 15 : 0); };
     this.description = "Deals 85 base power damage to the opponent. Base power increases for each sandstorm turn left.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sandstorm"); }
+    this.upgradeBan = "bp";
 }
 
 function PowerTrip() {
@@ -12010,6 +12077,7 @@ function PowerTrip() {
     };
     this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of positive stat changes on the user.";
     this.priority = function (pA, pD) { return -2 + (Math.max(0, pA.statchanges.attack) + Math.max(0, pA.statchanges.defense) + Math.max(0, pA.statchanges.spattack) + Math.max(0, pA.statchanges.spdefense) + Math.max(0, pA.statchanges.speed)); }
+    this.upgradeBan = "bp";
 }
 
 function PowerUpPunch() {
@@ -12098,6 +12166,7 @@ function PsychicFangs() {
     this.effect = function (move, pA, pD) { this.bp = 75 + 10 * pA.draw.length; };
     this.description = "Deals 75 base power damage to the opponent. Base power increases with each card in the user's draw pile.";
     this.priority = function (pA, pD) { return -2 + pA.draw.length; }
+    this.upgradeBan = "bp";
 }
 
 function PsychoCut() {
@@ -12110,6 +12179,7 @@ function PsychoCut() {
     this.effect = function (move, pA, pD) { this.crit = (pA.draw.length >= 5); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if the user's draw pile contains at least 5 cards.";
     this.priority = function (pA, pD) { return 3 * (pA.draw.length >= 5); }
+    this.upgradeBan = "crit";
 }
 
 function PsychUp() {
@@ -12135,6 +12205,7 @@ function Psyshock() {
     this.effect = function (move, pA, pD) { this.bp = 100 * (pD.spdefense * statsChangeMultiplier ** pD.statchanges.spdefense) / (pD.defense * statsChangeMultiplier ** pD.statchanges.defense) };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power varies depending on target's defense.";
     this.priority = function (pA, pD) { return pD.statchanges.defense; }
+    this.upgradeBan = "bp";
 }
 
 function Psystrike() {
@@ -12146,6 +12217,7 @@ function Psystrike() {
     this.effect = function (move, pA, pD) { this.bp = 100 * (pD.spdefense * statsChangeMultiplier ** pD.statchanges.spdefense) / (pD.defense * statsChangeMultiplier ** pD.statchanges.defense) };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Base power varies depending on target's defense.";
     this.priority = function (pA, pD) { return pD.statchanges.defense; }
+    this.upgradeBan = "bp";
 }
 
 function PyroBall() {
@@ -12164,6 +12236,7 @@ function PyroBall() {
     };
     this.description = "Deals 110 base power damage to the opponent. Discards all cards in the user's draw pile and deals extra damage for each discarded card.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function QuickAttack() {
@@ -12237,6 +12310,7 @@ function RazorLeaf() {
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit against seeded targets.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function Recover() {
@@ -12277,6 +12351,7 @@ function Revenge() {
     this.effect = function (move, pA, pD) { if (pA.currenthp <= pA.maxhp / 2) this.bp = 120; else this.bp = 60; };
     this.description = "Deals 60 base power damage to the opponent. Power doubles if user's HP is below 50%.";
     this.priority = function (pA, pD) { return -1 + 5 * (pA.currenthp <= pA.maxhp / 2); }
+    this.upgradeBan = "bp";
 }
 
 function Reversal() {
@@ -12288,6 +12363,7 @@ function Reversal() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, 200 * (1 - pA.currenthp / pA.maxhp)); };
     this.description = "Deals up to 200 base power damage to the opponent, depending on how low user's HP is.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pA.currenthp / pA.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function RockBlast() {
@@ -12300,6 +12376,7 @@ function RockBlast() {
     this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * (weather != undefined && weather.name === "Sandstorm"); };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits 2 extra times in the sandstorm.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sandstorm"); }
+    this.upgradeBan = "multi";
 }
 
 function RockPolish() {
@@ -12325,6 +12402,7 @@ function RockSmash() {
     this.effect = function (move, pA, pD) { this.bp = 40 + 40 * (pD.statchanges.defense > 0); };
     this.description = "Deals 40 base power damage to the opponent. Base power doubles if target's defense was raised.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function RockSlide() {
@@ -12415,6 +12493,7 @@ function Round() {
     this.effect = function (move, pA, pD) { this.bp = 35 + 35 * (pA.discard.findIndex(e => e.name === "Round" && e !== move) >= 0); };
     this.description = "Deals 35 base power damage to the opponent. Power doubles if there is another move called Round in the user's discard pile.";
     this.priority = function (pA, pD) { return 3 * (pA.discard.findIndex(e => e.name === "Round") >= 0); }
+    this.upgradeBan = "bp";
 }
 
 function SacredSword() {
@@ -12426,6 +12505,7 @@ function SacredSword() {
     this.effect = function (move, pA, pD) { this.bp = 85 * statsChangeMultiplier ** pD.statchanges.defense; };
     this.description = "Deals 85 base power damage to the opponent. Base power varies with the target's defense stat changes.";
     this.priority = function (pA, pD) { return pA.statchanges.defense; }
+    this.upgradeBan = "bp";
 }
 
 function SandTomb() {
@@ -12464,6 +12544,7 @@ function Scald() {
     this.postEffect = function (move, pA, pD) { if (weather !== undefined && (weather.name === "Rain" || weather.name === "Sun")) applyEffect("burn", 1, pD); };
     this.description = "Deals 35 base power damage to the opponent. Applies 1 stack of burn to the target in the rain or the sun. Base power increases in the sun.";
     this.priority = function (pA, pD) { return 3 * (effectiveMultiplier(this, pD) >= 1); }
+    this.upgradeBan = "bp";
 }
 
 function ScaleShot() {
@@ -12580,6 +12661,7 @@ function ShadowClaw() {
     this.effect = function (move, pA, pD) { this.crit = pA.discard.length >= pA.draw.length; };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit if user's draw pile is shorter that its discard pile.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function ShadowForce() {
@@ -12647,6 +12729,7 @@ function ShockWave() {
     this.effect = function (move, pA, pD) { if (energy == 0) this.bp = 60; else this.bp = 30; };
     this.description = "Deals 30 base power damage to the opponent. Base power doubles if user's energy reaches 0 upon use.";
     this.priority = function (pA, pD) { return (energy - this.cost == 0); }
+    this.upgradeBan = "bp";
 }
 
 function SignalBeam() {
@@ -12762,6 +12845,7 @@ function Slash() {
     this.postEffect = function (move, pA, pD) { boostStat(pA, "attack", 1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit. Raises user's attack by 1 stage.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function Sludge() {
@@ -12806,6 +12890,7 @@ function SludgeWave() {
     };
     this.description = "Deals 75 base power damage to the opponent. Base power increases for each stack of poison on the target.";
     this.priority = function (pA, pD) { return 3 * isPoisoned(pD); }
+    this.upgradeBan = "bp";
 }
 
 function Smog() {
@@ -13045,6 +13130,7 @@ function SteamEruption() {
     this.effect = function (move, pA, pD) { this.bp = 80 + 50 * isBurned(pD); };
     this.description = "Deals 80 base power damage to the opponent. Damage increases a lot against burned foes.";
     this.priority = function (pA, pD) { return 3 * isBurned(pD); }
+    this.upgradeBan = "bp";
 }
 
 function SteelBeam() {
@@ -13087,7 +13173,7 @@ function StickyWeb() {
             }
         }
     };
-    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and is the Pokémon is grounded.";
+    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and if the Pokémon is grounded.";
     this.priority = function (pA, pD) { return 0; }
 }
 
@@ -13107,6 +13193,7 @@ function StoneEdge() {
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit and grounds target in a sandstorm.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined && weather.name === "Sandstorm"); }
+    this.upgradeBan = "crit";
 }
 
 function StoredPower() {
@@ -13126,6 +13213,7 @@ function StoredPower() {
     };
     this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of positive stat changes on the user.";
     this.priority = function (pA, pD) { return -2 + (Math.max(0, pA.statchanges.attack) + Math.max(0, pA.statchanges.defense) + Math.max(0, pA.statchanges.spattack) + Math.max(0, pA.statchanges.spdefense) + Math.max(0, pA.statchanges.speed)); }
+    this.upgradeBan = "bp";
 }
 
 function StompingTantrum() {
@@ -13135,7 +13223,7 @@ function StompingTantrum() {
     this.bp = 70;
     this.cost = 2;
     this.preEffect = function (move, pA, pD) { if (doesBlock(pD)) boostStat(pA, "attack", 1); };
-    this.description = "Deals 70 base power damage to the opponent. Raises user's attack by one stage if target is blocking.";
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Raises user's attack by one stage if target is blocking.";
     this.priority = function (pA, pD) { return 7 * doesBlock(pD); }
 }
 
@@ -13224,6 +13312,7 @@ function SuperFang() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, 100 * pD.currenthp / pD.maxhp); };
     this.description = "Deals up to 100 base power damage to the opponent, depending on how high its HP is.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pD.currenthp / pD.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function Supersonic() {
@@ -13278,6 +13367,7 @@ function SurgingStrikes() {
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Always results in a critical hit.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function Swagger() {
@@ -13520,6 +13610,7 @@ function ThunderShock() {
     this.effect = function (move, pA, pD) { this.bp = 35 + 5 * (energy + this.cost); };
     this.description = "Deals 35 base power damage to the opponent. Base power increases with each energy point left upon use.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function ThunderWave() {
@@ -13610,6 +13701,7 @@ function TripleAxel() {
     this.effect = function (move, pA, pD) { this.multihit = 3 + 2 * isFrozen(pD); };
     this.description = "Deals " + this.bp + " base power damage to the opponent 3 times. Hits 2 more times if the target is frozen.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "multi";
 }
 
 function Twister() {
@@ -13719,6 +13811,7 @@ function Venoshock() {
     };
     this.description = "Deals 65 base power damage to the opponent. Base power doubles if target is poisoned.";
     this.priority = function (pA, pD) { return 3 * isPoisoned(pD); }
+    this.upgradeBan = "bp";
 }
 
 function VineWhip() {
@@ -13785,6 +13878,7 @@ function WaterGun() {
     };
     this.description = "Deals 40 base power damage to the opponent. Deals extra damage to burned foes and cures them of their burn.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function WaterPulse() {
@@ -13807,6 +13901,7 @@ function WaterSpout() {
     this.effect = function (move, pA, pD) { this.bp = Math.max(1, 150 * pA.currenthp / pA.maxhp); };
     this.description = "Deals up to 150 base power damage to the opponent. Base power decreases with user's HP.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pA.currenthp / pA.maxhp)); }
+    this.upgradeBan = "bp";
 }
 
 function WeatherBall() {
@@ -13829,6 +13924,7 @@ function WeatherBall() {
     };
     this.description = "Deals 70 base power damage to the opponent. Type and base power depend on the weather.";
     this.priority = function (pA, pD) { return 3 * (weather != undefined); }
+    this.upgradeBan = "bp";
 }
 
 function Whirlpool() {
@@ -13856,6 +13952,7 @@ function WickedBlow() {
     this.effect = function (move, pA, pD) { };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Always results in a critical hit.";
     this.priority = function (pA, pD) { return 2 * (pA.statchanges.spattack - pD.statchanges.spdefense < 0); }
+    this.upgradeBan = "crit";
 }
 
 function WildCharge() {
@@ -13890,6 +13987,7 @@ function WingAttack() {
     this.effect = function (move, pA, pD) { this.bp = 35 + 12 * drawn; };
     this.description = "Deals 35 base power damage to the opponent. Base power increases with each extra card drawn this turn.";
     this.priority = function (pA, pD) { return 0; }
+    this.upgradeBan = "bp";
 }
 
 function Wish() {
@@ -13948,6 +14046,7 @@ function XScissor() {
             c += m.type === "bug";
         return 3 * (c > 1);
     }
+    this.upgradeBan = "crit";
 }
 
 function ZapCannon() {
@@ -14028,6 +14127,54 @@ function isSoundBased(move) {
 function isSlicing(move) {
     return move.name.includes("Aerial Ace") || move.name.includes("Cut") || move.name.includes("Slash") || move.name.includes("Blade") || move.name.includes("Cross Poison")
         || move.name.includes("Razor") || move.name.includes("Population Bomb") || move.name.includes("Sacred Sword") || move.name.includes("Stone Axe") || move.name.includes("X-Scissor");
+}
+
+function upgradeMove(move) {
+    if (!isSpecialMove(move)) {
+        possibleUpgrades = [];
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("bp") || move.cat === "status" || move.bp == 0)) {
+            possibleUpgrades.push("bp");
+            possibleUpgrades.push("bp");
+            possibleUpgrades.push("bp");
+        }
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("crit") || move.cat === "status" || move.bp == 0 || move.crit !== undefined))
+            possibleUpgrades.push("crit");
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("multi") || move.cat === "status" || move.bp == 0 || move.multihit == undefined))
+            possibleUpgrades.push("multi");
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("cost") || move.cost == 0)) {
+            possibleUpgrades.push("cost");
+            possibleUpgrades.push("cost");
+        }
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("drain") || move.cat === "status" || move.bp == 0 || move.drain !== undefined))
+            possibleUpgrades.push("drain");
+
+        if (possibleUpgrades.length > 0) {
+            let upgrade = possibleUpgrades[Math.floor(Math.random() * possibleUpgrades.length)];
+            switch (upgrade) {
+                case "bp":
+                    move.bp = Math.floor(move.bp * 1.25);
+                    move.description += " Deals extra damage."
+                    break;
+                case "crit":
+                    move.crit = true;
+                    move.description += " Always results in a critical hit.";
+                    break;
+                case "multi":
+                    move.multihit += 1;
+                    move.description += " Hits once more.";
+                    break;
+                case "cost":
+                    move.cost -= 1;
+                    break;
+                case "drain":
+                    move.drain = -.3;
+                    move.description += " Heals user for 30% of damage dealt.";
+                    break;
+                default:
+            }
+            move.name += "*";
+        }
+    }
 }
 
 
@@ -17505,6 +17652,8 @@ function createReward(isItem, r1, r2, r3, next) {
 
                 moveN = getFromMovepool(p);
                 move1 = createMove(moveN);
+                if (Math.random() < .08)
+                    upgradeMove(move1);
                 function makeCard(move) {
                     this.card = document.createElement('div');
                     this.card.className = "static-move-card";
@@ -18207,8 +18356,9 @@ function Event8() {
             text: "[Ice] Make " + team[ice].name + " freeze the river",
             effect: () => {
                 var move = new FreezeDry();
-                move.bp += 20;
+                move.bp += 25;
                 move.name += "*";
+                move.description = "Deals 110 base power damage to the opponent. Base power increases drastically against water type foes."
                 team[ice].moves.push(move);
                 maxDeckSize = Math.max(maxDeckSize, team[ice].moves.length);
                 nextEncounter();
