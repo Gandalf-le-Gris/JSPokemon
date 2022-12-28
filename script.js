@@ -7568,7 +7568,7 @@ specialMoves = ["Judgment", "Magma Storm", "Psytrike", "Hyperspace Fury", "Hyper
     "Land's Wrath", "Glacial Lance", "Astral Barrage", "Jungle Healing", "Steam Eruption", "Spectral Thief"];
 
 function isSpecialMove(move) {
-    return contains(specialMoves, move.name) || move.name.includes("*");
+    return contains(specialMoves, move.name) || move.upgraded;
 }
 
 function createMove(move) {
@@ -9904,7 +9904,7 @@ function DynamaxCannon() {
     this.cat = "special";
     this.bp = 90;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { this.bp = 90 + 40 * (pD.currenthp > .9 * pD.maxhp); };
+    this.effect = function (move, pA, pD) { this.bp = 90 + 40 * (pD.currenthp > .85 * pD.maxhp); };
     this.description = "Deals 90 base power damage to the opponent. Base power increases against healthy foes.";
     this.priority = function (pA, pD) { return 4 - Math.round(6 * (1 - pD.currenthp / pD.maxhp)); }
     this.upgradeBan = "bp";
@@ -12682,7 +12682,7 @@ function ShadowForceStrike() {
     this.name = "Shadow Force Strike";
     this.type = "ghost";
     this.cat = "physical";
-    this.bp = 90;
+    this.bp = 100;
     this.cost = 0;
     this.exhaust = true;
     this.noBlock = true;
@@ -14139,12 +14139,13 @@ function upgradeMove(move) {
         }
         if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("crit") || move.cat === "status" || move.bp == 0 || move.crit !== undefined))
             possibleUpgrades.push("crit");
-        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("multi") || move.cat === "status" || move.bp == 0 || move.multihit == undefined))
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("multi") || move.cat === "status" || move.bp == 0 || move.multihit == undefined)) {
             possibleUpgrades.push("multi");
-        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("cost") || move.cost == 0)) {
-            possibleUpgrades.push("cost");
-            possibleUpgrades.push("cost");
+            possibleUpgrades.push("multi");
+            possibleUpgrades.push("multi");
         }
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("cost") || move.cost == 0))
+            possibleUpgrades.push("cost");
         if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("drain") || move.cat === "status" || move.bp == 0 || move.drain !== undefined))
             possibleUpgrades.push("drain");
 
@@ -14152,7 +14153,7 @@ function upgradeMove(move) {
             let upgrade = possibleUpgrades[Math.floor(Math.random() * possibleUpgrades.length)];
             switch (upgrade) {
                 case "bp":
-                    move.bp = Math.floor(move.bp * 1.25);
+                    move.bp = Math.floor(move.bp * 1.4);
                     move.description += " Deals extra damage."
                     break;
                 case "crit":
@@ -14167,12 +14168,12 @@ function upgradeMove(move) {
                     move.cost -= 1;
                     break;
                 case "drain":
-                    move.drain = -.3;
-                    move.description += " Heals user for 30% of damage dealt.";
+                    move.recoil = -.5;
+                    move.description += " Heals user for 50% of damage dealt.";
                     break;
                 default:
             }
-            move.name += "*";
+            move.upgraded = true;
         }
     }
 }
@@ -16212,7 +16213,7 @@ function TMm1() {
     this.init = true;
     var move = new HiddenPower();
     move.cost = 0;
-    move.name += "*";
+    move.upgraded = true;
     this.effect = (p) => { p.draw.splice(Math.floor(Math.random() * p.draw.length + 1), 0, move); }
 }
 
@@ -16838,7 +16839,7 @@ function HeartScale() {
     this.effect = (p) => {
         var move = createMove(p.movepool[Math.floor(Math.random() * p.movepool.length)]);
         move.cost = Math.max(0, move.cost - 1);
-        move.name += "*";
+        move.upgraded = true;
         if (!move.description.includes('Exhaust.')) {
             move.description += " Exhaust.";
             move.exhaust = true;
@@ -18357,7 +18358,7 @@ function Event8() {
             effect: () => {
                 var move = new FreezeDry();
                 move.bp += 25;
-                move.name += "*";
+                move.upgraded = true;
                 move.description = "Deals 110 base power damage to the opponent. Base power increases drastically against water type foes."
                 team[ice].moves.push(move);
                 maxDeckSize = Math.max(maxDeckSize, team[ice].moves.length);
@@ -18553,7 +18554,7 @@ function Event10() {
             effect: () => {
                 var move = new ExtremeEvoboost();
                 move.cost -= 1;
-                move.name += "*";
+                move.upgraded = true;
                 team[eevee].moves.push(move);
                 maxDeckSize = Math.max(maxDeckSize, team[eevee].moves.length);
                 nextEncounter();
