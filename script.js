@@ -1255,7 +1255,7 @@ function damageCalculator(move, pA, pD) {
             atkMul = statsChangeMultiplier ** pA.statchanges.attack;
             defMul = statsChangeMultiplier ** pD.statchanges.defense;
         }
-        baseDam = Math.max(1, 22 * move.bp * pA.attack * atkMul / (50 * pD.defense * defMul));
+        baseDam = 22 * move.bp * pA.attack * atkMul / (50 * pD.defense * defMul);
     } else if (move.cat === "special") {
         if (crit) {
             atkMul = Math.max(1, statsChangeMultiplier ** pA.statchanges.spattack);
@@ -1264,7 +1264,7 @@ function damageCalculator(move, pA, pD) {
             atkMul = statsChangeMultiplier ** pA.statchanges.spattack;
             defMul = statsChangeMultiplier ** pD.statchanges.spdefense;
         }
-        baseDam = Math.max(1, 22 * move.bp * pA.spattack * atkMul / (50 * pD.spdefense * defMul));
+        baseDam = 22 * move.bp * pA.spattack * atkMul / (50 * pD.spdefense * defMul);
     }
     if (crit)
         baseDam *= 1.5
@@ -16153,13 +16153,13 @@ function Revive() {
 
 function Pearl() {
     this.name = "Pearl";
-    this.description = "Grants " + String.fromCharCode(08381) + "600 on pickup.";
+    this.description = "Grants " + String.fromCharCode(08381) + "1200 on pickup.";
     this.img = 'resources/sprites/held_items/pearl.webp';
     this.area = "";
     this.pickup = true;
     this.effect = (p) => {
-        money += 600;
-        earnedMoney += 600;
+        money += 1200;
+        earnedMoney += 1200;
     }
 }
 
@@ -16175,13 +16175,13 @@ function Potion() {
 
 function AmuletCoin() {
     this.name = "Amulet Coin";
-    this.description = "Gain " + String.fromCharCode(08381) + "100 each battle.";
+    this.description = "Gain " + String.fromCharCode(08381) + "125 each battle.";
     this.img = 'resources/sprites/held_items/amulet_coin.webp';
     this.area = "";
     this.init = true;
     this.effect = (p) => {
-        money += 100;
-        earnedMoney += 100;
+        money += 125;
+        earnedMoney += 125;
     }
 }
 
@@ -17050,7 +17050,7 @@ function ExpertBelt() {
 
 function LoadedDice() {
     this.name = "Loaded Dice";
-    this.description = "Holder multi-hitting attacks hit one more time.";
+    this.description = "Holder's multi-hitting attacks hit one more time.";
     this.img = 'resources/sprites/held_items/loaded_dice.webp';
     this.area = "";
     this.effect = (move, p) => { }
