@@ -19,3 +19,22 @@ This game is meant to be played in any browser, although Chrome, Edge and Safari
 - Over 150 held items
 - Over 380 moves
 - 2 levels of difficulty
+
+
+## Image gallery
+
+![Dozens of Pokémon to choose from](https://zupimages.net/up/22/52/t8pf.png)
+
+![Turn based battles](https://zupimages.net/up/22/52/ij2z.png)
+
+![Full deck customization](https://zupimages.net/up/22/52/jnmc.png)
+
+![Powerful held items](https://zupimages.net/up/22/52/g2u0.png)
+
+![Challenge legendary Pokémon](https://zupimages.net/up/22/52/0ny8.png)
+
+![Almost 400 moves...](https://zupimages.net/up/22/52/kuf6.png)
+
+![...and over 150 items](https://zupimages.net/up/22/52/ubsw.png)
+
+
