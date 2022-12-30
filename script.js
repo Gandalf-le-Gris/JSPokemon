@@ -2417,6 +2417,9 @@ function switchPokemon(ind) {
 
         if (team[activePokemon].currenthp > 0)
             document.getElementById("leftSprite").className += " blink-transform2";
+
+        if (team[n].currenthp > 0)
+            switchesLeft--;
         setTimeout(() => {
             document.getElementById("leftSprite").className = "pokemon-sprite";
             var n = activePokemon;
@@ -2443,8 +2446,6 @@ function switchPokemon(ind) {
             drawHand();
             drawEffects(true);
             drawStats(true);
-            if (pS.currenthp > 0)
-                switchesLeft--;
 
             switchCastform(team[activePokemon]);
             resizeSprites(true, false);
