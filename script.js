@@ -10585,7 +10585,7 @@ function GigaImpact() {
     this.name = "Giga Impact";
     this.type = "normal";
     this.cat = "physical";
-    this.bp = 350;
+    this.bp = 280;
     this.cost = 5;
     this.postEffect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new Recharge());
