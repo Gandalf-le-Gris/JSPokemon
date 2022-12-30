@@ -10350,8 +10350,9 @@ function Flatter() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 1;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) { boostStat(pD, "spattack", 1); applyEffect("confusion", 2, pD); };
-    this.description = "Raises target's special attack by 1 stage and applies 2 stacks of confusion to it.";
+    this.description = "Raises target's special attack by 1 stage and applies 2 stacks of confusion to it. Exhaust.";
     this.priority = function (pA, pD) { return 0; }
 }
 
