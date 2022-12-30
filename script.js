@@ -10150,6 +10150,7 @@ function FakeOut() {
     };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Applies 1 stack of fear to the target. Draw a card. Fails if energy is below 5 upon use.";
     this.priority = function (pA, pD) { return -10 + 18 * (energy + this.cost >= 5); }
+    this.upgradeBan = "cost";
 }
 
 function FakeTears() {
