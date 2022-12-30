@@ -1243,7 +1243,7 @@ function damageCalculator(move, pA, pD) {
     var typeMul = typemultiplier(move, pA, pD);
     var baseDam = 0;
     var crit = false;
-    if (move.crit != undefined && pD.talent !== "Shell Armor")
+    if (move.crit && pD.talent !== "Shell Armor")
         crit = true;
     var atkMul = 1;
     var defMul = 1;
@@ -1255,7 +1255,7 @@ function damageCalculator(move, pA, pD) {
             atkMul = statsChangeMultiplier ** pA.statchanges.attack;
             defMul = statsChangeMultiplier ** pD.statchanges.defense;
         }
-        baseDam = 22 * move.bp * pA.attack * atkMul / (50 * pD.defense * defMul);
+        baseDam = Math.max(1, 22 * move.bp * pA.attack * atkMul / (50 * pD.defense * defMul));
     } else if (move.cat === "special") {
         if (crit) {
             atkMul = Math.max(1, statsChangeMultiplier ** pA.statchanges.spattack);
@@ -1264,7 +1264,7 @@ function damageCalculator(move, pA, pD) {
             atkMul = statsChangeMultiplier ** pA.statchanges.spattack;
             defMul = statsChangeMultiplier ** pD.statchanges.spdefense;
         }
-        baseDam = 22 * move.bp * pA.spattack * atkMul / (50 * pD.spdefense * defMul);
+        baseDam = Math.max(1, 22 * move.bp * pA.spattack * atkMul / (50 * pD.spdefense * defMul));
     }
     if (crit)
         baseDam *= 1.5
@@ -10546,6 +10546,8 @@ function FutureSight() {
     this.cost = 2;
     this.effect = function (move, pA, pD) {
         pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ForeseenAttack());
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ForeseenAttack());
+        pA.draw.splice(Math.floor(Math.random() * pA.draw.length + 1), 0, new ForeseenAttack());
     };
     this.description = "Shuffles 3 Foreseen Attacks into the user's deck.";
     this.priority = function (pA, pD) { return 10 * doesBlock(pD); }
@@ -10555,7 +10557,7 @@ function ForeseenAttack() {
     this.name = "Foreseen Attack";
     this.type = "psychic";
     this.cat = "special";
-    this.bp = 40;
+    this.bp = 30;
     this.cost = 0;
     this.exhaust = true;
     this.effect = function (move, pA, pD) { drawMove(pA, false); };
