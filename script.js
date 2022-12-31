@@ -3265,14 +3265,14 @@ function createOpponent(encounter, fixedOpponent) {
     if (!contains(encounteredPokemon, opponentN) && opponentN !== "nidoqueen")
         encounteredPokemon.push(opponentN);
 
-    adjustBST(opponent, 370 + 10 * area + 110 * world + 100 * (encounter === "boss"), (encounter === "boss"));
+    adjustBST(opponent, 400 + 10 * area + 120 * world + 90 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
         opponent.maxhp = 3 + 2 * world;
         opponent.currenthp = opponent.maxhp;
     }
 
     opponent.moves = [].concat(opponent.opponentMoves[Math.floor(Math.random() * opponent.opponentMoves.length)]);
-    if (area < 10) {
+    if (encounter !== "boss") {
         for (let i = 0; i <= Math.floor(Math.random() * 3); i++) {
             if (opponent.moves.length > 0)
                 opponent.moves.splice(Math.floor(Math.random() * opponent.moves.length), 1);
@@ -7466,7 +7466,7 @@ function adjustBST(pokemon, target, boss) {
     pokemon.spattack = Math.round(pokemon.spattack * ratio);
     pokemon.spdefense = Math.round(pokemon.spdefense * ratio);
     pokemon.speed = Math.round(pokemon.speed * ratio);
-    pokemon.maxhp = (5 + 3 * boss) * pokemon.hp;
+    pokemon.maxhp = Math.round((5 + 2.5 * boss) * pokemon.hp);
     pokemon.currenthp = pokemon.maxhp;
 }
 
@@ -10047,7 +10047,7 @@ function Explosion() {
     this.name = "Explosion";
     this.type = "normal";
     this.cat = "physical";
-    this.bp = 250;
+    this.bp = 300;
     this.cost = 0;
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { dealDamage(9999, pA); };
@@ -10414,7 +10414,7 @@ function FocusBlast() {
     this.name = "Focus Blast";
     this.type = "fighting";
     this.cat = "special";
-    this.bp = 130;
+    this.bp = 135;
     this.cost = 3;
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { if (pA.currenthp < .3 * pA.maxhp) boostStat(pD, "spdefense", -1); };
@@ -11397,8 +11397,9 @@ function LeechSeed() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 2;
+    this.exhaust = true;
     this.effect = function (move, pA, pD) { applyEffect("leech_seed", 10, pD); };
-    this.description = "Drains a little HP from the opponent at the end of every turn for 10 turns. Grass type Pokémon are immune.";
+    this.description = "Drains a little HP from the opponent at the end of every turn for 10 turns. Grass type Pokémon are immune. Exhaust.";
     this.priority = function (pA, pD) { return -1 - 10 * contains(pD.types, "grass") + 3 * (pD.effects.findIndex(e => e.name === "Leech Seed") == -1); }
 }
 
@@ -14151,7 +14152,7 @@ function upgradeMove(move) {
         }
         if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("cost") || move.cost == 0))
             possibleUpgrades.push("cost");
-        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("drain") || move.cat === "status" || move.bp == 0 || move.drain !== undefined))
+        if (!(move.upgradeBan !== undefined && move.upgradeBan.includes("drain") || move.cat === "status" || move.bp == 0 || move.recoil !== undefined))
             possibleUpgrades.push("drain");
 
         if (possibleUpgrades.length > 0) {
@@ -14414,7 +14415,7 @@ function Freeze(stacks) {
 
 function Grounded(stacks) {
     this.name = "Grounded";
-    this.description = "Grounded";
+    this.description = "Grounded\nNullifies all forms of ground type immunities.";
     this.icon = 'resources/sprites/ui_icons/debuff.png';
     this.stacks = stacks;
     this.nonstackable = true;
@@ -18938,7 +18939,7 @@ function Event16() {
         },
         description: "That kid will be no match for your team. You might as well teach them a lesson.",
     })
-    var highAttack = team.findIndex(e => e.attack > 130 || e.spattack > 130);
+    var highAttack = team.findIndex(e => e.attack > 135 || e.spattack > 135);
     if (highAttack >= 0) {
         this.options.push({
             text: "[High attack] Intimidate the kid with your " + team[highAttack].name,
