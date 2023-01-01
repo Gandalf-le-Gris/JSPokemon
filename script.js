@@ -709,11 +709,13 @@ function loadProgress() {
     foundMoves = window.localStorage.getItem('foundMoves') != null ? JSON.parse(window.localStorage.getItem('foundMoves')) : [];
     encounteredPokemon = window.localStorage.getItem('encounteredPokemon') != null ? JSON.parse(window.localStorage.getItem('encounteredPokemon')) : [];
     berriesFound = window.localStorage.getItem('berriesFound') != null ? parseInt(JSON.parse(window.localStorage.getItem('berriesFound'))) : 0;
-    if (berriesFound < 8)
+    if (berriesFound < 8) {
+        berriesFound = 0;
         for (let i of foundItems) {
             if (i.includes("berry"))
                 berriesFound++;
         }
+    }
     unlockedPokemon = -3;
     for (let p of pokemonList) {
         unlockedPokemon += createPokemon(p).unlocked;
