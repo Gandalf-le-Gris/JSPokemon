@@ -10909,7 +10909,7 @@ function HighJumpKick() {
     this.cat = "physical";
     this.bp = 105;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { if (doesBlock(pD) || effectiveMultiplier(this, pD) == 0) dealDamage(150, pA); };
+    this.preEffect = function (move, pA, pD) { if (doesBlock(pD) || effectiveMultiplier(this, pD) == 0) dealDamage(150, pA); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Deals heavy damage to the user if the move is used and doesn't hit.";
     this.priority = function (pA, pD) { return 1 - 11 * (doesBlock(pD) || effectiveMultiplier(this, pD) == 0); }
 }
