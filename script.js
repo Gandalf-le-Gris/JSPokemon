@@ -3267,7 +3267,7 @@ function createOpponent(encounter, fixedOpponent) {
     if (!contains(encounteredPokemon, opponentN) && opponentN !== "nidoqueen")
         encounteredPokemon.push(opponentN);
 
-    adjustBST(opponent, 400 + 10 * area + 120 * world + 90 * (encounter === "boss"), (encounter === "boss"));
+    adjustBST(opponent, 440 + 10 * area + 120 * world + 90 * (encounter === "boss"), (encounter === "boss"));
     if (opponent.talent === "Wonder guard") {
         opponent.maxhp = 3 + 2 * world;
         opponent.currenthp = opponent.maxhp;
@@ -9614,7 +9614,7 @@ function DoubleEdge() {
     this.name = "Double Edge";
     this.type = "normal";
     this.cat = "physical";
-    this.bp = 120;
+    this.bp = 125;
     this.cost = 2;
     this.recoil = .33;
     this.effect = function (move, pA, pD) { };
@@ -16895,7 +16895,7 @@ function Upgrade() {
 
 function PrismScale() {
     this.name = "Prism Scale";
-    this.description = "Holder's attacks deal 20% extra damage if it has at least 4 different move types in its hand.";
+    this.description = "Holder's attacks deal 30% extra damage if it has at least 4 different move types in its hand.";
     this.img = 'resources/sprites/held_items/prism_scale.webp';
     this.area = "boss";
     this.boost = true;
@@ -16904,7 +16904,7 @@ function PrismScale() {
         for (let c of p.hand)
             if (!contains(typesH, c.type))
                 typesH.push(c.type)
-        return 1 + .2 * (typesH.length >= 4);
+        return 1 + .3 * (typesH.length >= 4);
     };
 }
 
