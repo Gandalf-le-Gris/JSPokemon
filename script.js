@@ -7324,7 +7324,7 @@ function Volcanion() {
     this.currenthp = 0;
     this.types = ["fire", "water"];
     this.moves = [];
-    this.opponentMoves = [[createMove("steam_eruption"), createMove("steam_eruption"), createMove("scald"), createMove("hydro_pump"), createMove("flamethrower"), createMove("fire_blast"), createMove("incinerate"), createMove("will_o_wisp"), createMove("flare_blitz"), createMove("sludge_wave")]];
+    this.opponentMoves = [[createMove("steam_eruption"), createMove("steam_eruption"), createMove("scald"), createMove("hydro_pump"), createMove("flamethrower"), createMove("fire_blast"), createMove("incinerate"), createMove("will_o_wisp"), createMove("flame_charge"), createMove("sludge_wave")]];
     this.movepool = ["struggle"];
     this.imgf = 'resources/sprites/pokemon_battle_icons/front/volcanion.gif';
     this.imgb = 'resources/sprites/pokemon_battle_icons/back/volcanion.gif';
@@ -9149,10 +9149,10 @@ function BurningJealousy() {
     this.name = "Burning Jealousy";
     this.type = "fire";
     this.cat = "special";
-    this.bp = 20;
+    this.bp = 30;
     this.cost = 1;
-    this.effect = function (move, pA, pD) { this.bp = 20 * (1 + Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); };
-    this.description = "Deals 20 base power damage to the opponent, plus 20 additional base power for each stat raise on the opponent.";
+    this.effect = function (move, pA, pD) { this.bp =  30 + 20 * (Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); };
+    this.description = "Deals 30 base power damage to the opponent, plus 20 additional base power for each stat raise on the opponent.";
     this.priority = function (pA, pD) { return -2 + (Math.max(0, pD.statchanges.attack) + Math.max(0, pD.statchanges.defense) + Math.max(0, pD.statchanges.spattack) + Math.max(0, pD.statchanges.spdefense) + Math.max(0, pD.statchanges.speed)); }
     this.upgradeBan = "bp";
 }
@@ -11325,9 +11325,9 @@ function LashOut() {
         c += Math.max(0, -pA.statchanges.spattack);
         c += Math.max(0, -pA.statchanges.spdefense);
         c += Math.max(0, -pA.statchanges.speed);
-        this.bp = 20 * (c + 1);
+        this.bp = 30 * (c + 1);
     };
-    this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of negative stat changes on the user.";
+    this.description = "Deals 30 base power damage to the opponent, plus 30 base power multiplied by the amount of negative stat changes on the user.";
     this.priority = function (pA, pD) { return -2 - (Math.min(0, pA.statchanges.attack) + Math.min(0, pA.statchanges.defense) + Math.min(0, pA.statchanges.spattack) + Math.min(0, pA.statchanges.spdefense) + Math.min(0, pA.statchanges.speed)); }
     this.upgradeBan = "bp";
 }
@@ -11387,7 +11387,7 @@ function LeechLife() {
     this.bp = 65;
     this.cost = 2;
     this.recoil = -.5;
-    this.effect = function (move, pA, pD) { this.bp = 65 + 15 * (!contains(pD.types, "poison") && !contains(pD.types, "steel") && !contains(pD.types, "ghost")); };
+    this.effect = function (move, pA, pD) { this.bp = 65 + 20 * (!contains(pD.types, "poison") && !contains(pD.types, "steel") && !contains(pD.types, "ghost")); };
     this.description = "Deals 65 base power damage to the opponent. Heals user for 50% of damage dealt. Damage increases against non poison, steel or ghost types.";
     this.priority = function (pA, pD) { return 0; }
     this.upgradeBan = "bp";
@@ -11399,9 +11399,8 @@ function LeechSeed() {
     this.cat = "status";
     this.bp = 0;
     this.cost = 2;
-    this.exhaust = true;
     this.effect = function (move, pA, pD) { applyEffect("leech_seed", 10, pD); };
-    this.description = "Drains a little HP from the opponent at the end of every turn for 10 turns. Grass type Pokémon are immune. Exhaust.";
+    this.description = "Drains a little HP from the opponent at the end of every turn for 10 turns. Grass type Pokémon are immune.";
     this.priority = function (pA, pD) { return -1 - 10 * contains(pD.types, "grass") + 3 * (pD.effects.findIndex(e => e.name === "Leech Seed") == -1); }
 }
 
@@ -12048,7 +12047,7 @@ function Poltergeist() {
     this.name = "Poltergeist";
     this.type = "ghost";
     this.cat = "physical";
-    this.bp = 110;
+    this.bp = 105;
     this.cost = 2;
     this.fails = false;
     this.effect = function (move, pA, pD) { this.fails = pD.items.length == 0; };
@@ -12104,7 +12103,7 @@ function PowerWhip() {
     this.name = "Power Whip";
     this.type = "grass";
     this.cat = "physical";
-    this.bp = 130;
+    this.bp = 135;
     this.cost = 3;
     this.effect = function (move, pA, pD) { if (pD.effects.findIndex(e => e.name === "Leech Seed") >= 0) dealDamage(-25, pA); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Heals user for 25HP if target is seeded.";
@@ -12409,7 +12408,7 @@ function RockSmash() {
     this.cost = 1;
     this.effect = function (move, pA, pD) { this.bp = 40 + 40 * (pD.statchanges.defense > 0); };
     this.description = "Deals 40 base power damage to the opponent. Base power doubles if target's defense was raised.";
-    this.priority = function (pA, pD) { return 0; }
+    this.priority = function (pA, pD) { return 3 * (pD.statchanges.defense > 0); }
     this.upgradeBan = "bp";
 }
 
@@ -12433,7 +12432,7 @@ function RockThrow() {
     this.effect = function (move, pA, pD) { };
     this.postEffect = function (move, pA, pD) { setWeather("sandstorm", 1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Whips up a sandstorm until the end of the turn if not in a sandstorm.";
-    this.priority = function (pA, pD) { return 0; }
+    this.priority = function (pA, pD) { return (weather == undefined || weather.name !== "Sandstorm"); }
 }
 
 function RockTomb() {
@@ -12508,10 +12507,10 @@ function SacredSword() {
     this.name = "Sacred Sword";
     this.type = "fighting";
     this.cat = "physical";
-    this.bp = 85;
+    this.bp = 90;
     this.cost = 2;
-    this.effect = function (move, pA, pD) { this.bp = 85 * statsChangeMultiplier ** pD.statchanges.defense; };
-    this.description = "Deals 85 base power damage to the opponent. Base power varies with the target's defense stat changes.";
+    this.effect = function (move, pA, pD) { this.bp = 90 * statsChangeMultiplier ** pD.statchanges.defense; };
+    this.description = "Deals 90 base power damage to the opponent. Base power varies with the target's defense stat changes.";
     this.priority = function (pA, pD) { return pA.statchanges.defense; }
     this.upgradeBan = "bp";
 }
@@ -13145,7 +13144,7 @@ function SteelBeam() {
     this.name = "Steel Beam";
     this.type = "steel";
     this.cat = "special";
-    this.bp = 200;
+    this.bp = 220;
     this.cost = 3;
     this.recoil = 0;
     this.effect = function (move, pA, pD) {
@@ -13181,7 +13180,7 @@ function StickyWeb() {
             }
         }
     };
-    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and if the Pokémon is grounded.";
+    this.description = "Sets a sticky web around the opposing team to reduce their speed at the end of each turn if it hasn't been lowered already and if the Pokémon is on the ground.";
     this.priority = function (pA, pD) { return 0; }
 }
 
@@ -13217,9 +13216,9 @@ function StoredPower() {
         c += Math.max(0, pA.statchanges.spattack);
         c += Math.max(0, pA.statchanges.spdefense);
         c += Math.max(0, pA.statchanges.speed);
-        this.bp = 20 * (c + 1);
+        this.bp = 30 + 20 * c;
     };
-    this.description = "Deals 20 base power damage to the opponent, plus 20 base power multiplied by the amount of positive stat changes on the user.";
+    this.description = "Deals 30 base power damage to the opponent, plus 20 base power multiplied by the amount of positive stat changes on the user.";
     this.priority = function (pA, pD) { return -2 + (Math.max(0, pA.statchanges.attack) + Math.max(0, pA.statchanges.defense) + Math.max(0, pA.statchanges.spattack) + Math.max(0, pA.statchanges.spdefense) + Math.max(0, pA.statchanges.speed)); }
     this.upgradeBan = "bp";
 }
