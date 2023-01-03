@@ -7468,7 +7468,7 @@ function adjustBST(pokemon, target, boss) {
     pokemon.spattack = Math.round(pokemon.spattack * ratio);
     pokemon.spdefense = Math.round(pokemon.spdefense * ratio);
     pokemon.speed = Math.round(pokemon.speed * ratio);
-    pokemon.maxhp = Math.round((5 + 2.5 * boss) * pokemon.hp);
+    pokemon.maxhp = Math.round((5 + 3 * boss) * pokemon.hp);
     pokemon.currenthp = pokemon.maxhp;
 }
 
