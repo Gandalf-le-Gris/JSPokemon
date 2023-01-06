@@ -1800,6 +1800,8 @@ function battleEncounter(encounter, fixedPokemon, lootAmount) {
 
     writePokemonTitle();
     resizeSprites(true, true);
+    refreshHealthBar(true);
+    refreshHealthBar(false);
 
     actions = document.createElement('div');
     actions.className = "action-section";
@@ -2435,6 +2437,8 @@ function switchPokemon(ind) {
             document.getElementById("switchImage" + n).src = pS.imgf;
             document.getElementById("switchName" + n).innerHTML = pS.name;
             document.getElementById("switchHP" + n).value = pS.currenthp;
+            let ratio = pS.currenthp / pS.maxhp;
+            document.getElementById("switchHP" + n).setAttribute("data-hp-color", ratio < .2 ? "red" : (ratio < .5 ? "yellow" : "green"));
             document.getElementById("switchHP" + n).max = pS.maxhp;
             document.getElementById("switchHPText" + n).innerHTML = pS.currenthp + "/" + pS.maxhp;
             document.getElementById("switch" + n).setAttribute("data-switch-title", getMoveDescription(pS));
@@ -2442,6 +2446,8 @@ function switchPokemon(ind) {
             document.getElementById("leftSprite").src = pA.imgb;
             document.getElementById("leftName").innerHTML = pA.name;
             document.getElementById("leftHP").value = pA.currenthp;
+            ratio = pA.currenthp / pA.maxhp;
+            document.getElementById("leftHP").setAttribute("data-hp-color", ratio < .2 ? "red" : (ratio < .5 ? "yellow" : "green"));
             document.getElementById("leftHP").max = pA.maxhp;
             document.getElementById("leftHPText").innerHTML = pA.currenthp + "/" + pA.maxhp;
 
@@ -2482,6 +2488,8 @@ function switchPokemon(ind) {
 function drawHealthBar(n) {
     var p = team[switchInd[n - 1]];
     document.getElementById("switchHP" + n).value = p.currenthp;
+    let ratio = p.currenthp / p.maxhp;
+    document.getElementById("switchHP" + n).setAttribute("data-hp-color", ratio < .2 ? "red" : (ratio < .5 ? "yellow" : "green"));
     document.getElementById("switchHP" + n).max = p.maxhp;
     document.getElementById("switchHPText" + n).innerHTML = p.currenthp + "/" + p.maxhp;
 }
@@ -2607,10 +2615,14 @@ function refreshIconCounts() {
 function refreshHealthBar(p) {
     if (!p) {
         document.getElementById("rightHP").value = opponent.currenthp;
+        let ratio = opponent.currenthp / opponent.maxhp;
+        document.getElementById("rightHP").setAttribute("data-hp-color", ratio < .2 ? "red" : (ratio < .5 ? "yellow" : "green"));
         document.getElementById("rightHP").max = opponent.maxhp;
         document.getElementById("rightHPText").innerHTML = opponent.currenthp + "/" + opponent.maxhp;
     } else {
         document.getElementById("leftHP").value = team[activePokemon].currenthp;
+        let ratio = team[activePokemon].currenthp / team[activePokemon].maxhp;
+        document.getElementById("leftHP").setAttribute("data-hp-color", ratio < .2 ? "red" : (ratio < .5 ? "yellow" : "green"));
         document.getElementById("leftHP").max = team[activePokemon].maxhp;
         document.getElementById("leftHPText").innerHTML = team[activePokemon].currenthp + "/" + team[activePokemon].maxhp;
     }

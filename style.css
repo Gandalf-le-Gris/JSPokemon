@@ -342,6 +342,7 @@ button.start:hover {
     border-top-left-radius: 1.2vh;
     border-top-right-radius: 1.2vh;
     transition: background .3s;
+    box-shadow: 0px 0px 4px #222;
 }
 
 .pokemon-hp {
@@ -350,25 +351,53 @@ button.start:hover {
     width: 100%;
     border-radius: 1.2vh;
     border: none;
+    outline: solid 1px #444;
 }
 
     .pokemon-hp::-webkit-progress-bar {
         border-radius: 1.2vh;
-        transition: padding-left .8s;
+        transition: padding-left .8s, color .8s;
         padding-left: var(--value);
     }
 
     .pokemon-hp::-webkit-progress-value {
         border-radius: 1.2vh;
         background: green;
-        transition: width .8s;
+        transition: width .8s, background .8s;
+    }
+
+    .pokemon-hp[data-hp-color=green]::-webkit-progress-value {
+        background: green;
+    }
+
+    .pokemon-hp[data-hp-color=yellow]::-webkit-progress-value {
+        background: #eec944;
+    }
+
+    .pokemon-hp[data-hp-color=red]::-webkit-progress-value {
+        background: #eb3b00;
     }
 
     .pokemon-hp::-moz-progress-bar {
         border-radius: 1.2vh;
         background: green;
-        transition: width .8s;
+        transition: all .8s;
     }
+
+    .pokemon-hp[data-hp-color=green]::-moz-progress-bar {
+        background: green;
+    }
+
+    .pokemon-hp[data-hp-color=yellow]::-moz-progress-bar {
+        background: #eec944;
+    }
+
+    .pokemon-hp[data-hp-color=red]::-moz-progress-bar {
+        background: #eb3b00;
+    }
+
+
+
 
 .pokemon-name {
     font-weight: bold;
@@ -2489,12 +2518,12 @@ input:checked + .slider:before {
 
 @keyframes shimmer {
     100% {
-        -webkit-mask-position: left
+        -webkit-mask-position: left;
     }
 }
 
 @-webkit-keyframes shimmer {
     100% {
-        -webkit-mask-position: left
+        -webkit-mask-position: left;
     }
 }
