@@ -12442,7 +12442,7 @@ function RockThrow() {
     this.bp = 40;
     this.cost = 1;
     this.effect = function (move, pA, pD) { };
-    this.postEffect = function (move, pA, pD) { setWeather("sandstorm", 1); };
+    this.postEffect = function (move, pA, pD) { if (weather == undefined || weather.name !== "Sandstorm") setWeather("sandstorm", 1); };
     this.description = "Deals " + this.bp + " base power damage to the opponent. Whips up a sandstorm until the end of the turn if not in a sandstorm.";
     this.priority = function (pA, pD) { return (weather == undefined || weather.name !== "Sandstorm"); }
 }
@@ -13416,10 +13416,10 @@ function Swift() {
     this.name = "Swift";
     this.type = "normal";
     this.cat = "special";
-    this.bp = 20;
+    this.bp = 30;
     this.cost = 0;
-    this.postEffect = function (move, pA, pD) { drawMove(pA, false); };
-    this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card.";
+    this.postEffect = function (move, pA, pD) { if (drawn < 1) drawMove(pA, false); };
+    this.description = "Deals " + this.bp + " base power damage to the opponent. Draw a card if no card was drawn this turn.";
     this.priority = function (pA, pD) { return 0; }
 }
 

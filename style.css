@@ -905,8 +905,9 @@ button.start:hover {
 }
 
 .item-sprite {
-    max-height: 5vh;
+    max-height: 4vh;
     width: auto;
+    max-width: 4vh;
     transition: transform .2s;
 }
 
