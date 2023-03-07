@@ -5,6 +5,8 @@ This project is a Slay the Spire-like Pokémon fan game, created by a software e
 
 ## How to play
 
+Go to https://pokeunotor.vercel.app/ or:
+
 1. Download the archive
 2. Extract its content
 3. Launch game.html
